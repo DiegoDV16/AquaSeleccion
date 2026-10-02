@@ -5,6 +5,7 @@ import RutaProtegida from './RutaProtegida.jsx';
 import { PERMISOS_POR_MODULO as PERMISOS } from '../mock/catalogoRoles.js';
 
 import Login from '../pages/auth/Login.jsx';
+import Postular from '../pages/public/Postular.jsx';
 import ModuloPendiente from '../pages/ModuloPendiente.jsx';
 import SinPermisos from '../pages/SinPermisos.jsx';
 import NotFound from '../pages/NotFound.jsx';
@@ -24,6 +25,7 @@ export default function AppRouter() {
       {/* ------------------------------- Publicas ------------------------------- */}
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/postular" element={<Postular />} />
       <Route path="/sin-permisos" element={<SinPermisos />} />
 
       {/* --------------------------- Layout del monolito ------------------------- */}
