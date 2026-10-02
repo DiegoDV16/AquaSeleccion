@@ -1,0 +1,592 @@
+/* ==========================================================================
+   AquaSeleccion - Paleta corporativa sobria (industria acuicola / salmobras)
+   Se sobreescriben las variables CSS de Bootstrap 5 para mantener coherencia
+   visual en toda la aplicacion sin depender de frameworks externos.
+   ========================================================================== */
+
+:root {
+  /* Paleta institucional AquaChile */
+  --aqua-primary: #0f4c5c;
+  --aqua-primary-dark: #093642;
+  --aqua-primary-light: #1b7f8e;
+  --aqua-accent: #2f9aa8;
+  --aqua-surface: #f4f7f8;
+  --aqua-surface-alt: #e9eff1;
+  --aqua-border: #d8e2e6;
+  --aqua-success: #2e7d5b;
+  --aqua-warning: #b7791f;
+  --aqua-danger: #b3261e;
+  --aqua-ink: #1d2b30;
+  --aqua-muted: #5b6f76;
+  --aqua-sidebar-w: 264px;
+  --aqua-sidebar-w-collapsed: 76px;
+  --aqua-navbar-h: 60px;
+
+  /* Bootstrap 5: se reasignan los tokens nativos */
+  --bs-primary: var(--aqua-primary);
+  --bs-primary-rgb: 15, 76, 92;
+  --bs-secondary-color: var(--aqua-muted);
+  --bs-body-color: var(--aqua-ink);
+  --bs-body-bg: var(--aqua-surface);
+  --bs-border-color: var(--aqua-border);
+  --bs-link-color: var(--aqua-primary-light);
+  --bs-link-hover-color: var(--aqua-primary);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--aqua-surface);
+  color: var(--aqua-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background-color: var(--aqua-surface);
+}
+
+/* ----------------------------- Navbar ----------------------------------- */
+.aqua-navbar {
+  background-color: var(--aqua-primary-dark);
+  box-shadow: 0 2px 6px rgba(9, 54, 66, 0.25);
+  min-height: var(--aqua-navbar-h);
+  z-index: 1040;
+}
+
+.aqua-navbar .navbar-brand,
+.aqua-navbar .nav-link,
+.aqua-navbar .navbar-text {
+  color: #eaf3f5;
+}
+
+.aqua-brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(140deg, var(--aqua-primary-light), var(--aqua-accent));
+  color: #fff;
+  font-size: 1.15rem;
+}
+
+.aqua-role-select {
+  min-width: 210px;
+  background-color: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--aqua-border);
+  font-size: 0.875rem;
+  padding: 0.3rem 2rem 0.3rem 0.6rem;
+  color: var(--aqua-ink);
+}
+
+.aqua-role-select:focus {
+  box-shadow: 0 0 0 0.2rem rgba(47, 154, 168, 0.35);
+  border-color: var(--aqua-accent);
+}
+
+.aqua-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: var(--aqua-accent);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ----------------------------- Sidebar ---------------------------------- */
+.aqua-sidebar {
+  width: var(--aqua-sidebar-w);
+  flex: 0 0 var(--aqua-sidebar-w);
+  background-color: var(--aqua-primary-dark);
+  color: #cfe3e7;
+  min-height: calc(100vh - var(--aqua-navbar-h));
+  transition: width 0.2s ease, flex-basis 0.2s ease;
+}
+
+.aqua-sidebar .sidebar-section-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #7ba3ab;
+  padding: 0.9rem 1.1rem 0.35rem;
+  font-weight: 600;
+}
+
+.aqua-sidebar .nav-link {
+  color: #cfe3e7;
+  border-radius: 6px;
+  margin: 0 0.6rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.aqua-sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+.aqua-sidebar .nav-link.active {
+  background-color: var(--aqua-primary-light);
+  color: #fff;
+  font-weight: 600;
+}
+
+.aqua-sidebar .nav-link .bi {
+  font-size: 1rem;
+  width: 1.15rem;
+  text-align: center;
+  flex: 0 0 1.15rem;
+}
+
+.aqua-sidebar .badge {
+  background-color: rgba(255, 255, 255, 0.18);
+  font-weight: 500;
+}
+
+/* Sidebar colapsable (escritorio) */
+.aqua-sidebar.collapsed {
+  width: var(--aqua-sidebar-w-collapsed);
+  flex-basis: var(--aqua-sidebar-w-collapsed);
+}
+
+.aqua-sidebar.collapsed .nav-link span,
+.aqua-sidebar.collapsed .sidebar-section-title,
+.aqua-sidebar.collapsed .sidebar-footer-text {
+  display: none;
+}
+
+.aqua-sidebar.collapsed .nav-link {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.aqua-sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.85rem 1.1rem;
+  font-size: 0.78rem;
+  color: #7ba3ab;
+}
+
+/* ------------------------------ Contenido ------------------------------- */
+.aqua-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 1.5rem 0 3rem;
+}
+
+.aqua-page-header {
+  background-color: #fff;
+  border: 1px solid var(--aqua-border);
+  border-left: 4px solid var(--aqua-primary-light);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.aqua-page-header h1 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--aqua-primary-dark);
+}
+
+.aqua-page-header p {
+  margin: 0.2rem 0 0;
+  font-size: 0.86rem;
+  color: var(--aqua-muted);
+}
+
+.aqua-card {
+  background-color: #fff;
+  border: 1px solid var(--aqua-border);
+  border-radius: 8px;
+}
+
+.aqua-card .card-header {
+  background-color: var(--aqua-surface-alt);
+  border-bottom: 1px solid var(--aqua-border);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.7rem 1rem;
+}
+
+/* Tarjetas de metricas del dashboard */
+.aqua-stat {
+  background-color: #fff;
+  border: 1px solid var(--aqua-border);
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.aqua-stat .stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex: 0 0 44px;
+}
+
+.aqua-stat .stat-value {
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--aqua-primary-dark);
+}
+
+.aqua-stat .stat-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--aqua-muted);
+}
+
+.aqua-stat .stat-foot {
+  font-size: 0.78rem;
+  color: var(--aqua-muted);
+}
+
+.bg-tint-primary {
+  background-color: rgba(27, 127, 142, 0.14);
+  color: var(--aqua-primary-light);
+}
+
+.bg-tint-success {
+  background-color: rgba(46, 125, 91, 0.14);
+  color: var(--aqua-success);
+}
+
+.bg-tint-warning {
+  background-color: rgba(183, 121, 31, 0.16);
+  color: var(--aqua-warning);
+}
+
+.bg-tint-danger {
+  background-color: rgba(179, 38, 30, 0.13);
+  color: var(--aqua-danger);
+}
+
+.bg-tint-info {
+  background-color: rgba(47, 154, 168, 0.16);
+  color: var(--aqua-primary-light);
+}
+
+/* Tablas */
+.aqua-table {
+  font-size: 0.87rem;
+}
+
+.aqua-table thead th {
+  background-color: var(--aqua-surface-alt);
+  color: var(--aqua-primary-dark);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  border-bottom: 2px solid var(--aqua-border);
+  white-space: nowrap;
+}
+
+.aqua-table tbody td {
+  vertical-align: middle;
+}
+
+.aqua-table tbody tr:hover {
+  background-color: #f7fbfb;
+}
+
+/* Formularios */
+.aqua-form label,
+.aqua-form .form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--aqua-primary-dark);
+  margin-bottom: 0.3rem;
+}
+
+.aqua-form .form-control,
+.aqua-form .form-select {
+  border-color: var(--aqua-border);
+  font-size: 0.9rem;
+}
+
+.aqua-form .form-control:focus,
+.aqua-form .form-select:focus {
+  border-color: var(--aqua-accent);
+  box-shadow: 0 0 0 0.2rem rgba(47, 154, 168, 0.22);
+}
+
+.aqua-form .form-text {
+  font-size: 0.76rem;
+}
+
+/* Botones corporativos (extiende Bootstrap sin reemplazar .btn) */
+.btn-aqua {
+  background-color: var(--aqua-primary);
+  border: 1px solid var(--aqua-primary);
+  color: #fff;
+  font-weight: 500;
+}
+
+.btn-aqua:hover,
+.btn-aqua:focus {
+  background-color: var(--aqua-primary-dark);
+  border-color: var(--aqua-primary-dark);
+  color: #fff;
+}
+
+.btn-outline-aqua {
+  border: 1px solid var(--aqua-primary-light);
+  color: var(--aqua-primary-light);
+  font-weight: 500;
+  background-color: transparent;
+}
+
+.btn-outline-aqua:hover,
+.btn-outline-aqua:focus {
+  background-color: var(--aqua-primary-light);
+  color: #fff;
+}
+
+.btn-soft {
+  background-color: var(--aqua-surface-alt);
+  border: 1px solid var(--aqua-border);
+  color: var(--aqua-primary-dark);
+  font-weight: 500;
+}
+
+.btn-soft:hover,
+.btn-soft:focus {
+  background-color: #dbe6e9;
+  color: var(--aqua-primary-dark);
+  border-color: var(--aqua-accent);
+}
+
+/* Estados (badges) */
+.badge-estado {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.35em 0.65em;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.badge-estado-pendiente {
+  background-color: #fdf3e2;
+  color: var(--aqua-warning);
+  border: 1px solid #f0dcb6;
+}
+
+.badge-estado-proceso {
+  background-color: #e4f1f3;
+  color: var(--aqua-primary-light);
+  border: 1px solid #c3dfe3;
+}
+
+.badge-estado-finalizada {
+  background-color: #e6f2ec;
+  color: var(--aqua-success);
+  border: 1px solid #c2e0d0;
+}
+
+.badge-estado-apto {
+  background-color: #e6f2ec;
+  color: var(--aqua-success);
+  border: 1px solid #c2e0d0;
+}
+
+.badge-estado-noapto {
+  background-color: #fbe9e8;
+  color: var(--aqua-danger);
+  border: 1px solid #f0cbc8;
+}
+
+.badge-estado-observaciones {
+  background-color: #fdf3e2;
+  color: var(--aqua-warning);
+  border: 1px solid #f0dcb6;
+}
+
+.badge-estado-activo {
+  background-color: #e6f2ec;
+  color: var(--aqua-success);
+  border: 1px solid #c2e0d0;
+}
+
+.badge-estado-inactivo {
+  background-color: #eceff1;
+  color: #62727a;
+  border: 1px solid #d5dde1;
+}
+
+.badge-tipo {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.3em 0.6em;
+  border-radius: 4px;
+}
+
+.badge-tipo-externa {
+  background-color: #e9eefb;
+  color: #3b5bdb;
+  border: 1px solid #ccd6f7;
+}
+
+.badge-tipo-interna {
+  background-color: #f3ecfb;
+  color: #7048b5;
+  border: 1px solid #ddcdf3;
+}
+
+/* Vistas publicas / auth */
+.aqua-hero {
+  background: linear-gradient(150deg, var(--aqua-primary-dark) 0%, var(--aqua-primary) 55%, var(--aqua-primary-light) 100%);
+  color: #eaf3f5;
+}
+
+.aqua-hero h1 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.aqua-hero .lead {
+  color: #cfe3e7;
+  font-weight: 300;
+}
+
+.aqua-feature {
+  background-color: #fff;
+  border: 1px solid var(--aqua-border);
+  border-radius: 8px;
+  height: 100%;
+}
+
+.aqua-feature .feature-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  margin-bottom: 0.7rem;
+}
+
+.aqua-footer {
+  background-color: var(--aqua-primary-dark);
+  color: #a8c4ca;
+  font-size: 0.82rem;
+}
+
+.aqua-footer a {
+  color: #d7eaee;
+  text-decoration: none;
+}
+
+.aqua-footer a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.aqua-dropzone {
+  border: 2px dashed var(--aqua-border);
+  border-radius: 8px;
+  background-color: #fbfdfd;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.aqua-dropzone:hover,
+.aqua-dropzone.is-dragover {
+  border-color: var(--aqua-accent);
+  background-color: #f2f9fa;
+}
+
+.aqua-dropzone .bi-paperclip {
+  font-size: 1.9rem;
+  color: var(--aqua-primary-light);
+}
+
+.aqua-timeline {
+  border-left: 2px solid var(--aqua-border);
+  margin-left: 0.5rem;
+  padding-left: 1.1rem;
+}
+
+.aqua-timeline-item {
+  position: relative;
+  padding-bottom: 1.1rem;
+}
+
+.aqua-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -1.42rem;
+  top: 0.3rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--aqua-accent);
+  border: 2px solid #fff;
+}
+
+.text-muted-aqua {
+  color: var(--aqua-muted) !important;
+}
+
+.bg-aqua-primary {
+  background-color: var(--aqua-primary) !important;
+}
+
+.text-aqua-primary {
+  color: var(--aqua-primary) !important;
+}
+
+.rounded-8 {
+  border-radius: 8px;
+}
+
+@media (max-width: 991.98px) {
+  .aqua-sidebar {
+    min-height: auto;
+    width: 100%;
+    flex: 0 0 100%;
+  }
+
+  .aqua-sidebar .nav-link {
+    margin: 0 0.35rem;
+  }
+
+  .aqua-main {
+    padding-top: 1rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .aqua-role-select {
+    min-width: 150px;
+  }
+}
