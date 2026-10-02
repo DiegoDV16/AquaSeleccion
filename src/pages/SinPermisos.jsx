@@ -1,0 +1,42 @@
+import { Link, useLocation } from 'react-router-dom';
+
+import { useAuth } from '../context/AuthContext.js';
+
+/** Vista mostrada cuando un rol intenta abrir un modulo que no le corresponde. */
+export default function SinPermisos() {
+  const { rol, usuario } = useAuth();
+  const location = useLocation();
+  const solicitado = location.state?.solicitado;
+
+  return (
+    <div className="min-vh-100 d-flex flex-column bg-light">
+      <div className="container py-5 flex-grow-1 d-flex align-items-center justify-content-center">
+        <div className="aqua-card text-center" style={{ maxWidth: 620 }}>
+          <div className="card-body p-5">
+            <span className="stat-icon bg-tint-danger mx-auto mb-3" style={{ width: 62, height: 62, fontSize: '1.8rem' }} aria-hidden="true">
+              <i className="bi bi-shield-lock" />
+            </span>
+            <h1 className="h5 fw-semibold mb-2">Acceso restringido</h1>
+            <p className="text-muted-aqua small mb-1">
+              Tu sesión activa con rol <strong>{rol.nombre}</strong>
+              {usuario ? ` (${usuario.nombre})` : ''} no tiene permiso para abrir este módulo.
+            </p>
+            {solicitado && (
+              <p className="text-muted-aqua small mb-3">
+                Ruta solicitada: <code>{solicitado}</code>
+              </p>
+            )}
+            <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+              <Link to={rol.rutaInicio ?? '/login'} className="btn btn-aqua btn-sm">
+                Ir a mi módulo
+              </Link>
+              <Link to="/login" className="btn btn-soft btn-sm">
+                Cambiar de rol
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
