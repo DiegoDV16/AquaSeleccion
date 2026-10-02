@@ -16,13 +16,15 @@ import AnalistaCandidatos from '../pages/analista/AnalistaCandidatos.jsx';
 import AnalistaSolicitudes from '../pages/analista/AnalistaSolicitudes.jsx';
 import AnalistaNuevaSolicitud from '../pages/analista/AnalistaNuevaSolicitud.jsx';
 
-import ModuloPendiente from '../pages/ModuloPendiente.jsx';
+import EvaluadorMisSolicitudes from '../pages/evaluador/EvaluadorMisSolicitudes.jsx';
+import EvaluadorEvaluar from '../pages/evaluador/EvaluadorEvaluar.jsx';
+
 import SinPermisos from '../pages/SinPermisos.jsx';
 import NotFound from '../pages/NotFound.jsx';
 
 /**
  * AppRouter
- * Tabla de rutas del monolito (react-router-dom v6).
+ * Tabla de rutas unica del monolito (react-router-dom v6).
  *
  *  - Publicas ....... /, /login, /postular, /sin-permisos, * (404)
  *  - Protegidas ..... cada modulo se monta dentro de AppLayout (Navbar +
@@ -118,10 +120,26 @@ export default function AppRouter() {
 
         {/* Modulo Profesional Evaluador */}
         <Route
+          path="/evaluador"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.EVALUADOR}>
+              <Navigate to="/evaluador/mis-solicitudes" replace />
+            </RutaProtegida>
+          }
+        />
+        <Route
           path="/evaluador/mis-solicitudes"
           element={
             <RutaProtegida rolesPermitidos={PERMISOS.EVALUADOR}>
-              <ModuloPendiente modulo="Modulo Evaluador" />
+              <EvaluadorMisSolicitudes />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/evaluador/evaluar/:id"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.EVALUADOR}>
+              <EvaluadorEvaluar />
             </RutaProtegida>
           }
         />
