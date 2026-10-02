@@ -12,6 +12,10 @@ import AdminPostularInterno from '../pages/admin/AdminPostularInterno.jsx';
 import AdminUsuarios from '../pages/admin/AdminUsuarios.jsx';
 import AdminHistorial from '../pages/admin/AdminHistorial.jsx';
 
+import AnalistaCandidatos from '../pages/analista/AnalistaCandidatos.jsx';
+import AnalistaSolicitudes from '../pages/analista/AnalistaSolicitudes.jsx';
+import AnalistaNuevaSolicitud from '../pages/analista/AnalistaNuevaSolicitud.jsx';
+
 import ModuloPendiente from '../pages/ModuloPendiente.jsx';
 import SinPermisos from '../pages/SinPermisos.jsx';
 import NotFound from '../pages/NotFound.jsx';
@@ -80,10 +84,34 @@ export default function AppRouter() {
 
         {/* Modulo Analista de Reclutamiento */}
         <Route
+          path="/analista"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ANALISTA}>
+              <Navigate to="/analista/candidatos" replace />
+            </RutaProtegida>
+          }
+        />
+        <Route
           path="/analista/candidatos"
           element={
             <RutaProtegida rolesPermitidos={PERMISOS.ANALISTA}>
-              <ModuloPendiente modulo="Modulo Analista" />
+              <AnalistaCandidatos />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/analista/solicitudes"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ANALISTA}>
+              <AnalistaSolicitudes />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/analista/nueva-solicitud"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ANALISTA}>
+              <AnalistaNuevaSolicitud />
             </RutaProtegida>
           }
         />
