@@ -6,6 +6,12 @@ import { PERMISOS_POR_MODULO as PERMISOS } from '../mock/catalogoRoles.js';
 
 import Login from '../pages/auth/Login.jsx';
 import Postular from '../pages/public/Postular.jsx';
+
+import AdminDashboard from '../pages/admin/AdminDashboard.jsx';
+import AdminPostularInterno from '../pages/admin/AdminPostularInterno.jsx';
+import AdminUsuarios from '../pages/admin/AdminUsuarios.jsx';
+import AdminHistorial from '../pages/admin/AdminHistorial.jsx';
+
 import ModuloPendiente from '../pages/ModuloPendiente.jsx';
 import SinPermisos from '../pages/SinPermisos.jsx';
 import NotFound from '../pages/NotFound.jsx';
@@ -14,7 +20,7 @@ import NotFound from '../pages/NotFound.jsx';
  * AppRouter
  * Tabla de rutas del monolito (react-router-dom v6).
  *
- *  - Publicas ....... /, /login, /sin-permisos, * (404)
+ *  - Publicas ....... /, /login, /postular, /sin-permisos, * (404)
  *  - Protegidas ..... cada modulo se monta dentro de AppLayout (Navbar +
  *                     Sidebar + Outlet) y se envuelve en RutaProtegida con
  *                     los roles autorizados para ese modulo.
@@ -32,10 +38,42 @@ export default function AppRouter() {
       <Route element={<AppLayout />}>
         {/* Modulo Administrador */}
         <Route
+          path="/admin"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+              <Navigate to="/admin/dashboard" replace />
+            </RutaProtegida>
+          }
+        />
+        <Route
           path="/admin/dashboard"
           element={
             <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
-              <ModuloPendiente modulo="Modulo Administrador" />
+              <AdminDashboard />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/admin/postular-interno"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+              <AdminPostularInterno />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/admin/usuarios"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+              <AdminUsuarios />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/admin/historial"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+              <AdminHistorial />
             </RutaProtegida>
           }
         />
