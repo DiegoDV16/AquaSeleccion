@@ -4,7 +4,7 @@ import PageHeader from '../../components/ui/PageHeader.jsx';
 import StatCard from '../../components/ui/StatCard.jsx';
 import EstadoBadge from '../../components/ui/EstadoBadge.jsx';
 import { useAuth } from '../../context/AuthContext.js';
-import { ACTIVIDAD_RECIENTE, TOP_CARGOS, metricasDashboard } from '../../mock/metricas.js';
+import { ACTIVIDAD_RECIENTE, TOP_CARGOS, distribucionPorEstado, distribucionPorFamilia, metricasDashboard } from '../../mock/metricas.js';
 import { SOLICITUDES } from '../../mock/solicitudes.js';
 import { obtenerCandidato, nombreCompleto } from '../../mock/candidatos.js';
 import { obtenerUsuario } from '../../mock/usuarios.js';
@@ -14,8 +14,19 @@ import { obtenerCargo } from '../../mock/cargos.js';
 export default function AdminDashboard() {
   const { usuario } = useAuth();
   const metricas = metricasDashboard();
+  const porEstado = distribucionPorEstado();
+  const porFamilia = distribucionPorFamilia();
 
   const solicitudesRecientes = SOLICITUDES.slice(0, 5);
+  const totalSolicitudes = SOLICITUDES.length;
+
+  /** Ancho porcentual de cada barra de distribucion, respecto al mayor valor. */
+  function anchoBarra(total, referencia) {
+    return `${Math.round((total / referencia) * 100)}%`;
+  }
+
+  const maxFamilia = Math.max(...porFamilia.map((familia) => familia.total), 1);
+  const maxDemanda = Math.max(...TOP_CARGOS.map((item) => item.postulaciones), 1);
 
   return (
     <>
@@ -135,55 +146,112 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Top cargos */}
-        <div className="col-12">
-          <div className="aqua-card">
+        {/* Distribucion de solicitudes por estado */}
+        <div className="col-lg-4">
+          <div className="aqua-card h-100">
+            <div className="card-header">
+              <i className="bi bi-pie-chart me-2" aria-hidden="true" />
+              Solicitudes por estado
+            </div>
+            <div className="card-body">
+              {porEstado.map((item) => (
+                <div className="dist-row" key={item.clave}>
+                  <div className="dist-head">
+                    <span className="dist-name">{item.nombre}</span>
+                    <span className="dist-value">{item.total}</span>
+                  </div>
+                  <div
+                    className="dist-bar"
+                    role="progressbar"
+                    aria-label={`${item.nombre}: ${item.total} solicitudes`}
+                    aria-valuenow={item.total}
+                    aria-valuemin={0}
+                    aria-valuemax={totalSolicitudes}
+                  >
+                    <span style={{ width: anchoBarra(item.total, totalSolicitudes), backgroundColor: item.color }} />
+                  </div>
+                </div>
+              ))}
+              <p className="text-muted-aqua mb-0 mt-3" style={{ fontSize: '0.78rem' }}>
+                <i className="bi bi-info-circle me-1" aria-hidden="true" />
+                {totalSolicitudes} solicitudes en total dentro del proceso simulado.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Postulaciones por familia de cargo */}
+        <div className="col-lg-4">
+          <div className="aqua-card h-100">
+            <div className="card-header">
+              <i className="bi bi-diagram-3 me-2" aria-hidden="true" />
+              Postulaciones por familia
+            </div>
+            <div className="card-body">
+              {porFamilia.map((familia) => (
+                <div className="dist-row" key={familia.clave}>
+                  <div className="dist-head">
+                    <span className="dist-name">{familia.nombre}</span>
+                    <span className="dist-value">{familia.total}</span>
+                  </div>
+                  <div
+                    className="dist-bar"
+                    role="progressbar"
+                    aria-label={`${familia.nombre}: ${familia.total} postulaciones`}
+                    aria-valuenow={familia.total}
+                    aria-valuemin={0}
+                    aria-valuemax={maxFamilia}
+                  >
+                    <span
+                      style={{
+                        width: anchoBarra(familia.total, maxFamilia),
+                        backgroundColor: 'var(--aqua-solid-info)',
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Cargos con mayor demanda */}
+        <div className="col-lg-4">
+          <div className="aqua-card h-100">
             <div className="card-header">
               <i className="bi bi-graph-up-arrow me-2" aria-hidden="true" />
               Cargos con mayor demanda
             </div>
-            <div className="table-responsive">
-              <table className="table aqua-table mb-0">
-                <thead>
-                  <tr>
-                    <th scope="col">Cargo</th>
-                    <th scope="col" style={{ width: '38%' }}>
-                      Postulaciones
-                    </th>
-                    <th scope="col">Vacantes</th>
-                    <th scope="col" style={{ width: '22%' }}>
-                      Cobertura
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {TOP_CARGOS.map((item) => {
-                    const cobertura = Math.min(100, Math.round((item.postulaciones / item.vacantes) * 100));
-                    return (
-                      <tr key={item.cargo}>
-                        <td>{item.cargo}</td>
-                        <td>
-                          <div className="d-flex align-items-center gap-2">
-                            <div className="progress flex-grow-1" style={{ height: 6 }} role="progressbar" aria-label={`Postulaciones para ${item.cargo}`} aria-valuenow={item.postulaciones} aria-valuemin={0} aria-valuemax={item.vacantes}>
-                              <div
-                                className={`progress-bar ${cobertura >= 100 ? 'bg-success' : 'bg-aqua-primary'}`}
-                                style={{ width: `${cobertura}%` }}
-                              />
-                            </div>
-                            <span className="text-muted-aqua small">{item.postulaciones}</span>
-                          </div>
-                        </td>
-                        <td className="text-muted-aqua">{item.vacantes}</td>
-                        <td>
-                          <span className={`badge-estado ${cobertura >= 100 ? 'badge-estado-apto' : 'badge-estado-pendiente'}`}>
-                            {cobertura}%
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="card-body">
+              {TOP_CARGOS.map((item) => {
+                const cobertura = Math.min(100, Math.round((item.postulaciones / item.vacantes) * 100));
+                return (
+                  <div className="dist-row" key={item.cargo}>
+                    <div className="dist-head">
+                      <span className="dist-name">{item.cargo}</span>
+                      <span className={`badge-estado ${cobertura >= 100 ? 'badge-estado-apto' : 'badge-estado-pendiente'}`}>
+                        {item.postulaciones}/{item.vacantes}
+                      </span>
+                    </div>
+                    <div
+                      className="dist-bar"
+                      role="progressbar"
+                      aria-label={`Postulaciones para ${item.cargo}`}
+                      aria-valuenow={item.postulaciones}
+                      aria-valuemin={0}
+                      aria-valuemax={item.vacantes}
+                    >
+                      <span
+                        style={{
+                          width: anchoBarra(item.postulaciones, maxDemanda),
+                          backgroundColor:
+                            cobertura >= 100 ? 'var(--aqua-solid-success)' : 'var(--aqua-solid-primary)',
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

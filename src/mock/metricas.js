@@ -2,11 +2,18 @@
  * metricas.js
  * Agregaciones calculadas sobre los datos simulados. En el backend estas
  * cifras saldran de consultas SQL con COUNT/SUM agrupado por estado y tipo.
+ *
+ * Cada metrica declara `acento` (color solido para el borde y el icono de la
+ * tarjeta) y `tinte` (fondo claro para la pastilla de tendencia). Los colores
+ * solidos se eligen de la paleta --aqua-solid-* del tema: blanco encima siempre
+ * supera el contraste AA.
  */
 
 import { CANDIDATOS } from './candidatos.js';
 import { SOLICITUDES } from './solicitudes.js';
 import { USUARIOS } from './usuarios.js';
+import { ESTADOS_SOLICITUD } from './solicitudes.js';
+import { FAMILIAS_CARGO, obtenerCargo } from './cargos.js';
 
 export function metricasDashboard() {
   const externas = CANDIDATOS.filter((candidato) => candidato.tipo_postulacion === 'externa');
@@ -16,7 +23,6 @@ export function metricasDashboard() {
   const finalizadas = SOLICITUDES.filter((solicitud) => solicitud.estado === 'finalizada');
   const pendientes = SOLICITUDES.filter((solicitud) => solicitud.estado === 'pendiente');
   const aptos = finalizadas.filter((solicitud) => solicitud.resultado === 'apto');
-
   const usuariosActivos = USUARIOS.filter((usuario) => usuario.estado === 'activo').length;
 
   return [
@@ -25,62 +31,88 @@ export function metricasDashboard() {
       titulo: 'Postulaciones externas',
       valor: externas.length,
       pie: `${externas.filter((c) => c.estado === 'pendiente').length} sin evaluar`,
-      icono: 'envelope-paper',
-      tinte: 'bg-tint-primary',
       variacion: '+18% vs. mes anterior',
-      variante: 'externa',
+      icono: 'envelope-paper',
+      acento: 'var(--aqua-solid-primary)',
+      tinte: 'bg-tint-primary',
     },
     {
       clave: 'postulaciones_internas',
       titulo: 'Postulaciones internas',
       valor: internas.length,
       pie: `${internas.filter((c) => c.estado === 'pendiente').length} sin evaluar`,
-      icono: 'building',
-      tinte: 'bg-tint-info',
       variacion: '+2 vs. mes anterior',
-      variante: 'interna',
+      icono: 'building',
+      acento: 'var(--aqua-solid-info)',
+      tinte: 'bg-tint-info',
     },
     {
       clave: 'evaluaciones_proceso',
       titulo: 'Evaluaciones en proceso',
       valor: enProceso.length,
       pie: `${pendientes.length} pendientes de asignar`,
-      icono: 'arrow-repeat',
-      tinte: 'bg-tint-warning',
       variacion: 'En curso',
-      variante: 'proceso',
+      icono: 'arrow-repeat',
+      acento: 'var(--aqua-solid-warning)',
+      tinte: 'bg-tint-warning',
     },
     {
       clave: 'evaluaciones_finalizadas',
       titulo: 'Evaluaciones finalizadas',
       valor: finalizadas.length,
       pie: `${aptos.length} con resultado apto`,
-      icono: 'check-circle',
-      tinte: 'bg-tint-success',
       variacion: `${finalizadas.length} de ${SOLICITUDES.length} solicitudes`,
-      variante: 'finalizada',
+      icono: 'check-circle',
+      acento: 'var(--aqua-solid-success)',
+      tinte: 'bg-tint-success',
     },
     {
       clave: 'usuarios_activos',
       titulo: 'Usuarios activos',
       valor: usuariosActivos,
       pie: `${USUARIOS.length} usuarios registrados`,
-      icono: 'person-gear',
-      tinte: 'bg-tint-success',
       variacion: 'Sistema operativo',
-      variante: 'usuarios',
+      icono: 'person-gear',
+      acento: 'var(--aqua-solid-primary)',
+      tinte: 'bg-tint-primary',
     },
     {
       clave: 'tasa_aprobacion',
       titulo: 'Tasa de aprobacion',
       valor: `${finalizadas.length ? Math.round((aptos.length / finalizadas.length) * 100) : 0}%`,
       pie: 'Sobre evaluaciones finalizadas',
-      icono: 'percent',
-      tinte: 'bg-tint-primary',
       variacion: 'Meta >= 60%',
-      variante: 'tasa',
+      icono: 'percent',
+      acento: 'var(--aqua-solid-secondary)',
+      tinte: 'bg-tint-info',
     },
   ];
+}
+
+/** Solicitudes por estado, para las barras de distribucion del dashboard. */
+export function distribucionPorEstado() {
+  const colores = {
+    pendiente: 'var(--aqua-solid-warning)',
+    en_proceso: 'var(--aqua-solid-primary)',
+    finalizada: 'var(--aqua-solid-success)',
+  };
+
+  return ESTADOS_SOLICITUD.map((estado) => ({
+    clave: estado.clave,
+    nombre: estado.nombre,
+    total: SOLICITUDES.filter((solicitud) => solicitud.estado === estado.clave).length,
+    color: colores[estado.clave],
+  }));
+}
+
+/** Postulaciones por familia de cargo (solo las que tienen movimiento). */
+export function distribucionPorFamilia() {
+  return FAMILIAS_CARGO.map((familia) => ({
+    clave: familia.id,
+    nombre: familia.nombre,
+    total: CANDIDATOS.filter((candidato) => obtenerCargo(candidato.cargo_id)?.familia_id === familia.id)
+      .length,
+  })).filter((familia) => familia.total > 0);
 }
 
 /** Actividad reciente para el panel lateral del dashboard. */

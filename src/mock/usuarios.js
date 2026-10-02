@@ -198,13 +198,6 @@ export const USUARIOS = [
   },
 ];
 
-/** Usuario simulado por defecto segun rol, usado para pintar el Navbar. */
-export const USUARIOS_DEMO = {
-  [CLAVE_ROLES.ADMINISTRADOR]: USUARIOS[0],
-  [CLAVE_ROLES.ANALISTA]: USUARIOS[3],
-  [CLAVE_ROLES.EVALUADOR]: USUARIOS[6],
-};
-
 export function obtenerUsuario(idUsuario) {
   return USUARIOS.find((usuario) => usuario.id === Number(idUsuario)) ?? null;
 }
@@ -213,9 +206,11 @@ export function obtenerUsuarioPorCorreo(correo) {
   return USUARIOS.find((usuario) => usuario.correo.toLowerCase() === String(correo).toLowerCase()) ?? null;
 }
 
-/** Listado de usuarios sin rol administrador (para postulate interno). */
+/** Listado de colaboradores activos (para la postulacion interna). */
 export function usuariosElegiblesInternos() {
-  return USUARIOS.filter((usuario) => usuario.estado === 'activo');
+  return USUARIOS.filter(
+    (usuario) => usuario.rol_id === CLAVE_ROLES.COLABORADOR && usuario.estado === 'activo',
+  );
 }
 
 /** Usuarios que pueden recibir solicitudes de evaluacion. */

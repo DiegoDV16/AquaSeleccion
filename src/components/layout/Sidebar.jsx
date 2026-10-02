@@ -10,9 +10,9 @@ import { contadoresMenu, MENU_POR_ROL } from '../../mock/menu.js';
  * como offcanvas (controlado desde AppLayout, sin depender de bootstrap.js).
  */
 export default function Sidebar({ colapsado, abierto, onNavegar }) {
-  const { rolActivo, rol } = useAuth();
+  const { rolActivo, rol, usuario } = useAuth();
   const bloques = MENU_POR_ROL[rolActivo] ?? [];
-  const contadores = contadoresMenu();
+  const contadores = contadoresMenu(usuario?.id);
 
   return (
     <aside

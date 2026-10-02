@@ -18,8 +18,14 @@ export default function SinPermisos() {
             </span>
             <h1 className="h5 fw-semibold mb-2">Acceso restringido</h1>
             <p className="text-muted-aqua small mb-1">
-              Tu sesión activa con rol <strong>{rol.nombre}</strong>
-              {usuario ? ` (${usuario.nombre})` : ''} no tiene permiso para abrir este módulo.
+              {rol ? (
+                <>
+                  Tu sesión activa con rol <strong>{rol.nombre}</strong>
+                  {usuario ? ` (${usuario.nombre})` : ''} no tiene permiso para abrir este módulo.
+                </>
+              ) : (
+                'Necesitas iniciar sesión para abrir este módulo.'
+              )}
             </p>
             {solicitado && (
               <p className="text-muted-aqua small mb-3">
@@ -27,11 +33,14 @@ export default function SinPermisos() {
               </p>
             )}
             <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-              <Link to={rol.rutaInicio ?? '/login'} className="btn btn-aqua btn-sm">
-                Ir a mi módulo
-              </Link>
+              {rol?.rutaInicio && (
+                <Link to={rol.rutaInicio} className="btn btn-aqua btn-sm">
+                  Ir a mi módulo
+                </Link>
+              )}
               <Link to="/login" className="btn btn-soft btn-sm">
-                Cambiar de rol
+                <i className="bi bi-box-arrow-right me-1" aria-hidden="true" />
+                Iniciar sesión con otra cuenta
               </Link>
             </div>
           </div>

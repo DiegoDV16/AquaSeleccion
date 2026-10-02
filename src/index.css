@@ -5,32 +5,42 @@
    ========================================================================== */
 
 :root {
-  /* Paleta institucional AquaChile */
-  --aqua-primary: #0f4c5c;
-  --aqua-primary-dark: #093642;
-  --aqua-primary-light: #1b7f8e;
-  --aqua-accent: #2f9aa8;
-  --aqua-surface: #f4f7f8;
-  --aqua-surface-alt: #e9eff1;
-  --aqua-border: #d8e2e6;
-  --aqua-success: #2e7d5b;
-  --aqua-warning: #b7791f;
-  --aqua-danger: #b3261e;
-  --aqua-ink: #1d2b30;
-  --aqua-muted: #5b6f76;
+  /* Paleta institucional AquaChile: cian corporativo, claro y legible */
+  --aqua-primary: #0e7490;
+  --aqua-primary-dark: #155e75;
+  --aqua-primary-light: #0891b2;
+  --aqua-accent: #06b6d4;
+  --aqua-surface: #f6f9fa;
+  --aqua-surface-alt: #eef4f6;
+  --aqua-border: #dde7ea;
+  --aqua-success: #15803d;
+  --aqua-warning: #b45309;
+  --aqua-danger: #b91c1c;
+  --aqua-ink: #0f1e26;
+  --aqua-muted: #4a616b;
   --aqua-sidebar-w: 264px;
   --aqua-sidebar-w-collapsed: 76px;
-  --aqua-navbar-h: 60px;
+  --aqua-navbar-h: 64px;
+
+  /* Paleta solida para acentos: blanco encima siempre supera 4.5:1 (WCAG AA) */
+  --aqua-solid-primary: #0e7490;
+  --aqua-solid-info: #0b6a86;
+  --aqua-solid-success: #15803d;
+  --aqua-solid-warning: #b45309;
+  --aqua-solid-danger: #b91c1c;
+  --aqua-solid-secondary: #4a616b;
+  --aqua-shadow: 0 1px 2px rgba(15, 30, 38, 0.06), 0 1px 3px rgba(15, 30, 38, 0.04);
+  --aqua-shadow-lg: 0 4px 14px rgba(15, 30, 38, 0.1);
 
   /* Bootstrap 5: se reasignan los tokens nativos */
   --bs-primary: var(--aqua-primary);
-  --bs-primary-rgb: 15, 76, 92;
+  --bs-primary-rgb: 14, 116, 144;
   --bs-secondary-color: var(--aqua-muted);
   --bs-body-color: var(--aqua-ink);
   --bs-body-bg: var(--aqua-surface);
   --bs-border-color: var(--aqua-border);
-  --bs-link-color: var(--aqua-primary-light);
-  --bs-link-hover-color: var(--aqua-primary);
+  --bs-link-color: #0e7490;
+  --bs-link-hover-color: #155e75;
 }
 
 * {
@@ -51,9 +61,11 @@ body {
 }
 
 /* ----------------------------- Navbar ----------------------------------- */
+/* Barra superior clara: el color se reserva para marcas y acentos. */
 .aqua-navbar {
-  background-color: var(--aqua-primary-dark);
-  box-shadow: 0 2px 6px rgba(9, 54, 66, 0.25);
+  background-color: #fff;
+  border-bottom: 1px solid var(--aqua-border);
+  box-shadow: var(--aqua-shadow);
   min-height: var(--aqua-navbar-h);
   z-index: 1040;
 }
@@ -61,72 +73,81 @@ body {
 .aqua-navbar .navbar-brand,
 .aqua-navbar .nav-link,
 .aqua-navbar .navbar-text {
-  color: #eaf3f5;
+  color: var(--aqua-ink);
+}
+
+.aqua-navbar .navbar-brand:hover {
+  color: var(--aqua-primary);
 }
 
 .aqua-brand-mark {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 9px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(140deg, var(--aqua-primary-light), var(--aqua-accent));
+  background: linear-gradient(135deg, var(--aqua-primary), var(--aqua-primary-light));
   color: #fff;
   font-size: 1.15rem;
-}
-
-.aqua-role-select {
-  min-width: 210px;
-  background-color: rgba(255, 255, 255, 0.94);
-  border: 1px solid var(--aqua-border);
-  font-size: 0.875rem;
-  padding: 0.3rem 2rem 0.3rem 0.6rem;
-  color: var(--aqua-ink);
-}
-
-.aqua-role-select:focus {
-  box-shadow: 0 0 0 0.2rem rgba(47, 154, 168, 0.35);
-  border-color: var(--aqua-accent);
+  box-shadow: 0 2px 6px rgba(14, 116, 144, 0.28);
 }
 
 .aqua-avatar {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background-color: var(--aqua-accent);
+  background-color: var(--aqua-solid-primary);
   color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
+  flex: 0 0 34px;
+}
+
+/* Modulo al que el usuario tiene acceso tras iniciar sesion */
+.aqua-modulo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.6rem;
+  border-radius: 5px;
+  background-color: #e4f2f6;
+  color: #0c5c73;
+  white-space: nowrap;
 }
 
 /* ----------------------------- Sidebar ---------------------------------- */
 .aqua-sidebar {
   width: var(--aqua-sidebar-w);
   flex: 0 0 var(--aqua-sidebar-w);
-  background-color: var(--aqua-primary-dark);
-  color: #cfe3e7;
+  background-color: #fff;
+  border-right: 1px solid var(--aqua-border);
+  color: var(--aqua-muted);
   min-height: calc(100vh - var(--aqua-navbar-h));
   transition: width 0.2s ease, flex-basis 0.2s ease;
 }
 
 .aqua-sidebar .sidebar-section-title {
-  font-size: 0.7rem;
-  letter-spacing: 0.09em;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #7ba3ab;
-  padding: 0.9rem 1.1rem 0.35rem;
-  font-weight: 600;
+  color: #7c929b;
+  padding: 0.9rem 1.1rem 0.4rem;
+  font-weight: 700;
 }
 
 .aqua-sidebar .nav-link {
-  color: #cfe3e7;
+  color: var(--aqua-muted);
   border-radius: 6px;
   margin: 0 0.6rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.52rem 0.75rem;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
@@ -134,14 +155,15 @@ body {
 }
 
 .aqua-sidebar .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.09);
-  color: #fff;
+  background-color: #f1f7f9;
+  color: var(--aqua-primary-dark);
 }
 
 .aqua-sidebar .nav-link.active {
-  background-color: var(--aqua-primary-light);
-  color: #fff;
+  background-color: #e4f2f6;
+  color: #0b5567;
   font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--aqua-primary);
 }
 
 .aqua-sidebar .nav-link .bi {
@@ -152,8 +174,9 @@ body {
 }
 
 .aqua-sidebar .badge {
-  background-color: rgba(255, 255, 255, 0.18);
-  font-weight: 500;
+  background-color: #e4f2f6;
+  color: #0c5c73;
+  font-weight: 700;
 }
 
 /* Sidebar colapsable (escritorio) */
@@ -175,10 +198,10 @@ body {
 }
 
 .aqua-sidebar-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid var(--aqua-border);
   padding: 0.85rem 1.1rem;
   font-size: 0.78rem;
-  color: #7ba3ab;
+  color: var(--aqua-muted);
 }
 
 /* ------------------------------ Contenido ------------------------------- */
@@ -191,15 +214,16 @@ body {
 .aqua-page-header {
   background-color: #fff;
   border: 1px solid var(--aqua-border);
-  border-left: 4px solid var(--aqua-primary-light);
+  border-left: 5px solid var(--aqua-primary-light);
   border-radius: 8px;
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
+  box-shadow: var(--aqua-shadow);
 }
 
 .aqua-page-header h1 {
   font-size: 1.3rem;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0;
   color: var(--aqua-primary-dark);
 }
@@ -210,85 +234,183 @@ body {
   color: var(--aqua-muted);
 }
 
+.aqua-page-header .etiqueta,
+.etiqueta-aqua {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #fff;
+  background-color: var(--aqua-solid-primary);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
 .aqua-card {
   background-color: #fff;
   border: 1px solid var(--aqua-border);
   border-radius: 8px;
+  box-shadow: var(--aqua-shadow);
 }
 
 .aqua-card .card-header {
   background-color: var(--aqua-surface-alt);
   border-bottom: 1px solid var(--aqua-border);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
   padding: 0.7rem 1rem;
+  color: var(--aqua-primary-dark);
 }
 
 /* Tarjetas de metricas del dashboard */
 .aqua-stat {
   background-color: #fff;
   border: 1px solid var(--aqua-border);
+  border-left: 5px solid var(--stat-accent, var(--aqua-solid-primary));
   border-radius: 8px;
-  padding: 1.1rem 1.25rem;
+  padding: 1rem 1.1rem;
   height: 100%;
   display: flex;
   align-items: flex-start;
   gap: 0.9rem;
+  box-shadow: var(--aqua-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.aqua-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--aqua-shadow-lg);
 }
 
 .aqua-stat .stat-icon {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
-  flex: 0 0 44px;
+  font-size: 1.35rem;
+  flex: 0 0 46px;
+}
+
+/* Icono solido: glifo blanco sobre color de acento (contraste AA) */
+.aqua-stat .stat-icon.is-solid {
+  background-color: var(--stat-accent, var(--aqua-solid-primary));
+  color: #fff;
 }
 
 .aqua-stat .stat-value {
-  font-size: 1.65rem;
+  font-size: 1.8rem;
   font-weight: 700;
   line-height: 1.1;
+  letter-spacing: -0.02em;
   color: var(--aqua-primary-dark);
 }
 
 .aqua-stat .stat-label {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 700;
   color: var(--aqua-muted);
 }
 
 .aqua-stat .stat-foot {
-  font-size: 0.78rem;
+  font-size: 0.79rem;
   color: var(--aqua-muted);
 }
 
+/* Pastilla de tendencia dentro de la tarjeta */
+.stat-pill {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.35rem;
+}
+
+/* Barras de distribucion */
+.dist-row + .dist-row {
+  margin-top: 0.85rem;
+}
+
+.dist-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.82rem;
+  margin-bottom: 0.3rem;
+}
+
+.dist-head .dist-name {
+  font-weight: 600;
+  color: var(--aqua-ink);
+}
+
+.dist-head .dist-value {
+  font-weight: 700;
+  color: var(--aqua-primary-dark);
+}
+
+.dist-bar {
+  height: 9px;
+  border-radius: 6px;
+  background-color: var(--aqua-surface-alt);
+  overflow: hidden;
+}
+
+.dist-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+}
+
+/* Etiqueta de color por variante (fondo solido, texto blanco) */
+.variant-primary {
+  background-color: var(--aqua-solid-primary);
+}
+.variant-info {
+  background-color: var(--aqua-solid-info);
+}
+.variant-success {
+  background-color: var(--aqua-solid-success);
+}
+.variant-warning {
+  background-color: var(--aqua-solid-warning);
+}
+.variant-danger {
+  background-color: var(--aqua-solid-danger);
+}
+.variant-secondary {
+  background-color: var(--aqua-solid-secondary);
+}
+
+/* Tintes: fondo claro + texto oscuro (contraste AA en todo tamano) */
 .bg-tint-primary {
-  background-color: rgba(27, 127, 142, 0.14);
-  color: var(--aqua-primary-light);
+  background-color: #d8edf0;
+  color: #0f5561;
 }
 
 .bg-tint-success {
-  background-color: rgba(46, 125, 91, 0.14);
-  color: var(--aqua-success);
+  background-color: #d9ede2;
+  color: #1f5f44;
 }
 
 .bg-tint-warning {
-  background-color: rgba(183, 121, 31, 0.16);
-  color: var(--aqua-warning);
+  background-color: #f7e8cd;
+  color: #7a4f0c;
 }
 
 .bg-tint-danger {
-  background-color: rgba(179, 38, 30, 0.13);
-  color: var(--aqua-danger);
+  background-color: #f7dcda;
+  color: #94211a;
 }
 
 .bg-tint-info {
-  background-color: rgba(47, 154, 168, 0.16);
-  color: var(--aqua-primary-light);
+  background-color: #d7ebee;
+  color: #0f5561;
 }
 
 /* Tablas */
@@ -332,8 +454,8 @@ body {
 
 .aqua-form .form-control:focus,
 .aqua-form .form-select:focus {
-  border-color: var(--aqua-accent);
-  box-shadow: 0 0 0 0.2rem rgba(47, 154, 168, 0.22);
+  border-color: var(--aqua-primary-light);
+  box-shadow: 0 0 0 0.2rem rgba(8, 145, 178, 0.18);
 }
 
 .aqua-form .form-text {
@@ -345,7 +467,8 @@ body {
   background-color: var(--aqua-primary);
   border: 1px solid var(--aqua-primary);
   color: #fff;
-  font-weight: 500;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(14, 116, 144, 0.25);
 }
 
 .btn-aqua:hover,
@@ -357,29 +480,30 @@ body {
 
 .btn-outline-aqua {
   border: 1px solid var(--aqua-primary-light);
-  color: var(--aqua-primary-light);
-  font-weight: 500;
-  background-color: transparent;
+  color: #0c5c73;
+  font-weight: 600;
+  background-color: #fff;
 }
 
 .btn-outline-aqua:hover,
 .btn-outline-aqua:focus {
-  background-color: var(--aqua-primary-light);
+  background-color: var(--aqua-primary);
+  border-color: var(--aqua-primary);
   color: #fff;
 }
 
 .btn-soft {
-  background-color: var(--aqua-surface-alt);
+  background-color: #fff;
   border: 1px solid var(--aqua-border);
   color: var(--aqua-primary-dark);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .btn-soft:hover,
 .btn-soft:focus {
-  background-color: #dbe6e9;
-  color: var(--aqua-primary-dark);
-  border-color: var(--aqua-accent);
+  background-color: #f1f7f9;
+  color: #0c5c73;
+  border-color: var(--aqua-primary-light);
 }
 
 /* Estados (badges) */
@@ -393,51 +517,51 @@ body {
 }
 
 .badge-estado-pendiente {
-  background-color: #fdf3e2;
-  color: var(--aqua-warning);
-  border: 1px solid #f0dcb6;
+  background-color: #fdf1e0;
+  color: #92400e;
+  border: 1px solid #f5ddb9;
 }
 
 .badge-estado-proceso {
-  background-color: #e4f1f3;
-  color: var(--aqua-primary-light);
-  border: 1px solid #c3dfe3;
+  background-color: #e2f1f6;
+  color: #0c5c73;
+  border: 1px solid #c3e0e8;
 }
 
 .badge-estado-finalizada {
-  background-color: #e6f2ec;
-  color: var(--aqua-success);
-  border: 1px solid #c2e0d0;
+  background-color: #e3f3e9;
+  color: #12642f;
+  border: 1px solid #bfe0cd;
 }
 
 .badge-estado-apto {
-  background-color: #e6f2ec;
-  color: var(--aqua-success);
-  border: 1px solid #c2e0d0;
+  background-color: #e3f3e9;
+  color: #12642f;
+  border: 1px solid #bfe0cd;
 }
 
 .badge-estado-noapto {
-  background-color: #fbe9e8;
-  color: var(--aqua-danger);
-  border: 1px solid #f0cbc8;
+  background-color: #fce8e8;
+  color: #a41c1c;
+  border: 1px solid #f2c9c9;
 }
 
 .badge-estado-observaciones {
-  background-color: #fdf3e2;
-  color: var(--aqua-warning);
-  border: 1px solid #f0dcb6;
+  background-color: #fdf1e0;
+  color: #92400e;
+  border: 1px solid #f5ddb9;
 }
 
 .badge-estado-activo {
-  background-color: #e6f2ec;
-  color: var(--aqua-success);
-  border: 1px solid #c2e0d0;
+  background-color: #e3f3e9;
+  color: #12642f;
+  border: 1px solid #bfe0cd;
 }
 
 .badge-estado-inactivo {
-  background-color: #eceff1;
-  color: #62727a;
-  border: 1px solid #d5dde1;
+  background-color: #eef1f3;
+  color: #4d5f68;
+  border: 1px solid #dbe2e6;
 }
 
 .badge-tipo {
@@ -448,21 +572,21 @@ body {
 }
 
 .badge-tipo-externa {
-  background-color: #e9eefb;
-  color: #3b5bdb;
-  border: 1px solid #ccd6f7;
+  background-color: #e7eefc;
+  color: #2c4bb0;
+  border: 1px solid #ccd9f7;
 }
 
 .badge-tipo-interna {
-  background-color: #f3ecfb;
-  color: #7048b5;
-  border: 1px solid #ddcdf3;
+  background-color: #f2ecfd;
+  border: 1px solid #ddcdf7;
+  color: #5f3bab;
 }
 
 /* Vistas publicas / auth */
 .aqua-hero {
-  background: linear-gradient(150deg, var(--aqua-primary-dark) 0%, var(--aqua-primary) 55%, var(--aqua-primary-light) 100%);
-  color: #eaf3f5;
+  background: linear-gradient(135deg, #0c5c73 0%, var(--aqua-primary) 45%, var(--aqua-primary-light) 100%);
+  color: #eaf6f9;
 }
 
 .aqua-hero h1 {
@@ -471,7 +595,7 @@ body {
 }
 
 .aqua-hero .lead {
-  color: #cfe3e7;
+  color: #cfe9ef;
   font-weight: 300;
 }
 
@@ -494,18 +618,20 @@ body {
 }
 
 .aqua-footer {
-  background-color: var(--aqua-primary-dark);
-  color: #a8c4ca;
+  background-color: #fff;
+  border-top: 1px solid var(--aqua-border);
+  color: var(--aqua-muted);
   font-size: 0.82rem;
 }
 
 .aqua-footer a {
-  color: #d7eaee;
+  color: var(--aqua-primary);
   text-decoration: none;
+  font-weight: 500;
 }
 
 .aqua-footer a:hover {
-  color: #fff;
+  color: var(--aqua-primary-dark);
   text-decoration: underline;
 }
 
@@ -569,6 +695,54 @@ body {
   border-radius: 8px;
 }
 
+/* Cuentas de prueba de la pantalla de login */
+.demo-account {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  text-align: left;
+  background-color: #fff;
+  border: 1px solid var(--aqua-border);
+  border-left: 4px solid var(--demo-accent, var(--aqua-solid-primary));
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.demo-account:hover,
+.demo-account:focus-visible {
+  background-color: var(--aqua-surface);
+  border-color: var(--demo-accent, var(--aqua-solid-primary));
+}
+
+.demo-account .demo-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  flex: 0 0 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #fff;
+  background-color: var(--demo-accent, var(--aqua-solid-primary));
+}
+
+.demo-account .demo-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--aqua-ink);
+  display: block;
+}
+
+.demo-account .demo-mail {
+  font-size: 0.75rem;
+  color: var(--aqua-muted);
+  display: block;
+  word-break: break-all;
+}
+
 @media (max-width: 991.98px) {
   .aqua-sidebar {
     min-height: auto;
@@ -586,7 +760,14 @@ body {
 }
 
 @media (max-width: 575.98px) {
-  .aqua-role-select {
-    min-width: 150px;
+  .aqua-stat .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .aqua-stat .stat-icon {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    font-size: 1.1rem;
   }
 }

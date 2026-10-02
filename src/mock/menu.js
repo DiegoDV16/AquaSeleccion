@@ -8,7 +8,6 @@
 
 import { CLAVE_ROLES } from './catalogoRoles.js';
 import { SOLICITUDES } from './solicitudes.js';
-import { USUARIOS_DEMO } from './usuarios.js';
 
 export const MENU_POR_ROL = {
   [CLAVE_ROLES.ADMINISTRADOR]: [
@@ -43,19 +42,21 @@ export const MENU_POR_ROL = {
   ],
 };
 
-/** Badge informativo en el menu: solicitudes pendientes por modulo. */
-function pendientesDeEvaluadorDemo() {
-  const evaluador = USUARIOS_DEMO[CLAVE_ROLES.EVALUADOR];
-  return SOLICITUDES.filter(
-    (solicitud) => solicitud.evaluador_id === evaluador.id && solicitud.estado === 'pendiente',
-  ).length;
-}
-
-export function contadoresMenu() {
+/**
+ * Contadores del menu: solicitudes pendientes que el usuario puede atender.
+ * El modulo Administrador no muestra contador global; el del Analista cuenta
+ * los pendientes del proceso y el del Evaluador solo los suyos, por eso recibe
+ * el id del usuario autenticado y no un usuario fijo de demostracion.
+ */
+export function contadoresMenu(idUsuario) {
   return {
     [`${CLAVE_ROLES.ANALISTA}/analista/solicitudes`]: SOLICITUDES.filter(
       (solicitud) => solicitud.estado === 'pendiente',
     ).length,
-    [`${CLAVE_ROLES.EVALUADOR}/evaluador/mis-solicitudes`]: pendientesDeEvaluadorDemo(),
+    [`${CLAVE_ROLES.EVALUADOR}/evaluador/mis-solicitudes`]: idUsuario
+      ? SOLICITUDES.filter(
+          (solicitud) => solicitud.evaluador_id === Number(idUsuario) && solicitud.estado === 'pendiente',
+        ).length
+      : 0,
   };
 }

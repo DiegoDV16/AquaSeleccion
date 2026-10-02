@@ -2,15 +2,34 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext.js';
-import { ROLES } from '../../mock/catalogoRoles.js';
+import { obtenerRol } from '../../mock/catalogoRoles.js';
+import { USUARIOS } from '../../mock/usuarios.js';
+
+const CLAVE_DEMO = 'Aqua2026*';
+
+/**
+ * Cuentas de prueba del MVP: el rol se deduce del correo, por eso se listan
+ * las credenciales reales de los mocks y no un selector de modulo. Al migrar a
+ * MySQL + PHP este bloque se elimina y queda solo el formulario corporativo.
+ */
+const CUENTAS_DEMO = [
+  { correo: 'catalina.fuentes@aquachile.cl', icono: 'shield-lock', tinte: 'primary' },
+  { correo: 'mariajose.rojas@aquachile.cl', icono: 'people', tinte: 'info' },
+  { correo: 'valentina.aravena@aquachile.cl', icono: 'clipboard2-pulse', tinte: 'success' },
+].map((cuenta) => {
+  const usuario = USUARIOS.find((registrado) => registrado.correo === cuenta.correo);
+  return { ...cuenta, nombre: usuario.nombre, rol: obtenerRol(usuario.rol_id).nombre };
+});
 
 /**
  * Login
  * Vista publica de acceso al monolito. En el MVP el submit no llama a la API:
- * usa AuthProvider.login() y redirige al modulo del rol seleccionado.
+ * usa AuthProvider.login(), que busca el usuario por correo y redirige al
+ * modulo que corresponde a su rol. No hay selector de modulo: para entrar a otro
+ * modulo hay que iniciar sesion con otra cuenta.
  */
 export default function Login() {
-  const [formulario, setFormulario] = useState({ correo: '', clave: '', rol: 'administrador', recordarme: true });
+  const [formulario, setFormulario] = useState({ correo: '', clave: '', recordarme: true });
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -22,17 +41,20 @@ export default function Login() {
 
   function manejarEnvio(evento) {
     evento.preventDefault();
-    if (formulario.correo.trim() === '' || formulario.clave.trim() === '') {
-      setError('Ingresa tu correo institucional y contrasena para continuar.');
+    setError('');
+    const resultado = login({ correo: formulario.correo, clave: formulario.clave });
+
+    if (!resultado.ok) {
+      setError(resultado.mensaje);
       return;
     }
-    setError('');
-    const rol = login({ correo: formulario.correo, rol: formulario.rol });
-    navigate(rol.rutaInicio, { replace: true });
+
+    navigate(resultado.rol.rutaInicio, { replace: true });
   }
 
   function cargarCredencialesDemo(correo) {
-    setFormulario((actual) => ({ ...actual, correo, clave: 'Aqua2026*' }));
+    setFormulario((actual) => ({ ...actual, correo, clave: CLAVE_DEMO }));
+    setError('');
   }
 
   return (
@@ -180,63 +202,45 @@ export default function Login() {
                     </div>
                   </div>
 
-                  <div className="mb-3">
-                    <label className="form-label" htmlFor="rol">
-                      Módulo a ingresar
-                    </label>
-                    <select
-                      className="form-select"
-                      id="rol"
-                      name="rol"
-                      value={formulario.rol}
-                      onChange={actualizarCampo}
-                    >
-                      {ROLES.filter((rol) => rol.rutaInicio !== null).map((rol) => (
-                        <option key={rol.clave} value={rol.clave}>
-                          {rol.nombre}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="form-text">
-                      Maquetado: el selector determina el módulo que se abre al ingresar.
-                    </div>
+                  <div className="mb-4">
+                    <button type="submit" className="btn btn-aqua w-100 py-2">
+                      <i className="bi bi-box-arrow-in-right me-1" aria-hidden="true" />
+                      Iniciar Sesión
+                    </button>
+                    <p className="text-muted-aqua mt-2 mb-0 text-center" style={{ fontSize: '0.76rem' }}>
+                      El módulo se abre automáticamente según el rol asignado a tu cuenta.
+                    </p>
                   </div>
-
-                  <button type="submit" className="btn btn-aqua w-100 py-2">
-                    <i className="bi bi-box-arrow-in-right me-1" aria-hidden="true" />
-                    Iniciar Sesión
-                  </button>
                 </form>
 
                 <div className="border-top mt-4 pt-3">
-                  <p className="text-muted-aqua mb-2" style={{ fontSize: '0.76rem' }}>
-                    Credenciales de prueba
+                  <p className="mb-2">
+                    <span className="etiqueta-aqua">Cuentas de prueba</span>
                   </p>
-                  <div className="d-flex flex-column gap-1">
-                    <button
-                      type="button"
-                      className="btn btn-soft btn-sm text-start"
-                      onClick={() => cargarCredencialesDemo('catalina.fuentes@aquachile.cl')}
-                    >
-                      <i className="bi bi-shield-lock me-2" aria-hidden="true" />
-                      Administrador
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-soft btn-sm text-start"
-                      onClick={() => cargarCredencialesDemo('mariajose.rojas@aquachile.cl')}
-                    >
-                      <i className="bi bi-people me-2" aria-hidden="true" />
-                      Analista de reclutamiento
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-soft btn-sm text-start"
-                      onClick={() => cargarCredencialesDemo('valentina.aravena@aquachile.cl')}
-                    >
-                      <i className="bi bi-clipboard2-pulse me-2" aria-hidden="true" />
-                      Evaluador
-                    </button>
+                  <p className="text-muted-aqua mb-2" style={{ fontSize: '0.76rem' }}>
+                    Selecciona una cuenta para cargar sus credenciales y ver su módulo.
+                  </p>
+                  <div className="d-flex flex-column gap-2">
+                    {CUENTAS_DEMO.map((cuenta) => (
+                      <button
+                        key={cuenta.correo}
+                        type="button"
+                        className="demo-account"
+                        style={{ '--demo-accent': `var(--aqua-solid-${cuenta.tinte})` }}
+                        onClick={() => cargarCredencialesDemo(cuenta.correo)}
+                      >
+                        <span className="demo-avatar" aria-hidden="true">
+                          <i className={`bi bi-${cuenta.icono}`} />
+                        </span>
+                        <span className="flex-grow-1">
+                          <span className="demo-name">
+                            {cuenta.nombre} · {cuenta.rol}
+                          </span>
+                          <span className="demo-mail">{cuenta.correo}</span>
+                        </span>
+                        <i className="bi bi-arrow-right-circle text-muted-aqua" aria-hidden="true" />
+                      </button>
+                    ))}
                   </div>
                 </div>
 

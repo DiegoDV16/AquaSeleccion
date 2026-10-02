@@ -10,19 +10,20 @@ import { obtenerCandidato, nombreCompleto } from '../../mock/candidatos.js';
 import { obtenerCargo } from '../../mock/cargos.js';
 import { formatearFecha, solicitudesDeEvaluador } from '../../mock/solicitudes.js';
 
-/** Solicitudes asignadas al evaluador activo (contexto de rol). */
+/** Solicitudes asignadas al evaluador que inicio sesion. */
 export default function EvaluadorMisSolicitudes() {
   const { usuario } = useAuth();
   const [filtroEstado, setFiltroEstado] = useState('todas');
 
-  const identificador = usuario?.id ?? 7;
+  const identificador = usuario?.id;
 
   const solicitudes = useMemo(() => {
+    if (!identificador) return [];
     const propias = solicitudesDeEvaluador(identificador);
     return filtroEstado === 'todas' ? propias : propias.filter((solicitud) => solicitud.estado === filtroEstado);
   }, [identificador, filtroEstado]);
 
-  const todas = useMemo(() => solicitudesDeEvaluador(identificador), [identificador]);
+  const todas = useMemo(() => (identificador ? solicitudesDeEvaluador(identificador) : []), [identificador]);
   const pendientes = todas.filter((solicitud) => solicitud.estado === 'pendiente').length;
   const enProceso = todas.filter((solicitud) => solicitud.estado === 'en_proceso').length;
   const finalizadas = todas.filter((solicitud) => solicitud.estado === 'finalizada').length;
@@ -32,7 +33,7 @@ export default function EvaluadorMisSolicitudes() {
       <PageHeader
         etiqueta="Modulo Evaluador"
         titulo="Mis solicitudes"
-        descripcion={`Solicitudes de evaluación asignadas a ${usuario?.nombre ?? 'el evaluador activo'}.`}
+        descripcion={`Solicitudes de evaluación asignadas a ${usuario?.nombre ?? 'tu usuario'}.`}
         acciones={
           <span className="badge badge-estado badge-estado-proceso">
             <i className="bi bi-person-badge me-1" aria-hidden="true" />
