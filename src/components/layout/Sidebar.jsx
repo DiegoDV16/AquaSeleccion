@@ -26,6 +26,26 @@ export default function Sidebar({ colapsado, abierto, onNavegar }) {
         .join(' ')}
       aria-label="Menu de navegacion por modulo"
     >
+      {/* Encabezado de marca, estilo chrome de Stitch */}
+      <div
+        className="d-flex align-items-center gap-2 px-3 py-3 border-bottom"
+        style={{ borderColor: 'var(--aqua-border, #d3e4fe)' }}
+      >
+        <span className="aqua-brand-mark" aria-hidden="true">
+          <i className="bi bi-water" />
+        </span>
+        {!colapsado && (
+          <span className="d-flex flex-column lh-sm">
+            <span className="fw-bold" style={{ color: '#0e3a5d', fontSize: '0.95rem' }}>
+              Talento AquaChile
+            </span>
+            <small className="text-muted-aqua" style={{ fontSize: '0.68rem' }}>
+              Sistema de Gestion de Talento
+            </small>
+          </span>
+        )}
+      </div>
+
       <div className="flex-grow-1 d-flex flex-column">
         {bloques.map((bloque) => (
           <nav key={bloque.titulo} className="d-flex flex-column py-2" aria-label={bloque.titulo}>
@@ -40,6 +60,7 @@ export default function Sidebar({ colapsado, abierto, onNavegar }) {
                   className="nav-link"
                   onClick={onNavegar}
                   title={item.label}
+                  style={{ borderRadius: '999px' }}
                 >
                   <i className={`bi bi-${item.icono}`} aria-hidden="true" />
                   <span>{item.label}</span>

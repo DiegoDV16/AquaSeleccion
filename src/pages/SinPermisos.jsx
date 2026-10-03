@@ -9,14 +9,17 @@ export default function SinPermisos() {
   const solicitado = location.state?.solicitado;
 
   return (
-    <div className="min-vh-100 d-flex flex-column bg-light">
+    <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: '#f8f9ff' }}>
       <div className="container py-5 flex-grow-1 d-flex align-items-center justify-content-center">
-        <div className="aqua-card text-center" style={{ maxWidth: 620 }}>
+        <div className="aqua-card text-center w-100" style={{ maxWidth: 620 }}>
           <div className="card-body p-5">
-            <span className="stat-icon bg-tint-danger mx-auto mb-3" style={{ width: 62, height: 62, fontSize: '1.8rem' }} aria-hidden="true">
+            <span className="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style={{ width: 56, height: 56, backgroundColor: '#eff4ff', border: '1px solid #d3e4fe' }} aria-hidden="true">
+              <i className="bi bi-water" style={{ color: '#0e3a5d', fontSize: '1.5rem' }} />
+            </span>
+            <span className="stat-icon bg-tint-danger mx-auto mb-3 d-flex" style={{ width: 62, height: 62, fontSize: '1.8rem' }} aria-hidden="true">
               <i className="bi bi-shield-lock" />
             </span>
-            <h1 className="h5 fw-semibold mb-2">Acceso restringido</h1>
+            <h1 className="h5 fw-semibold mb-2" style={{ color: '#00243f' }}>Acceso restringido</h1>
             <p className="text-muted-aqua small mb-1">
               {rol ? (
                 <>

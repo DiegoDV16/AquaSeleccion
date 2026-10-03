@@ -108,336 +108,426 @@ export default function Postular() {
   const cargoSeleccionado = cargosFamiliaSeleccionada.find((cargo) => cargo.id === Number(formulario.cargo_id));
 
   return (
-    <div className="min-vh-100 d-flex flex-column bg-light">
-      {/* Encabezado del portal publico */}
-      <header className="aqua-hero py-4">
+    <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: 'var(--aqua-surface)' }}>
+      {/* Barra superior del portal publico */}
+      <header className="bg-white border-bottom py-2" style={{ borderColor: 'var(--aqua-border)' }}>
         <div className="container">
-          <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
             <div className="d-flex align-items-center gap-3">
               <span className="aqua-brand-mark" aria-hidden="true">
                 <i className="bi bi-water" />
               </span>
-              <div className="d-flex flex-column lh-sm">
-                <span className="fw-semibold fs-5">Portal de Postulaciones AquaChile</span>
-                <small className="text-white-50">Oportunidades laborales en salmonicultura y plantas industriales</small>
-              </div>
+              <span className="badge rounded-pill bg-tint-info px-3 py-2 fw-semibold">
+                Portal Oficial de Convocatorias
+              </span>
             </div>
-            <div className="d-flex gap-2">
-              <Link to="/login" className="btn btn-outline-light btn-sm">
-                <i className="bi bi-box-arrow-in-right me-1" aria-hidden="true" />
-                Acceso colaboradores
-              </Link>
-            </div>
+            <Link to="/login" className="btn btn-soft btn-sm d-inline-flex align-items-center gap-2">
+              <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
+              <span>Acceso Funcionarios / Login</span>
+            </Link>
           </div>
         </div>
       </header>
 
-      <main className="container py-5 flex-grow-1">
-        <div className="row g-4">
-          {/* Formulario */}
-          <div className="col-lg-8">
-            <div className="aqua-card">
-              <div className="card-body p-4">
-                <h1 className="h4 fw-semibold mb-1">Formulario de postulación</h1>
-                <p className="text-muted-aqua small mb-4">
-                  Completa tus datos y adjunta tu curriculum en PDF. Recibiras la confirmación en el
-                  correo indicado.
-                </p>
-
-                <form className="aqua-form" onSubmit={manejarEnvio} noValidate>
-                  <fieldset className="mb-4">
-                    <legend className="h6 fw-semibold mb-3">
-                      <span className="badge bg-aqua-primary me-2">1</span>
-                      Datos personales
-                    </legend>
-                    <div className="row g-3">
-                      <div className="col-md-4">
-                        <label className="form-label" htmlFor="nombres">
-                          Nombres <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${errores.nombres ? 'is-invalid' : ''}`}
-                          id="nombres"
-                          name="nombres"
-                          value={formulario.nombres}
-                          onChange={actualizarCampo}
-                          placeholder="Martina Andrea"
-                          required
-                        />
-                        {errores.nombres && <div className="invalid-feedback">{errores.nombres}</div>}
-                      </div>
-
-                      <div className="col-md-4">
-                        <label className="form-label" htmlFor="apellido_paterno">
-                          Apellido paterno <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${errores.apellido_paterno ? 'is-invalid' : ''}`}
-                          id="apellido_paterno"
-                          name="apellido_paterno"
-                          value={formulario.apellido_paterno}
-                          onChange={actualizarCampo}
-                          placeholder="Contreras"
-                          required
-                        />
-                        {errores.apellido_paterno && <div className="invalid-feedback">{errores.apellido_paterno}</div>}
-                      </div>
-
-                      <div className="col-md-4">
-                        <label className="form-label" htmlFor="apellido_materno">
-                          Apellido materno <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className={`form-control ${errores.apellido_materno ? 'is-invalid' : ''}`}
-                          id="apellido_materno"
-                          name="apellido_materno"
-                          value={formulario.apellido_materno}
-                          onChange={actualizarCampo}
-                          placeholder="Muniz"
-                          required
-                        />
-                        {errores.apellido_materno && <div className="invalid-feedback">{errores.apellido_materno}</div>}
-                      </div>
-                    </div>
-                  </fieldset>
-
-                  <fieldset className="mb-4">
-                    <legend className="h6 fw-semibold mb-3">
-                      <span className="badge bg-aqua-primary me-2">2</span>
-                      Contacto
-                    </legend>
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label" htmlFor="correo">
-                          Correo electrónico <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          className={`form-control ${errores.correo ? 'is-invalid' : ''}`}
-                          id="correo"
-                          name="correo"
-                          value={formulario.correo}
-                          onChange={actualizarCampo}
-                          placeholder="nombre.apellido@correo.cl"
-                          required
-                        />
-                        {errores.correo && <div className="invalid-feedback">{errores.correo}</div>}
-                      </div>
-
-                      <div className="col-md-6">
-                        <label className="form-label" htmlFor="telefono">
-                          Teléfono <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          className={`form-control ${errores.telefono ? 'is-invalid' : ''}`}
-                          id="telefono"
-                          name="telefono"
-                          value={formulario.telefono}
-                          onChange={actualizarCampo}
-                          placeholder="+56 9 1234 5678"
-                          required
-                        />
-                        {errores.telefono && <div className="invalid-feedback">{errores.telefono}</div>}
-                      </div>
-
-                      <div className="col-md-6">
-                        <label className="form-label" htmlFor="linkedin">
-                          LinkedIn (opcional)
-                        </label>
-                        <input
-                          type="url"
-                          className="form-control"
-                          id="linkedin"
-                          name="linkedin"
-                          value={formulario.linkedin}
-                          onChange={actualizarCampo}
-                          placeholder="https://www.linkedin.com/in/..."
-                        />
-                      </div>
-                    </div>
-                  </fieldset>
-
-                  <fieldset className="mb-4">
-                    <legend className="h6 fw-semibold mb-3">
-                      <span className="badge bg-aqua-primary me-2">3</span>
-                      Vacante a postular
-                    </legend>
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label" htmlFor="familia_id">
-                          Familia de cargo <span className="text-danger">*</span>
-                        </label>
-                        <select
-                          className={`form-select ${errores.familia_id ? 'is-invalid' : ''}`}
-                          id="familia_id"
-                          name="familia_id"
-                          value={formulario.familia_id}
-                          onChange={seleccionarFamilia}
-                          required
-                        >
-                          <option value="">Seleccione una familia</option>
-                          {grupos.map((grupo) => (
-                            <option key={grupo.id} value={grupo.id}>
-                              {grupo.nombre}
-                            </option>
-                          ))}
-                        </select>
-                        {errores.familia_id && <div className="invalid-feedback">{errores.familia_id}</div>}
-                      </div>
-
-                      <div className="col-md-6">
-                        <label className="form-label" htmlFor="cargo_id">
-                          Cargo al que postula <span className="text-danger">*</span>
-                        </label>
-                        <select
-                          className={`form-select ${errores.cargo_id ? 'is-invalid' : ''}`}
-                          id="cargo_id"
-                          name="cargo_id"
-                          value={formulario.cargo_id}
-                          onChange={actualizarCampo}
-                          disabled={!formulario.familia_id}
-                          required
-                        >
-                          <option value="">{formulario.familia_id ? 'Seleccione un cargo' : 'Elija primero la familia'}</option>
-                          {cargosFamiliaSeleccionada.map((cargo) => (
-                            <option key={cargo.id} value={cargo.id}>
-                              {cargo.nombre} ({cargo.vacantes} vacantes)
-                            </option>
-                          ))}
-                        </select>
-                        {errores.cargo_id && <div className="invalid-feedback">{errores.cargo_id}</div>}
-                      </div>
-
-                      <div className="col-12">
-                        <label className="form-label" htmlFor="comentarios">
-                          Comentarios (opcional)
-                        </label>
-                        <textarea
-                          className="form-control"
-                          id="comentarios"
-                          name="comentarios"
-                          rows={3}
-                          value={formulario.comentarios}
-                          onChange={actualizarCampo}
-                          placeholder="Cuentanos brevemente tu experiencia en el sector salmonicultor"
-                        />
-                      </div>
-                    </div>
-                  </fieldset>
-
-                  <fieldset className="mb-4">
-                    <legend className="h6 fw-semibold mb-3">
-                      <span className="badge bg-aqua-primary me-2">4</span>
-                      Currículum Vitae
-                    </legend>
-                    <div
-                      className={`aqua-dropzone ${arrastrando ? 'is-dragover' : ''}`}
-                      onDragOver={(evento) => {
-                        evento.preventDefault();
-                        setArrastrando(true);
-                      }}
-                      onDragLeave={() => setArrastrando(false)}
-                      onDrop={manejarSoltar}
-                      onClick={() => inputArchivoRef.current?.click()}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(evento) => {
-                        if (evento.key === 'Enter' || evento.key === ' ') inputArchivoRef.current?.click();
-                      }}
-                    >
-                      <i className="bi bi-paperclip d-block" aria-hidden="true" />
-                      {cv ? (
-                        <>
-                          <p className="mb-1 fw-semibold text-break">{cv.name}</p>
-                          <p className="text-muted-aqua mb-0" style={{ fontSize: '0.8rem' }}>
-                            {(cv.size / 1024).toFixed(0)} KB &middot; haz clic para reemplazar el archivo
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="fw-semibold mb-1">Arrastra tu CV o haz clic para buscarlo</p>
-                          <p className="text-muted-aqua mb-0" style={{ fontSize: '0.8rem' }}>
-                            Formato PDF, maximo {TAMANO_MAXIMO_MB} MB
-                          </p>
-                        </>
-                      )}
-                      <input
-                        ref={inputArchivoRef}
-                        type="file"
-                        className="d-none"
-                        accept="application/pdf,.pdf"
-                        onChange={manejarArchivo}
-                        aria-label="Adjuntar Curriculum Vitae en PDF"
-                      />
-                    </div>
-                    {errores.cv && <div className="text-danger mt-2" style={{ fontSize: '0.8rem' }}>{errores.cv}</div>}
-                    {cv && (
-                      <button type="button" className="btn btn-soft btn-sm mt-2" onClick={quitarArchivo}>
-                        <i className="bi bi-x-circle me-1" aria-hidden="true" />
-                        Quitar archivo
-                      </button>
-                    )}
-                  </fieldset>
-
-                  <div className="form-check mb-3">
-                    <input className="form-check-input" type="checkbox" id="autorizacion" defaultChecked required />
-                    <label className="form-check-label small" htmlFor="autorizacion">
-                      Autorizo a AquaChile a tratar mis datos personales para los fines de este proceso
-                      de seleccion.
-                    </label>
-                  </div>
-
-                  <div className="d-flex flex-column flex-sm-row gap-2">
-                    <button type="submit" className="btn btn-aqua px-4">
-                      <i className="bi bi-send me-1" aria-hidden="true" />
-                      Enviar postulación
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-soft px-4"
-                      onClick={() => {
-                        setFormulario(ESTADO_INICIAL);
-                        setCv(null);
-                        setErrores({});
-                      }}
-                    >
-                      <i className="bi bi-arrow-counterclockwise me-1" aria-hidden="true" />
-                      Limpiar formulario
-                    </button>
-                  </div>
-
-                  <p className="text-muted-aqua mt-3 mb-0" style={{ fontSize: '0.76rem' }}>
-                    Maquetado: los campos marcados con * son obligatorios. El envio no persiste datos
-                    hasta conectar el controlador PHP.
-                  </p>
-                </form>
-              </div>
+      <main className="container py-4 flex-grow-1">
+        {/* Hero */}
+        <section className="aqua-hero rounded-4 p-4 p-md-5 mb-4 position-relative overflow-hidden">
+          <div
+            className="position-absolute rounded-circle"
+            style={{ width: 320, height: 320, right: -60, top: -110, background: 'rgba(0,105,115,0.35)', filter: 'blur(70px)' }}
+            aria-hidden="true"
+          />
+          <div className="position-relative" style={{ maxWidth: 720 }}>
+            <span className="badge rounded-pill mb-3 px-3 py-2 text-uppercase" style={{ backgroundColor: 'rgba(208,228,255,0.2)', color: '#d0e4ff', letterSpacing: '0.08em' }}>
+              <i className="bi bi-clock me-1" aria-hidden="true" />
+              Proceso Abierto Temporada 2025
+            </span>
+            <h1 className="h2 fw-bold mb-2">Portal de Empleo y Selección de Talentos AquaChile</h1>
+            <p className="lead fw-light mb-4" style={{ fontSize: '1rem' }}>
+              Únete a nuestro equipo líder en la industria acuícola nacional e internacional. Cultivamos
+              excelencia, sustentabilidad e innovación austral.
+            </p>
+            <div className="d-flex flex-wrap gap-2">
+              <span className="badge rounded-pill fw-normal px-3 py-2 d-inline-flex align-items-center gap-2" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#eaf1ff' }}>
+                <i className="bi bi-water text-info" aria-hidden="true" /> Sustentabilidad Marina
+              </span>
+              <span className="badge rounded-pill fw-normal px-3 py-2 d-inline-flex align-items-center gap-2" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#eaf1ff' }}>
+                <i className="bi bi-gear" aria-hidden="true" /> Tecnología de Punta
+              </span>
+              <span className="badge rounded-pill fw-normal px-3 py-2 d-inline-flex align-items-center gap-2" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#eaf1ff' }}>
+                <i className="bi bi-arrow-left-right" aria-hidden="true" /> Carrera y Bienestar Austral
+              </span>
             </div>
           </div>
+        </section>
 
-          {/* Panel informativo */}
-          <div className="col-lg-4">
-            <div className="aqua-card mb-3">
+        <div className="row justify-content-center">
+          <div className="col-lg-10 col-xl-8">
+            {/* Tarjeta del formulario */}
+            <div className="aqua-card p-4 p-md-5 mb-4">
+              <h2 className="visually-hidden">Formulario de postulación</h2>
+
+              <form className="aqua-form d-flex flex-column gap-4" onSubmit={manejarEnvio} noValidate>
+                {/* Stepper / status track */}
+                <div className="d-flex align-items-center justify-content-between p-3 rounded-3" style={{ backgroundColor: 'rgba(239,244,255,0.6)' }}>
+                  <div className="d-flex align-items-center gap-2">
+                    <span className="badge rounded-circle bg-aqua-primary" style={{ width: 24, height: 24, lineHeight: '16px' }}>1</span>
+                    <span className="fw-semibold small text-aqua-primary">Identificación</span>
+                  </div>
+                  <span className="text-muted" style={{ letterSpacing: 2 }}>•••</span>
+                  <div className="d-flex align-items-center gap-2">
+                    <span className="badge rounded-circle bg-aqua-primary" style={{ width: 24, height: 24, lineHeight: '16px' }}>2</span>
+                    <span className="fw-semibold small text-aqua-primary">Postulación</span>
+                  </div>
+                  <span className="text-muted" style={{ letterSpacing: 2 }}>•••</span>
+                  <div className="d-flex align-items-center gap-2">
+                    <span className="badge rounded-circle bg-aqua-primary" style={{ width: 24, height: 24, lineHeight: '16px' }}>3</span>
+                    <span className="fw-semibold small text-aqua-primary">CV &amp; Validación</span>
+                  </div>
+                </div>
+
+                {/* Sección 1: Datos Personales */}
+                <section>
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <span className="rounded-2 d-inline-flex align-items-center justify-content-center bg-tint-primary" style={{ width: 30, height: 30 }}>
+                      <i className="bi bi-person" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h3 className="h6 fw-semibold mb-0">Sección 1: Datos Personales</h3>
+                      <p className="small text-muted-aqua mb-0">Ingresa tu identificación según tu cédula de identidad.</p>
+                    </div>
+                  </div>
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label" htmlFor="nombres">
+                        Nombres completos <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className={`form-control ${errores.nombres ? 'is-invalid' : ''}`}
+                        id="nombres"
+                        name="nombres"
+                        value={formulario.nombres}
+                        onChange={actualizarCampo}
+                        placeholder="Ej. Camila Andrea"
+                        required
+                      />
+                      {errores.nombres && <div className="invalid-feedback">{errores.nombres}</div>}
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label" htmlFor="apellido_paterno">
+                        Apellido paterno <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className={`form-control ${errores.apellido_paterno ? 'is-invalid' : ''}`}
+                        id="apellido_paterno"
+                        name="apellido_paterno"
+                        value={formulario.apellido_paterno}
+                        onChange={actualizarCampo}
+                        placeholder="Ej. Contreras"
+                        required
+                      />
+                      {errores.apellido_paterno && <div className="invalid-feedback">{errores.apellido_paterno}</div>}
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label" htmlFor="apellido_materno">
+                        Apellido materno <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className={`form-control ${errores.apellido_materno ? 'is-invalid' : ''}`}
+                        id="apellido_materno"
+                        name="apellido_materno"
+                        value={formulario.apellido_materno}
+                        onChange={actualizarCampo}
+                        placeholder="Ej. Muñoz"
+                        required
+                      />
+                      {errores.apellido_materno && <div className="invalid-feedback">{errores.apellido_materno}</div>}
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label" htmlFor="correo">
+                        Correo electrónico <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        className={`form-control ${errores.correo ? 'is-invalid' : ''}`}
+                        id="correo"
+                        name="correo"
+                        value={formulario.correo}
+                        onChange={actualizarCampo}
+                        placeholder="nombre.apellido@correo.cl"
+                        required
+                      />
+                      {errores.correo && <div className="invalid-feedback">{errores.correo}</div>}
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label" htmlFor="telefono">
+                        Teléfono móvil <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        className={`form-control ${errores.telefono ? 'is-invalid' : ''}`}
+                        id="telefono"
+                        name="telefono"
+                        value={formulario.telefono}
+                        onChange={actualizarCampo}
+                        placeholder="+56 9 1234 5678"
+                        required
+                      />
+                      {errores.telefono && <div className="invalid-feedback">{errores.telefono}</div>}
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label" htmlFor="linkedin">
+                        LinkedIn (opcional)
+                      </label>
+                      <input
+                        type="url"
+                        className="form-control"
+                        id="linkedin"
+                        name="linkedin"
+                        value={formulario.linkedin}
+                        onChange={actualizarCampo}
+                        placeholder="https://www.linkedin.com/in/..."
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                {/* Sección 2: Selección de Vacante */}
+                <section>
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <span className="rounded-2 d-inline-flex align-items-center justify-content-center bg-tint-primary" style={{ width: 30, height: 30 }}>
+                      <i className="bi bi-briefcase" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h3 className="h6 fw-semibold mb-0">Sección 2: Selección de Vacante y Área</h3>
+                      <p className="small text-muted-aqua mb-0">Selecciona el área productiva y el cargo de tu interés.</p>
+                    </div>
+                  </div>
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label" htmlFor="familia_id">
+                        Familia de cargo <span className="text-danger">*</span>
+                      </label>
+                      <select
+                        className={`form-select ${errores.familia_id ? 'is-invalid' : ''}`}
+                        id="familia_id"
+                        name="familia_id"
+                        value={formulario.familia_id}
+                        onChange={seleccionarFamilia}
+                        required
+                      >
+                        <option value="">Seleccione una familia</option>
+                        {grupos.map((grupo) => (
+                          <option key={grupo.id} value={grupo.id}>
+                            {grupo.nombre}
+                          </option>
+                        ))}
+                      </select>
+                      {errores.familia_id && <div className="invalid-feedback">{errores.familia_id}</div>}
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label" htmlFor="cargo_id">
+                        Cargo al que postula <span className="text-danger">*</span>
+                      </label>
+                      <select
+                        className={`form-select ${errores.cargo_id ? 'is-invalid' : ''}`}
+                        id="cargo_id"
+                        name="cargo_id"
+                        value={formulario.cargo_id}
+                        onChange={actualizarCampo}
+                        disabled={!formulario.familia_id}
+                        required
+                      >
+                        <option value="">{formulario.familia_id ? 'Seleccione un cargo' : 'Elija primero la familia'}</option>
+                        {cargosFamiliaSeleccionada.map((cargo) => (
+                          <option key={cargo.id} value={cargo.id}>
+                            {cargo.nombre} ({cargo.vacantes} vacantes)
+                          </option>
+                        ))}
+                      </select>
+                      {errores.cargo_id && <div className="invalid-feedback">{errores.cargo_id}</div>}
+                    </div>
+
+                    <div className="col-12">
+                      <label className="form-label" htmlFor="comentarios">
+                        Comentarios (opcional)
+                      </label>
+                      <textarea
+                        className="form-control"
+                        id="comentarios"
+                        name="comentarios"
+                        rows={3}
+                        value={formulario.comentarios}
+                        onChange={actualizarCampo}
+                        placeholder="Cuéntanos brevemente tu experiencia en el sector salmonicultor"
+                      />
+                    </div>
+
+                    {cargoSeleccionado && (
+                      <div className="col-12">
+                        <div className="p-3 rounded-3 bg-tint-info d-flex align-items-center gap-2">
+                          <i className="bi bi-geo-alt" aria-hidden="true" />
+                          <span className="small">
+                            <strong>{cargoSeleccionado.nombre}</strong> &middot; Jornada: {cargoSeleccionado.jornada}{' '}
+                            &middot; Vacantes disponibles: {cargoSeleccionado.vacantes}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {/* Sección 3: Antecedentes Curriculares */}
+                <section>
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <span className="rounded-2 d-inline-flex align-items-center justify-content-center bg-tint-primary" style={{ width: 30, height: 30 }}>
+                      <i className="bi bi-cloud-arrow-up" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h3 className="h6 fw-semibold mb-0">Sección 3: Antecedentes Curriculares</h3>
+                      <p className="small text-muted-aqua mb-0">Adjunta tu Currículum Vitae actualizado en formato PDF.</p>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`aqua-dropzone ${arrastrando ? 'is-dragover' : ''}`}
+                    onDragOver={(evento) => {
+                      evento.preventDefault();
+                      setArrastrando(true);
+                    }}
+                    onDragLeave={() => setArrastrando(false)}
+                    onDrop={manejarSoltar}
+                    onClick={() => inputArchivoRef.current?.click()}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(evento) => {
+                      if (evento.key === 'Enter' || evento.key === ' ') inputArchivoRef.current?.click();
+                    }}
+                  >
+                    <span className="rounded-circle bg-white shadow-sm d-inline-flex align-items-center justify-content-center mb-2" style={{ width: 48, height: 48 }}>
+                      <i className="bi bi-cloud-arrow-up fs-4 text-aqua-primary" aria-hidden="true" />
+                    </span>
+                    {cv ? (
+                      <>
+                        <p className="mb-1 fw-semibold text-break">{cv.name}</p>
+                        <p className="text-muted-aqua mb-0" style={{ fontSize: '0.8rem' }}>
+                          {(cv.size / 1024).toFixed(0)} KB &middot; haz clic para reemplazar el archivo
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="fw-semibold mb-1">Arrastra y suelta tu archivo PDF aquí</p>
+                        <p className="text-muted-aqua mb-0" style={{ fontSize: '0.8rem' }}>
+                          o haz clic para explorar en tu dispositivo (máximo {TAMANO_MAXIMO_MB} MB)
+                        </p>
+                      </>
+                    )}
+                    <input
+                      ref={inputArchivoRef}
+                      type="file"
+                      className="d-none"
+                      accept="application/pdf,.pdf"
+                      onChange={manejarArchivo}
+                      aria-label="Adjuntar Curriculum Vitae en PDF"
+                    />
+                  </div>
+                  {errores.cv && <div className="text-danger mt-2" style={{ fontSize: '0.8rem' }}>{errores.cv}</div>}
+                  {cv && (
+                    <div className="d-flex align-items-center justify-content-between p-3 rounded-3 mt-2" style={{ backgroundColor: 'var(--aqua-surface-alt)' }}>
+                      <div className="d-flex align-items-center gap-2">
+                        <span className="rounded d-inline-flex align-items-center justify-content-center bg-tint-danger" style={{ width: 36, height: 36 }}>
+                          <i className="bi bi-file-earmark-pdf" aria-hidden="true" />
+                        </span>
+                        <div>
+                          <div className="fw-semibold small text-break">{cv.name}</div>
+                          <div className="text-muted-aqua" style={{ fontSize: '0.78rem' }}>
+                            {(cv.size / 1024).toFixed(0)} KB &middot; listo para enviar
+                          </div>
+                        </div>
+                      </div>
+                      <button type="button" className="btn btn-link text-muted p-0" onClick={quitarArchivo} title="Eliminar archivo">
+                        <i className="bi bi-x-lg" aria-hidden="true" />
+                      </button>
+                    </div>
+                  )}
+                </section>
+
+                {/* Sección 4: Consentimiento */}
+                <section>
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <span className="rounded-2 d-inline-flex align-items-center justify-content-center bg-tint-primary" style={{ width: 30, height: 30 }}>
+                      <i className="bi bi-shield-check" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h3 className="h6 fw-semibold mb-0">Sección 4: Consentimiento Informado y Tratamiento de Datos</h3>
+                      <p className="small text-muted-aqua mb-0">Declaraciones legales obligatorias bajo la legislación chilena vigente.</p>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-3" style={{ backgroundColor: 'rgba(239,244,255,0.7)' }}>
+                    <div className="form-check">
+                      <input className="form-check-input" type="checkbox" id="autorizacion" defaultChecked required />
+                      <label className="form-check-label small" htmlFor="autorizacion">
+                        Autorizo expresamente a <strong>Empresas AquaChile S.A.</strong> para tratar y almacenar mis
+                        datos personales y antecedentes laborales con fines de postulación, evaluación psicométrica y
+                        eventual contratación, conforme a la <strong>Ley N° 19.628</strong>.
+                      </label>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Envío */}
+                <div className="d-flex flex-column gap-2 pt-2">
+                  <button type="submit" className="btn btn-aqua btn-lg w-100 d-flex align-items-center justify-content-center gap-2">
+                    <span>Enviar Postulación Oficial</span>
+                    <i className="bi bi-arrow-right" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-soft"
+                    onClick={() => {
+                      setFormulario(ESTADO_INICIAL);
+                      setCv(null);
+                      setErrores({});
+                    }}
+                  >
+                    <i className="bi bi-arrow-counterclockwise me-1" aria-hidden="true" />
+                    Limpiar formulario
+                  </button>
+                  <p className="text-center text-muted-aqua mt-1 mb-0" style={{ fontSize: '0.76rem' }}>
+                    Al pulsar &quot;Enviar Postulación Oficial&quot;, recibirás un correo de confirmación con tu
+                    código de seguimiento único.
+                  </p>
+                </div>
+              </form>
+            </div>
+
+            {/* Panel informativo */}
+            <div className="aqua-card mb-4">
               <div className="card-header">
                 <i className="bi bi-info-circle me-2" aria-hidden="true" />
-                Como funciona el proceso
+                ¿Cómo funciona el proceso?
               </div>
               <div className="card-body">
                 <div className="aqua-timeline">
                   <div className="aqua-timeline-item">
                     <p className="mb-1 fw-semibold small">1. Postulación</p>
                     <p className="mb-0 text-muted-aqua" style={{ fontSize: '0.8rem' }}>
-                      Envias tus datos y tu CV en PDF por este formulario.
+                      Envías tus datos y tu CV en PDF por este formulario.
                     </p>
                   </div>
                   <div className="aqua-timeline-item">
-                    <p className="mb-1 fw-semibold small">2. Revision curricular</p>
+                    <p className="mb-1 fw-semibold small">2. Revisión curricular</p>
                     <p className="mb-0 text-muted-aqua" style={{ fontSize: '0.8rem' }}>
-                      Un analista de reclutamiento valida tu postulacion.
+                      Un analista de reclutamiento valida tu postulación.
                     </p>
                   </div>
                   <div className="aqua-timeline-item">
@@ -449,31 +539,14 @@ export default function Postular() {
                   <div className="aqua-timeline-item pb-0">
                     <p className="mb-1 fw-semibold small">4. Evaluación psicolaboral</p>
                     <p className="mb-0 text-muted-aqua" style={{ fontSize: '0.8rem' }}>
-                      Un profesional psicologo realiza la evaluacion y registra el resultado.
+                      Un profesional psicólogo realiza la evaluación y registra el resultado.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {cargoSeleccionado && (
-              <div className="aqua-card mb-3">
-                <div className="card-header">
-                  <i className="bi bi-briefcase me-2" aria-hidden="true" />
-                  Vacante seleccionada
-                </div>
-                <div className="card-body">
-                  <h2 className="h6 fw-semibold mb-2">{cargoSeleccionado.nombre}</h2>
-                  <p className="text-muted-aqua small mb-0">
-                    Jornada: {cargoSeleccionado.jornada}
-                    <br />
-                    Vacantes disponibles: {cargoSeleccionado.vacantes}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <div className="aqua-card">
+            <div className="aqua-card mb-4">
               <div className="card-header">
                 <i className="bi bi-building me-2" aria-hidden="true" />
                 ¿Eres colaborador de AquaChile?

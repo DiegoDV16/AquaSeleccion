@@ -5,42 +5,42 @@
    ========================================================================== */
 
 :root {
-  /* Paleta institucional AquaChile: cian corporativo, claro y legible */
-  --aqua-primary: #0e7490;
-  --aqua-primary-dark: #155e75;
-  --aqua-primary-light: #0891b2;
-  --aqua-accent: #06b6d4;
-  --aqua-surface: #f6f9fa;
-  --aqua-surface-alt: #eef4f6;
-  --aqua-border: #dde7ea;
+  /* Paleta institucional AquaChile (sistema Stitch): azul marino corporativo */
+  --aqua-primary: #0e3a5d;
+  --aqua-primary-dark: #00243f;
+  --aqua-primary-light: #22496d;
+  --aqua-accent: #006973;
+  --aqua-surface: #f8f9ff;
+  --aqua-surface-alt: #eff4ff;
+  --aqua-border: #d3e4fe;
   --aqua-success: #15803d;
   --aqua-warning: #b45309;
-  --aqua-danger: #b91c1c;
-  --aqua-ink: #0f1e26;
-  --aqua-muted: #4a616b;
+  --aqua-danger: #ba1a1a;
+  --aqua-ink: #0b1c30;
+  --aqua-muted: #42474e;
   --aqua-sidebar-w: 264px;
   --aqua-sidebar-w-collapsed: 76px;
   --aqua-navbar-h: 64px;
 
   /* Paleta solida para acentos: blanco encima siempre supera 4.5:1 (WCAG AA) */
-  --aqua-solid-primary: #0e7490;
-  --aqua-solid-info: #0b6a86;
+  --aqua-solid-primary: #0e3a5d;
+  --aqua-solid-info: #003965;
   --aqua-solid-success: #15803d;
   --aqua-solid-warning: #b45309;
-  --aqua-solid-danger: #b91c1c;
-  --aqua-solid-secondary: #4a616b;
-  --aqua-shadow: 0 1px 2px rgba(15, 30, 38, 0.06), 0 1px 3px rgba(15, 30, 38, 0.04);
-  --aqua-shadow-lg: 0 4px 14px rgba(15, 30, 38, 0.1);
+  --aqua-solid-danger: #ba1a1a;
+  --aqua-solid-secondary: #42474e;
+  --aqua-shadow: 0 1px 2px rgba(11, 28, 48, 0.06), 0 1px 3px rgba(11, 28, 48, 0.04);
+  --aqua-shadow-lg: 0 4px 14px rgba(11, 28, 48, 0.12);
 
   /* Bootstrap 5: se reasignan los tokens nativos */
   --bs-primary: var(--aqua-primary);
-  --bs-primary-rgb: 14, 116, 144;
+  --bs-primary-rgb: 14, 58, 93;
   --bs-secondary-color: var(--aqua-muted);
   --bs-body-color: var(--aqua-ink);
   --bs-body-bg: var(--aqua-surface);
   --bs-border-color: var(--aqua-border);
-  --bs-link-color: #0e7490;
-  --bs-link-hover-color: #155e75;
+  --bs-link-color: #0e3a5d;
+  --bs-link-hover-color: #00243f;
 }
 
 * {
@@ -49,7 +49,7 @@
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--aqua-surface);
   color: var(--aqua-ink);
   -webkit-font-smoothing: antialiased;
@@ -87,10 +87,10 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--aqua-primary), var(--aqua-primary-light));
+  background: linear-gradient(135deg, var(--aqua-primary-dark), var(--aqua-primary) 60%, var(--aqua-primary-light));
   color: #fff;
   font-size: 1.15rem;
-  box-shadow: 0 2px 6px rgba(14, 116, 144, 0.28);
+  box-shadow: 0 2px 6px rgba(14, 58, 93, 0.28);
 }
 
 .aqua-avatar {
@@ -118,8 +118,8 @@ body {
   text-transform: uppercase;
   padding: 0.28rem 0.6rem;
   border-radius: 5px;
-  background-color: #e4f2f6;
-  color: #0c5c73;
+  background-color: #e5eeff;
+  color: #0e3a5d;
   white-space: nowrap;
 }
 
@@ -138,7 +138,7 @@ body {
   font-size: 0.68rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #7c929b;
+  color: #73777f;
   padding: 0.9rem 1.1rem 0.4rem;
   font-weight: 700;
 }
@@ -155,15 +155,14 @@ body {
 }
 
 .aqua-sidebar .nav-link:hover {
-  background-color: #f1f7f9;
+  background-color: #eff4ff;
   color: var(--aqua-primary-dark);
 }
 
 .aqua-sidebar .nav-link.active {
-  background-color: #e4f2f6;
-  color: #0b5567;
+  background-color: var(--aqua-primary);
+  color: #fff;
   font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--aqua-primary);
 }
 
 .aqua-sidebar .nav-link .bi {
@@ -174,8 +173,8 @@ body {
 }
 
 .aqua-sidebar .badge {
-  background-color: #e4f2f6;
-  color: #0c5c73;
+  background-color: #e5eeff;
+  color: #0e3a5d;
   font-weight: 700;
 }
 
@@ -389,8 +388,8 @@ body {
 
 /* Tintes: fondo claro + texto oscuro (contraste AA en todo tamano) */
 .bg-tint-primary {
-  background-color: #d8edf0;
-  color: #0f5561;
+  background-color: #d0e4ff;
+  color: #22496d;
 }
 
 .bg-tint-success {
@@ -409,8 +408,8 @@ body {
 }
 
 .bg-tint-info {
-  background-color: #d7ebee;
-  color: #0f5561;
+  background-color: #d0e4ff;
+  color: #22496d;
 }
 
 /* Tablas */
@@ -434,7 +433,7 @@ body {
 }
 
 .aqua-table tbody tr:hover {
-  background-color: #f7fbfb;
+  background-color: #f0f5ff;
 }
 
 /* Formularios */
@@ -455,7 +454,7 @@ body {
 .aqua-form .form-control:focus,
 .aqua-form .form-select:focus {
   border-color: var(--aqua-primary-light);
-  box-shadow: 0 0 0 0.2rem rgba(8, 145, 178, 0.18);
+  box-shadow: 0 0 0 0.2rem rgba(14, 58, 93, 0.18);
 }
 
 .aqua-form .form-text {
@@ -468,7 +467,7 @@ body {
   border: 1px solid var(--aqua-primary);
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(14, 116, 144, 0.25);
+  box-shadow: 0 1px 2px rgba(14, 58, 93, 0.25);
 }
 
 .btn-aqua:hover,
@@ -480,7 +479,7 @@ body {
 
 .btn-outline-aqua {
   border: 1px solid var(--aqua-primary-light);
-  color: #0c5c73;
+  color: #0e3a5d;
   font-weight: 600;
   background-color: #fff;
 }
@@ -501,8 +500,8 @@ body {
 
 .btn-soft:hover,
 .btn-soft:focus {
-  background-color: #f1f7f9;
-  color: #0c5c73;
+  background-color: #eff4ff;
+  color: #0e3a5d;
   border-color: var(--aqua-primary-light);
 }
 
@@ -523,27 +522,27 @@ body {
 }
 
 .badge-estado-proceso {
-  background-color: #e2f1f6;
-  color: #0c5c73;
-  border: 1px solid #c3e0e8;
+  background-color: #e5eeff;
+  color: #0e3a5d;
+  border: 1px solid #d0e4ff;
 }
 
 .badge-estado-finalizada {
-  background-color: #e3f3e9;
-  color: #12642f;
-  border: 1px solid #bfe0cd;
+  background-color: #e6f4ea;
+  color: #15803d;
+  border: 1px solid #c3e6cb;
 }
 
 .badge-estado-apto {
-  background-color: #e3f3e9;
-  color: #12642f;
-  border: 1px solid #bfe0cd;
+  background-color: #e6f4ea;
+  color: #15803d;
+  border: 1px solid #c3e6cb;
 }
 
 .badge-estado-noapto {
-  background-color: #fce8e8;
-  color: #a41c1c;
-  border: 1px solid #f2c9c9;
+  background-color: #ffdad6;
+  color: #93000a;
+  border: 1px solid #f2b8b5;
 }
 
 .badge-estado-observaciones {
@@ -553,9 +552,9 @@ body {
 }
 
 .badge-estado-activo {
-  background-color: #e3f3e9;
-  color: #12642f;
-  border: 1px solid #bfe0cd;
+  background-color: #e6f4ea;
+  color: #15803d;
+  border: 1px solid #c3e6cb;
 }
 
 .badge-estado-inactivo {
@@ -585,8 +584,8 @@ body {
 
 /* Vistas publicas / auth */
 .aqua-hero {
-  background: linear-gradient(135deg, #0c5c73 0%, var(--aqua-primary) 45%, var(--aqua-primary-light) 100%);
-  color: #eaf6f9;
+  background: linear-gradient(135deg, #00243f 0%, var(--aqua-primary) 55%, #22496d 100%);
+  color: #eaf1ff;
 }
 
 .aqua-hero h1 {
@@ -638,7 +637,7 @@ body {
 .aqua-dropzone {
   border: 2px dashed var(--aqua-border);
   border-radius: 8px;
-  background-color: #fbfdfd;
+  background-color: #f8f9ff;
   padding: 1.5rem 1rem;
   text-align: center;
   cursor: pointer;
@@ -648,7 +647,7 @@ body {
 .aqua-dropzone:hover,
 .aqua-dropzone.is-dragover {
   border-color: var(--aqua-accent);
-  background-color: #f2f9fa;
+  background-color: #eff4ff;
 }
 
 .aqua-dropzone .bi-paperclip {
