@@ -9,3 +9,4 @@ dist*
 .idea
 *.log
 npm-debug.log*
+/backend/config/conexion.php
