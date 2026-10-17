@@ -1,35 +1,58 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import { CLAVE_ROLES, obtenerRol } from '../../mock/catalogoRoles.js';
-import { USUARIOS } from '../../mock/usuarios.js';
+import { listarUsuarios } from '../../services/usuariosApi.js';
 
 /** Listado de usuarios del sistema con filtro por rol, estado y busqueda. */
 export default function AdminUsuarios() {
+  const [usuarios, setUsuarios] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [filtroRol, setFiltroRol] = useState('todos');
   const [filtroEstado, setFiltroEstado] = useState('todos');
 
+  useEffect(() => {
+    let vigente = true;
+
+    listarUsuarios()
+      .then((datos) => {
+        if (!vigente) return;
+        if (!datos?.ok) {
+          setError(datos?.mensaje ?? 'No se pudieron cargar los usuarios.');
+          return;
+        }
+        setUsuarios(datos.usuarios);
+      })
+      .finally(() => {
+        if (vigente) setCargando(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, []);
+
   const usuariosFiltrados = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
-    return USUARIOS.filter((usuario) => {
+    return usuarios.filter((usuario) => {
       const coincideTexto =
         texto === '' ||
         usuario.nombre.toLowerCase().includes(texto) ||
-        usuario.correo.toLowerCase().includes(texto) ||
-        usuario.cargo.toLowerCase().includes(texto);
+        usuario.correo.toLowerCase().includes(texto);
       const coincideRol = filtroRol === 'todos' || usuario.rol_id === filtroRol;
       const coincideEstado = filtroEstado === 'todos' || usuario.estado === filtroEstado;
       return coincideTexto && coincideRol && coincideEstado;
     });
-  }, [busqueda, filtroRol, filtroEstado]);
+  }, [usuarios, busqueda, filtroRol, filtroEstado]);
 
   return (
     <>
       <PageHeader
         etiqueta="Modulo Administrador"
         titulo="Usuarios del sistema"
-        descripcion={`${USUARIOS.length} usuarios registrados - ${USUARIOS.filter((u) => u.estado === 'activo').length} activos`}
+        descripcion={`${usuarios.length} usuarios registrados - ${usuarios.filter((u) => u.estado === 'activo').length} activos`}
         acciones={
           <button type="button" className="btn btn-aqua btn-sm" disabled title="Disponible en la iteracion con backend">
             <i className="bi bi-person-plus me-1" aria-hidden="true" />
@@ -53,7 +76,7 @@ export default function AdminUsuarios() {
                   type="search"
                   className="form-control"
                   id="busqueda-usuarios"
-                  placeholder="Buscar por nombre, correo o cargo"
+                  placeholder="Buscar por nombre o correo"
                   value={busqueda}
                   onChange={(evento) => setBusqueda(evento.target.value)}
                 />
@@ -113,22 +136,35 @@ export default function AdminUsuarios() {
               </tr>
             </thead>
             <tbody>
-              {usuariosFiltrados.map((usuario) => {
+              {cargando && (
+                <tr>
+                  <td colSpan={7} className="text-center text-muted-aqua py-4">
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                    Cargando usuarios...
+                  </td>
+                </tr>
+              )}
+              {!cargando && error && (
+                <tr>
+                  <td colSpan={7} className="text-center text-danger py-4">
+                    <i className="bi bi-exclamation-circle me-1" aria-hidden="true" />
+                    {error}
+                  </td>
+                </tr>
+              )}
+              {!cargando && !error && usuariosFiltrados.map((usuario) => {
                 const rol = obtenerRol(usuario.rol_id);
                 return (
                   <tr key={usuario.id}>
                     <td className="text-muted-aqua">{usuario.id}</td>
                     <td>
                       <span className="fw-semibold">{usuario.nombre}</span>
-                      <span className="d-block text-muted-aqua" style={{ fontSize: '0.78rem' }}>
-                        {usuario.cargo} &middot; {usuario.unidad}
-                      </span>
                     </td>
                     <td className="text-muted-aqua">{usuario.correo}</td>
                     <td>
                       <span className={`badge badge-estado badge-estado-${rol.color === 'secondary' ? 'inactivo' : 'proceso'}`}>
                         <i className={`bi bi-${rol.icono} me-1`} aria-hidden="true" />
-                        {rol.nombre}
+                        {usuario.rol_nombre ?? rol.nombre}
                       </span>
                     </td>
                     <td>
@@ -144,7 +180,7 @@ export default function AdminUsuarios() {
                         {usuario.estado === 'activo' ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
-                    <td className="text-muted-aqua small">{usuario.ultimo_acceso}</td>
+                    <td className="text-muted-aqua small">{usuario.ultimo_acceso ?? '—'}</td>
                     <td className="text-end">
                       <div className="btn-group btn-group-sm">
                         <button type="button" className="btn btn-soft" title="Ver detalle" disabled>
@@ -161,7 +197,7 @@ export default function AdminUsuarios() {
                   </tr>
                 );
               })}
-              {usuariosFiltrados.length === 0 && (
+              {!cargando && !error && usuariosFiltrados.length === 0 && (
                 <tr>
                   <td colSpan={7} className="text-center text-muted-aqua py-4">
                     No hay usuarios que coincidan con los filtros aplicados.

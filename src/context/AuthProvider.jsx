@@ -1,61 +1,69 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AuthContext } from './AuthContext.js';
 import { obtenerRol } from '../mock/catalogoRoles.js';
-import { obtenerUsuarioPorCorreo } from '../mock/usuarios.js';
+import { iniciarSesion, cerrarSesion, sesionActual } from '../services/authApi.js';
 
 /**
  * AuthProvider
- * Estado simulado de autenticacion. El rol NO se elige: se deduce del usuario
- * que inicia sesion, igual que lo hara el backend con la tabla `usuarios`.
- * Cuando exista MySQL + PHP, `login()` pasara a hacer POST /api/auth/login y la
- * sesion se sustentara con cookie de sesion, pero la forma de consumo
- * (`useAuth()`) se mantiene igual.
+ * Estado de autenticacion respaldado por la sesion PHP (backend/api/auth).
+ * El rol NO se elige: lo determina el backend a partir de la tabla `usuario`,
+ * y el menu/rutas se filtran con ese rol. Al recargar la pagina se restaura la
+ * sesion consultando session.php, que es la unica fuente de verdad.
  */
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
   const [autenticado, setAutenticado] = useState(false);
+  const [cargando, setCargando] = useState(true);
 
   const rolActivo = usuario?.rol_id ?? null;
   const rol = useMemo(() => (rolActivo ? obtenerRol(rolActivo) : null), [rolActivo]);
 
+  useEffect(() => {
+    let vigente = true;
+
+    sesionActual()
+      .then((datos) => {
+        if (!vigente) return;
+        if (datos?.ok && datos.autenticado) {
+          setUsuario(datos.usuario);
+          setAutenticado(true);
+        }
+      })
+      .finally(() => {
+        if (vigente) setCargando(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, []);
+
   /**
-   * Valida las credenciales contra los datos simulados.
-   * @returns {{ok: boolean, mensaje?: string, rol?: object}}
+   * Valida las credenciales contra el backend PHP.
+   * @returns {Promise<{ok: boolean, mensaje?: string, rol?: object}>}
    */
-  const login = useCallback(({ correo, clave }) => {
+  const login = useCallback(async ({ correo, clave }) => {
     if (!correo?.trim() || !clave?.trim()) {
       return { ok: false, mensaje: 'Ingresa tu correo institucional y contrasena.' };
     }
 
-    const encontrado = obtenerUsuarioPorCorreo(correo.trim());
+    const datos = await iniciarSesion({ correo: correo.trim(), contrasena: clave });
 
-    if (!encontrado) {
-      return {
-        ok: false,
-        mensaje: 'El correo no esta registrado en el sistema. Revisa el dominio o usa una cuenta de prueba.',
-      };
+    if (!datos?.ok) {
+      return { ok: false, mensaje: datos?.mensaje ?? 'No se pudo iniciar sesion.' };
     }
 
-    if (encontrado.estado !== 'activo') {
-      return { ok: false, mensaje: 'Tu usuario se encuentra inactivo. Contacta al administrador del sistema.' };
-    }
-
-    if (!obtenerRol(encontrado.rol_id).rutaInicio) {
-      return {
-        ok: false,
-        mensaje: 'Tu usuario esta registrado como colaborador y no tiene acceso a los modulos de gestion.',
-      };
-    }
-
-    setUsuario(encontrado);
+    setUsuario(datos.usuario);
     setAutenticado(true);
-    return { ok: true, rol: obtenerRol(encontrado.rol_id) };
+
+    return { ok: true, rol: obtenerRol(datos.usuario.rol_id) };
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     setUsuario(null);
     setAutenticado(false);
+    await cerrarSesion();
   }, []);
 
   const valor = useMemo(
@@ -64,10 +72,11 @@ export function AuthProvider({ children }) {
       usuario,
       rolActivo,
       rol,
+      cargando,
       login,
       logout,
     }),
-    [autenticado, usuario, rolActivo, rol, login, logout],
+    [autenticado, usuario, rolActivo, rol, cargando, login, logout],
   );
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>;
