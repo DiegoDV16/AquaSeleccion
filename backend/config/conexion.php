@@ -1,5 +1,6 @@
 <?php
 
+<<<<<<< Updated upstream
 /**
  * conexion.php
  * Conexion PDO a la base de datos MySQL/MariaDB de XAMPP.
@@ -51,4 +52,23 @@ function obtenerConexion(): PDO
     }
 
     return $pdo;
+=======
+declare(strict_types=1);
+
+function obtenerConexion(): PDO
+{
+    $host = '127.0.0.1';
+    $baseDeDatos = 'aquaseleccion';
+    $usuario = 'admin';
+    $contrasena = 'Admin123';
+    $charset = 'utf8mb4';
+
+    $dsn = "mysql:host={$host};dbname={$baseDeDatos};charset={$charset}";
+
+    return new PDO($dsn, $usuario, $contrasena, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ]);
+>>>>>>> Stashed changes
 }
