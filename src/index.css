@@ -770,3 +770,50 @@ body {
     font-size: 1.1rem;
   }
 }
+
+/* Vistas publicas / auth - mejoras visuales Postular */
+.aqua-public-bg {
+  background: linear-gradient(180deg, var(--aqua-primary) 0%, #003d5c 160px, var(--aqua-surface) 160px);
+}
+
+.aqua-public-header {
+  background: linear-gradient(135deg, #00243f 0%, var(--aqua-primary) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.aqua-public-header .navbar-brand,
+.aqua-public-header .nav-link,
+.aqua-public-header .navbar-text {
+  color: #eaf1ff;
+}
+
+.aqua-public-header .btn-link,
+.aqua-public-header .btn-soft {
+  color: #eaf1ff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.aqua-public-header .btn-soft:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.aqua-form-card {
+  background-color: #fff;
+  border: 1px solid var(--aqua-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 36, 63, 0.14);
+}
+
+.aqua-form-section {
+  background-color: #fff;
+  border: 1px solid var(--aqua-border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .aqua-form-section {
+    padding: 1.5rem 2rem;
+  }
+}

@@ -1,41 +1,83 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { cargosPorFamilia } from '../../mock/cargos.js';
-
 const ESTADO_INICIAL = {
+  fechaSolicitud: '',
   nombres: '',
-  apellido_paterno: '',
-  apellido_materno: '',
+  apellidoPaterno: '',
+  apellidoMaterno: '',
   correo: '',
   telefono: '',
-  familia_id: '',
-  cargo_id: '',
-  linkedin: '',
+  idFamiliaCargo: '',
+  idCargo: '',
   comentarios: '',
+  curriculumCv: '',
 };
 
 const TAMANO_MAXIMO_MB = 5;
+const LARGO_MAXIMO_CURRICULUM = 255;
+const EXTENSIONES_CV_PERMITIDAS = ['pdf', 'doc', 'docx'];
+
+function obtenerFechaLocal() {
+  const fecha = new Date();
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+
+  return `${anio}-${mes}-${dia}`;
+}
 
 /**
  * Postular
- * Formulario publico de postulacion externa. En el MVP valida en cliente,
- * muestra el resumen del registro y confirma el envío con un modal estatico;
- * la persistencia se implementara en el controlador PHP (POST /postulaciones).
+ * Formulario publico de postulacion externa con validacion en cliente y envio POST.
  */
 export default function Postular() {
-  const grupos = useMemo(() => cargosPorFamilia(), []);
-  const [formulario, setFormulario] = useState(ESTADO_INICIAL);
+  const [grupos, setGrupos] = useState([]);
+  const [cargandoCatalogos, setCargandoCatalogos] = useState(true);
+  const [errorCatalogos, setErrorCatalogos] = useState('');
+  const [formulario, setFormulario] = useState(() => ({
+    ...ESTADO_INICIAL,
+    fechaSolicitud: obtenerFechaLocal(),
+  }));
   const [cv, setCv] = useState(null);
   const [arrastrando, setArrastrando] = useState(false);
   const [errores, setErrores] = useState({});
-  const [enviado, setEnviado] = useState(false);
   const inputArchivoRef = useRef(null);
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function cargarCatalogos() {
+      try {
+        const respuesta = await fetch(
+          'http://localhost/AquaSeleccion/backend/config/c_listaCargosDisponibles.php',
+          { signal: controller.signal },
+        );
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok || !resultado.ok || !Array.isArray(resultado.familias)) {
+          throw new Error(resultado.mensaje || 'No se pudieron cargar las familias y cargos.');
+        }
+
+        setGrupos(resultado.familias);
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setErrorCatalogos(error.message || 'No se pudieron cargar las familias y cargos.');
+        }
+      } finally {
+        if (!controller.signal.aborted) setCargandoCatalogos(false);
+      }
+    }
+
+    cargarCatalogos();
+    return () => controller.abort();
+  }, []);
+
   const cargosFamiliaSeleccionada = useMemo(() => {
-    const grupo = grupos.find((item) => item.id === Number(formulario.familia_id));
+    const grupo = grupos.find((item) => item.id === Number(formulario.idFamiliaCargo));
     return grupo ? grupo.cargos : [];
-  }, [grupos, formulario.familia_id]);
+  }, [grupos, formulario.idFamiliaCargo]);
+  const familiaCargoSeleccionada = grupos.find((item) => item.id === Number(formulario.idFamiliaCargo));
 
   function actualizarCampo(evento) {
     const { name, value } = evento.target;
@@ -46,19 +88,27 @@ export default function Postular() {
   function seleccionarFamilia(evento) {
     setFormulario((actual) => ({
       ...actual,
-      familia_id: evento.target.value,
-      cargo_id: '',
+      idFamiliaCargo: evento.target.value,
+      idCargo: '',
     }));
-    setErrores((actual) => ({ ...actual, familia_id: undefined, cargo_id: undefined }));
+    setErrores((actual) => ({ ...actual, idFamiliaCargo: undefined, idCargo: undefined }));
   }
 
   function validarArchivo(archivo) {
     if (!archivo) {
-      setErrores((actual) => ({ ...actual, cv: 'Debes adjuntar tu curriculum en formato PDF.' }));
+      setErrores((actual) => ({ ...actual, cv: 'Adjunta tu currículum en formato PDF o Word.' }));
       return;
     }
-    if (archivo.type !== 'application/pdf' && !archivo.name.toLowerCase().endsWith('.pdf')) {
-      setErrores((actual) => ({ ...actual, cv: 'El archivo debe estar en formato PDF.' }));
+    const extension = archivo.name.split('.').pop()?.toLowerCase();
+    if (!EXTENSIONES_CV_PERMITIDAS.includes(extension)) {
+      setErrores((actual) => ({ ...actual, cv: 'El archivo debe estar en formato PDF o Word (.doc o .docx).' }));
+      return;
+    }
+    if (Array.from(archivo.name).length > LARGO_MAXIMO_CURRICULUM) {
+      setErrores((actual) => ({
+        ...actual,
+        cv: `El nombre del archivo no puede superar los ${LARGO_MAXIMO_CURRICULUM} caracteres.`,
+      }));
       return;
     }
     if (archivo.size > TAMANO_MAXIMO_MB * 1024 * 1024) {
@@ -66,6 +116,7 @@ export default function Postular() {
       return;
     }
     setCv(archivo);
+    setFormulario((actual) => ({ ...actual, curriculumCv: archivo.name }));
     setErrores((actual) => ({ ...actual, cv: undefined }));
   }
 
@@ -81,36 +132,36 @@ export default function Postular() {
 
   function quitarArchivo() {
     setCv(null);
+    setFormulario((actual) => ({ ...actual, curriculumCv: '' }));
     if (inputArchivoRef.current) inputArchivoRef.current.value = '';
   }
 
   function validarFormulario() {
     const nuevosErrores = {};
     if (!formulario.nombres.trim()) nuevosErrores.nombres = 'Ingresa tus nombres.';
-    if (!formulario.apellido_paterno.trim()) nuevosErrores.apellido_paterno = 'Ingresa tu apellido paterno.';
-    if (!formulario.apellido_materno.trim()) nuevosErrores.apellido_materno = 'Ingresa tu apellido materno.';
+    if (!formulario.apellidoPaterno.trim()) nuevosErrores.apellidoPaterno = 'Ingresa tu apellido paterno.';
+    if (!formulario.apellidoMaterno.trim()) nuevosErrores.apellidoMaterno = 'Ingresa tu apellido materno.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(formulario.correo)) nuevosErrores.correo = 'Ingresa un correo valido.';
     if (!/^\+?56?\s?9?\s?\d{4}\s?\d{4}$/.test(formulario.telefono.replace(/\s/g, '')) && formulario.telefono.replace(/\D/g, '').length < 9)
       nuevosErrores.telefono = 'Ingresa un telefono de contacto valido.';
-    if (!formulario.familia_id) nuevosErrores.familia_id = 'Selecciona la familia de cargo.';
-    if (!formulario.cargo_id) nuevosErrores.cargo_id = 'Selecciona el cargo al que postulas.';
-    if (!cv) nuevosErrores.cv = 'Debes adjuntar tu curriculum en formato PDF.';
+    if (!formulario.idFamiliaCargo) nuevosErrores.idFamiliaCargo = 'Selecciona la familia de cargo.';
+    if (!formulario.idCargo) nuevosErrores.idCargo = 'Selecciona el cargo al que postulas.';
+    if (!cv) nuevosErrores.cv = 'Adjunta tu currículum en formato PDF o Word.';
 
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   }
 
   function manejarEnvio(evento) {
-    evento.preventDefault();
-    if (validarFormulario()) setEnviado(true);
+    if (!validarFormulario()) evento.preventDefault();
   }
 
-  const cargoSeleccionado = cargosFamiliaSeleccionada.find((cargo) => cargo.id === Number(formulario.cargo_id));
+  const cargoSeleccionado = cargosFamiliaSeleccionada.find((cargo) => cargo.id === Number(formulario.idCargo));
 
   return (
     <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: 'var(--aqua-surface)' }}>
       {/* Barra superior del portal publico */}
-      <header className="bg-white border-bottom py-2" style={{ borderColor: 'var(--aqua-border)' }}>
+      <header className="aqua-public-header py-2">
         <div className="container">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
             <div className="d-flex align-items-center gap-3">
@@ -121,7 +172,7 @@ export default function Postular() {
                 Portal Oficial de Convocatorias
               </span>
             </div>
-            <Link to="/login" className="btn btn-soft btn-sm d-inline-flex align-items-center gap-2">
+            <Link to="/login" className="btn btn-outline-light btn-sm d-inline-flex align-items-center gap-2">
               <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
               <span>Acceso Funcionarios / Login</span>
             </Link>
@@ -129,7 +180,11 @@ export default function Postular() {
         </div>
       </header>
 
-      <main className="container py-4 flex-grow-1">
+      <main
+        className="min-vh-100 flex-grow-1 py-5 px-3 px-md-4"
+        style={{ background: 'linear-gradient(135deg, #02233f 0%, #0d4668 100%)' }}
+      >
+        <div className="container">
         {/* Hero */}
         <section className="aqua-hero rounded-4 p-4 p-md-5 mb-4 position-relative overflow-hidden">
           <div
@@ -167,9 +222,16 @@ export default function Postular() {
             <div className="aqua-card p-4 p-md-5 mb-4">
               <h2 className="visually-hidden">Formulario de postulación</h2>
 
-              <form className="aqua-form d-flex flex-column gap-4" onSubmit={manejarEnvio} noValidate>
+              <form
+                className="aqua-form d-flex flex-column gap-4"
+                method="POST"
+                action="http://localhost/AquaSeleccion/backend/config/c_candidato.php"
+                encType="multipart/form-data"
+                onSubmit={manejarEnvio}
+                noValidate
+              >
                 {/* Stepper / status track */}
-                <div className="d-flex align-items-center justify-content-between p-3 rounded-3" style={{ backgroundColor: 'rgba(239,244,255,0.6)' }}>
+                <div className="d-flex align-items-center justify-content-between p-3 rounded-3" style={{ backgroundColor: 'var(--aqua-surface-alt)' }}>
                   <div className="d-flex align-items-center gap-2">
                     <span className="badge rounded-circle bg-aqua-primary" style={{ width: 24, height: 24, lineHeight: '16px' }}>1</span>
                     <span className="fw-semibold small text-aqua-primary">Identificación</span>
@@ -199,6 +261,20 @@ export default function Postular() {
                   </div>
                   <div className="row g-3">
                     <div className="col-md-6">
+                      <label className="form-label" htmlFor="fechaSolicitud">
+                        Fecha de solicitud
+                      </label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        id="fechaSolicitud"
+                        name="fechaSolicitud"
+                        value={formulario.fechaSolicitud}
+                        readOnly
+                      />
+                    </div>
+
+                    <div className="col-md-6">
                       <label className="form-label" htmlFor="nombres">
                         Nombres completos <span className="text-danger">*</span>
                       </label>
@@ -216,37 +292,37 @@ export default function Postular() {
                     </div>
 
                     <div className="col-md-6">
-                      <label className="form-label" htmlFor="apellido_paterno">
+                      <label className="form-label" htmlFor="apellidoPaterno">
                         Apellido paterno <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
-                        className={`form-control ${errores.apellido_paterno ? 'is-invalid' : ''}`}
-                        id="apellido_paterno"
-                        name="apellido_paterno"
-                        value={formulario.apellido_paterno}
+                        className={`form-control ${errores.apellidoPaterno ? 'is-invalid' : ''}`}
+                        id="apellidoPaterno"
+                        name="apellidoPaterno"
+                        value={formulario.apellidoPaterno}
                         onChange={actualizarCampo}
                         placeholder="Ej. Contreras"
                         required
                       />
-                      {errores.apellido_paterno && <div className="invalid-feedback">{errores.apellido_paterno}</div>}
+                      {errores.apellidoPaterno && <div className="invalid-feedback">{errores.apellidoPaterno}</div>}
                     </div>
 
                     <div className="col-md-6">
-                      <label className="form-label" htmlFor="apellido_materno">
+                      <label className="form-label" htmlFor="apellidoMaterno">
                         Apellido materno <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
-                        className={`form-control ${errores.apellido_materno ? 'is-invalid' : ''}`}
-                        id="apellido_materno"
-                        name="apellido_materno"
-                        value={formulario.apellido_materno}
+                        className={`form-control ${errores.apellidoMaterno ? 'is-invalid' : ''}`}
+                        id="apellidoMaterno"
+                        name="apellidoMaterno"
+                        value={formulario.apellidoMaterno}
                         onChange={actualizarCampo}
                         placeholder="Ej. Muñoz"
                         required
                       />
-                      {errores.apellido_materno && <div className="invalid-feedback">{errores.apellido_materno}</div>}
+                      {errores.apellidoMaterno && <div className="invalid-feedback">{errores.apellidoMaterno}</div>}
                     </div>
 
                     <div className="col-md-6">
@@ -282,21 +358,6 @@ export default function Postular() {
                       />
                       {errores.telefono && <div className="invalid-feedback">{errores.telefono}</div>}
                     </div>
-
-                    <div className="col-md-6">
-                      <label className="form-label" htmlFor="linkedin">
-                        LinkedIn (opcional)
-                      </label>
-                      <input
-                        type="url"
-                        className="form-control"
-                        id="linkedin"
-                        name="linkedin"
-                        value={formulario.linkedin}
-                        onChange={actualizarCampo}
-                        placeholder="https://www.linkedin.com/in/..."
-                      />
-                    </div>
                   </div>
                 </section>
 
@@ -313,48 +374,52 @@ export default function Postular() {
                   </div>
                   <div className="row g-3">
                     <div className="col-md-6">
-                      <label className="form-label" htmlFor="familia_id">
+                      <label className="form-label" htmlFor="idFamiliaCargo">
                         Familia de cargo <span className="text-danger">*</span>
                       </label>
                       <select
-                        className={`form-select ${errores.familia_id ? 'is-invalid' : ''}`}
-                        id="familia_id"
-                        name="familia_id"
-                        value={formulario.familia_id}
+                        className={`form-select ${errores.idFamiliaCargo ? 'is-invalid' : ''}`}
+                        id="idFamiliaCargo"
+                        name="idFamiliaCargo"
+                        value={formulario.idFamiliaCargo}
                         onChange={seleccionarFamilia}
+                        disabled={cargandoCatalogos || Boolean(errorCatalogos)}
                         required
                       >
-                        <option value="">Seleccione una familia</option>
+                        <option value="">
+                          {cargandoCatalogos ? 'Cargando familias...' : 'Seleccione una familia'}
+                        </option>
                         {grupos.map((grupo) => (
                           <option key={grupo.id} value={grupo.id}>
                             {grupo.nombre}
                           </option>
                         ))}
                       </select>
-                      {errores.familia_id && <div className="invalid-feedback">{errores.familia_id}</div>}
+                      {errores.idFamiliaCargo && <div className="invalid-feedback">{errores.idFamiliaCargo}</div>}
+                      {errorCatalogos && <div className="text-danger small mt-1">{errorCatalogos}</div>}
                     </div>
 
                     <div className="col-md-6">
-                      <label className="form-label" htmlFor="cargo_id">
+                      <label className="form-label" htmlFor="idCargo">
                         Cargo al que postula <span className="text-danger">*</span>
                       </label>
                       <select
-                        className={`form-select ${errores.cargo_id ? 'is-invalid' : ''}`}
-                        id="cargo_id"
-                        name="cargo_id"
-                        value={formulario.cargo_id}
+                        className={`form-select ${errores.idCargo ? 'is-invalid' : ''}`}
+                        id="idCargo"
+                        name="idCargo"
+                        value={formulario.idCargo}
                         onChange={actualizarCampo}
-                        disabled={!formulario.familia_id}
+                        disabled={!formulario.idFamiliaCargo || cargandoCatalogos || Boolean(errorCatalogos)}
                         required
                       >
-                        <option value="">{formulario.familia_id ? 'Seleccione un cargo' : 'Elija primero la familia'}</option>
+                        <option value="">{formulario.idFamiliaCargo ? 'Seleccione un cargo' : 'Elija primero la familia'}</option>
                         {cargosFamiliaSeleccionada.map((cargo) => (
                           <option key={cargo.id} value={cargo.id}>
-                            {cargo.nombre} ({cargo.vacantes} vacantes)
+                            {cargo.nombre}
                           </option>
                         ))}
                       </select>
-                      {errores.cargo_id && <div className="invalid-feedback">{errores.cargo_id}</div>}
+                      {errores.idCargo && <div className="invalid-feedback">{errores.idCargo}</div>}
                     </div>
 
                     <div className="col-12">
@@ -377,8 +442,8 @@ export default function Postular() {
                         <div className="p-3 rounded-3 bg-tint-info d-flex align-items-center gap-2">
                           <i className="bi bi-geo-alt" aria-hidden="true" />
                           <span className="small">
-                            <strong>{cargoSeleccionado.nombre}</strong> &middot; Jornada: {cargoSeleccionado.jornada}{' '}
-                            &middot; Vacantes disponibles: {cargoSeleccionado.vacantes}
+                            <strong>{cargoSeleccionado.nombre}</strong>
+                            {familiaCargoSeleccionada && <> &middot; {familiaCargoSeleccionada.nombre}</>}
                           </span>
                         </div>
                       </div>
@@ -394,7 +459,7 @@ export default function Postular() {
                     </span>
                     <div>
                       <h3 className="h6 fw-semibold mb-0">Sección 3: Antecedentes Curriculares</h3>
-                      <p className="small text-muted-aqua mb-0">Adjunta tu Currículum Vitae actualizado en formato PDF.</p>
+                      <p className="small text-muted-aqua mb-0">Adjunta tu Currículum Vitae en PDF o Word (.doc, .docx).</p>
                     </div>
                   </div>
 
@@ -425,7 +490,7 @@ export default function Postular() {
                       </>
                     ) : (
                       <>
-                        <p className="fw-semibold mb-1">Arrastra y suelta tu archivo PDF aquí</p>
+                        <p className="fw-semibold mb-1">Arrastra y suelta tu currículum aquí</p>
                         <p className="text-muted-aqua mb-0" style={{ fontSize: '0.8rem' }}>
                           o haz clic para explorar en tu dispositivo (máximo {TAMANO_MAXIMO_MB} MB)
                         </p>
@@ -435,9 +500,10 @@ export default function Postular() {
                       ref={inputArchivoRef}
                       type="file"
                       className="d-none"
-                      accept="application/pdf,.pdf"
+                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                       onChange={manejarArchivo}
-                      aria-label="Adjuntar Curriculum Vitae en PDF"
+                      aria-label="Adjuntar Curriculum Vitae en PDF o Word"
+                      name="curriculumCv"
                     />
                   </div>
                   {errores.cv && <div className="text-danger mt-2" style={{ fontSize: '0.8rem' }}>{errores.cv}</div>}
@@ -445,7 +511,7 @@ export default function Postular() {
                     <div className="d-flex align-items-center justify-content-between p-3 rounded-3 mt-2" style={{ backgroundColor: 'var(--aqua-surface-alt)' }}>
                       <div className="d-flex align-items-center gap-2">
                         <span className="rounded d-inline-flex align-items-center justify-content-center bg-tint-danger" style={{ width: 36, height: 36 }}>
-                          <i className="bi bi-file-earmark-pdf" aria-hidden="true" />
+                          <i className="bi bi-file-earmark" aria-hidden="true" />
                         </span>
                         <div>
                           <div className="fw-semibold small text-break">{cv.name}</div>
@@ -474,7 +540,15 @@ export default function Postular() {
                   </div>
                   <div className="p-3 rounded-3" style={{ backgroundColor: 'rgba(239,244,255,0.7)' }}>
                     <div className="form-check">
-                      <input className="form-check-input" type="checkbox" id="autorizacion" defaultChecked required />
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="autorizacion"
+                        name="autorizacion"
+                        value="1"
+                        defaultChecked
+                        required
+                      />
                       <label className="form-check-label small" htmlFor="autorizacion">
                         Autorizo expresamente a <strong>Empresas AquaChile S.A.</strong> para tratar y almacenar mis
                         datos personales y antecedentes laborales con fines de postulación, evaluación psicométrica y
@@ -485,87 +559,58 @@ export default function Postular() {
                 </section>
 
                 {/* Envío */}
-                <div className="d-flex flex-column gap-2 pt-2">
-                  <button type="submit" className="btn btn-aqua btn-lg w-100 d-flex align-items-center justify-content-center gap-2">
-                    <span>Enviar Postulación Oficial</span>
-                    <i className="bi bi-arrow-right" aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-soft"
-                    onClick={() => {
-                      setFormulario(ESTADO_INICIAL);
-                      setCv(null);
-                      setErrores({});
-                    }}
-                  >
-                    <i className="bi bi-arrow-counterclockwise me-1" aria-hidden="true" />
-                    Limpiar formulario
-                  </button>
-                  <p className="text-center text-muted-aqua mt-1 mb-0" style={{ fontSize: '0.76rem' }}>
-                    Al pulsar &quot;Enviar Postulación Oficial&quot;, recibirás un correo de confirmación con tu
-                    código de seguimiento único.
-                  </p>
+                <div className="pt-3 mt-3 border-top">
+                  <div className="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-end gap-2">
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2"
+                      onClick={() => {
+                        setFormulario({ ...ESTADO_INICIAL, fechaSolicitud: obtenerFechaLocal() });
+                        setCv(null);
+                        setErrores({});
+                        if (inputArchivoRef.current) inputArchivoRef.current.value = '';
+                      }}
+                    >
+                      <i className="bi bi-arrow-counterclockwise" aria-hidden="true" />
+                      Limpiar campos
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-aqua d-flex align-items-center justify-content-center gap-2 px-4"
+                    >
+                      <i className="bi bi-send-fill" aria-hidden="true" />
+                      <span>Enviar formulario</span>
+                      <i className="bi bi-arrow-right" aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>
 
             {/* Panel informativo */}
-            <div className="aqua-card mb-4">
-              <div className="card-header">
-                <i className="bi bi-info-circle me-2" aria-hidden="true" />
-                ¿Cómo funciona el proceso?
-              </div>
-              <div className="card-body">
-                <div className="aqua-timeline">
-                  <div className="aqua-timeline-item">
-                    <p className="mb-1 fw-semibold small">1. Postulación</p>
-                    <p className="mb-0 text-muted-aqua" style={{ fontSize: '0.8rem' }}>
-                      Envías tus datos y tu CV en PDF por este formulario.
-                    </p>
-                  </div>
-                  <div className="aqua-timeline-item">
-                    <p className="mb-1 fw-semibold small">2. Revisión curricular</p>
-                    <p className="mb-0 text-muted-aqua" style={{ fontSize: '0.8rem' }}>
-                      Un analista de reclutamiento valida tu postulación.
-                    </p>
-                  </div>
-                  <div className="aqua-timeline-item">
-                    <p className="mb-1 fw-semibold small">3. Entrevista con RH</p>
-                    <p className="mb-0 text-muted-aqua" style={{ fontSize: '0.8rem' }}>
-                      Entrevista breve con el equipo de Personas.
-                    </p>
-                  </div>
-                  <div className="aqua-timeline-item pb-0">
-                    <p className="mb-1 fw-semibold small">4. Evaluación psicolaboral</p>
-                    <p className="mb-0 text-muted-aqua" style={{ fontSize: '0.8rem' }}>
-                      Un profesional psicólogo realiza la evaluación y registra el resultado.
-                    </p>
+            <div className="aqua-form-card mb-5 overflow-hidden">
+              <div className="p-4 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                <div className="d-flex align-items-start gap-3">
+                  <span className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style={{ width: 44, height: 44, backgroundColor: 'var(--aqua-surface-alt)' }}>
+                    <i className="bi bi-people-fill text-aqua-primary" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h3 className="h6 fw-semibold mb-1">¿Eres colaborador(a) de AquaChile?</h3>
+                    <p className="mb-0 text-muted-aqua small">Los movimientos internos de cargo se realizan por el equipo de Personas, no por este formulario público.</p>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="aqua-card mb-4">
-              <div className="card-header">
-                <i className="bi bi-building me-2" aria-hidden="true" />
-                ¿Eres colaborador de AquaChile?
-              </div>
-              <div className="card-body">
-                <p className="small text-muted-aqua mb-0">
-                  ¿Ya eres colaborador de AquaChile? El movimiento interno se realiza por el equipo de
-                  Personas, no por este formulario.
-                </p>
-                <Link to="/login" className="btn btn-outline-aqua btn-sm mt-3">
-                  Ingresar con mi correo institucional
+                <Link to="/login" className="btn btn-aqua d-inline-flex align-items-center justify-content-center gap-2 px-3">
+                  <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
+                  <span>Acceso al portal de colaboradores</span>
                 </Link>
               </div>
             </div>
           </div>
         </div>
+        </div>
       </main>
 
-      <footer className="aqua-footer py-3">
+      <footer className="aqua-footer py-3" style={{ backgroundColor: '#fff', borderTop: '1px solid var(--aqua-border)' }}>
         <div className="container d-flex flex-column flex-md-row justify-content-between gap-2">
           <span>&copy; {new Date().getFullYear()} AquaChile S.A. &middot; AquaSeleccion</span>
           <span>
@@ -574,49 +619,6 @@ export default function Postular() {
         </div>
       </footer>
 
-      {/* Modal de confirmacion de envio */}
-      {enviado && (
-        <>
-          <div
-            className="modal fade show d-block"
-            id="postulacion-exitosa"
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="postulacion-exitosa-titulo"
-          >
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-body text-center p-4">
-                  <span className="stat-icon bg-tint-success mx-auto mb-3" style={{ width: 60, height: 60, fontSize: '1.8rem' }} aria-hidden="true">
-                    <i className="bi bi-check-lg" />
-                  </span>
-                  <h2 className="h5 fw-semibold mb-2" id="postulacion-exitosa-titulo">
-                    Postulación registrada
-                  </h2>
-                  <p className="text-muted-aqua small mb-1">
-                    Gracias, <strong>{formulario.nombres} {formulario.apellido_paterno}</strong>. Tu postulación
-                    para <strong>{cargoSeleccionado?.nombre ?? 'el cargo seleccionado'}</strong> quedó registrada
-                    con estado pendiente.
-                  </p>
-                  <p className="text-muted-aqua small mb-0">
-                    Enviaremos la confirmacion a <strong>{formulario.correo}</strong>.
-                  </p>
-                </div>
-                <div className="modal-footer justify-content-center border-0 pt-0">
-                  <Link to="/postular" className="btn btn-soft">
-                    Registrar otra postulación
-                  </Link>
-                  <Link to="/login" className="btn btn-aqua">
-                    Iniciar sesión
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="modal-backdrop fade show" />
-        </>
-      )}
     </div>
   );
 }
