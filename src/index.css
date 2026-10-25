@@ -125,13 +125,40 @@ body {
 
 /* ----------------------------- Sidebar ---------------------------------- */
 .aqua-sidebar {
+  position: relative;
   width: var(--aqua-sidebar-w);
   flex: 0 0 var(--aqua-sidebar-w);
   background-color: #fff;
   border-right: 1px solid var(--aqua-border);
   color: var(--aqua-muted);
   min-height: calc(100vh - var(--aqua-navbar-h));
-  transition: width 0.2s ease, flex-basis 0.2s ease;
+  transition: width 0.25s ease-in-out, flex-basis 0.25s ease-in-out;
+}
+
+/* Pestaña circular sobre el borde derecho del sidebar */
+.sidebar-collapse-toggle {
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--aqua-border);
+  border-radius: 50%;
+  background-color: #fff;
+  color: var(--aqua-primary);
+  box-shadow: var(--aqua-shadow);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-collapse-toggle:hover,
+.sidebar-collapse-toggle:focus-visible {
+  background-color: var(--aqua-primary);
+  color: #fff;
 }
 
 .aqua-sidebar .sidebar-section-title {
@@ -179,28 +206,48 @@ body {
 }
 
 /* Sidebar colapsable (escritorio) */
-.aqua-sidebar.collapsed {
-  width: var(--aqua-sidebar-w-collapsed);
-  flex-basis: var(--aqua-sidebar-w-collapsed);
-}
+@media (min-width: 992px) {
+  .aqua-sidebar.collapsed {
+    width: var(--aqua-sidebar-w-collapsed);
+    flex-basis: var(--aqua-sidebar-w-collapsed);
+  }
 
-.aqua-sidebar.collapsed .nav-link span,
-.aqua-sidebar.collapsed .sidebar-section-title,
-.aqua-sidebar.collapsed .sidebar-footer-text {
-  display: none;
-}
+  .aqua-sidebar.collapsed .nav-link span,
+  .aqua-sidebar.collapsed .sidebar-section-title {
+    display: none;
+  }
 
-.aqua-sidebar.collapsed .nav-link {
-  justify-content: center;
-  padding-left: 0;
-  padding-right: 0;
-}
+  .aqua-sidebar.collapsed .nav-link {
+    position: relative;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
 
-.aqua-sidebar-footer {
-  border-top: 1px solid var(--aqua-border);
-  padding: 0.85rem 1.1rem;
-  font-size: 0.78rem;
-  color: var(--aqua-muted);
+  /* Tooltip de iconos cuando el sidebar esta plegado */
+  .aqua-sidebar.collapsed .nav-link[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 12px);
+    transform: translateY(-50%);
+    z-index: 20;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    background-color: var(--aqua-primary-dark);
+    color: #fff;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: var(--aqua-shadow-lg);
+    transition: opacity 0.15s ease;
+  }
+
+  .aqua-sidebar.collapsed .nav-link[data-tooltip]:hover::after,
+  .aqua-sidebar.collapsed .nav-link[data-tooltip]:focus-visible::after {
+    opacity: 1;
+  }
 }
 
 /* ------------------------------ Contenido ------------------------------- */
@@ -740,6 +787,13 @@ body {
   color: var(--aqua-muted);
   display: block;
   word-break: break-all;
+}
+
+@media (min-width: 992px) {
+  /* Permite que la pestaña y los tooltips sobresalgan del sidebar */
+  .aqua-sidebar {
+    overflow: visible;
+  }
 }
 
 @media (max-width: 991.98px) {

@@ -70,30 +70,6 @@ export default function Navbar({ sidebarAbierto, onToggleSidebar }) {
           </span>
         </Link>
 
-        {/* Barra de busqueda visual (sin comportamiento), como en el chrome de Stitch */}
-        <div className="d-none d-md-block me-auto" style={{ maxWidth: 420, flex: '1 1 320px' }}>
-          <div
-            className="input-group input-group-sm"
-            style={{
-              backgroundColor: '#f1f5fb',
-              borderRadius: '999px',
-              border: '1px solid var(--aqua-border, #d3e4fe)',
-              overflow: 'hidden',
-            }}
-          >
-            <span className="input-group-text border-0 bg-transparent ps-3">
-              <i className="bi bi-search text-muted-aqua" aria-hidden="true" />
-            </span>
-            <input
-              type="search"
-              className="form-control border-0 bg-transparent"
-              placeholder="Buscar candidatos, evaluaciones, vacantes..."
-              aria-label="Buscar"
-              readOnly
-            />
-          </div>
-        </div>
-
         <div className="d-flex align-items-center gap-2 ms-auto">
           <button className="btn btn-sm btn-soft position-relative" type="button" aria-label="Notificaciones">
             <i className="bi bi-bell" aria-hidden="true" />
