@@ -1,48 +1,47 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext.js';
-import { obtenerRol } from '../../mock/catalogoRoles.js';
-import { USUARIOS } from '../../mock/usuarios.js';
-
-const CLAVE_DEMO = 'Aqua2026*';
-
-/**
- * Cuentas de prueba del MVP: el rol se deduce del correo, por eso se listan
- * las credenciales reales de los mocks y no un selector de modulo. Al migrar a
- * MySQL + PHP este bloque se elimina y queda solo el formulario corporativo.
- */
-const CUENTAS_DEMO = [
-  { correo: 'catalina.fuentes@aquachile.cl', icono: 'shield-lock', tinte: 'primary' },
-  { correo: 'mariajose.rojas@aquachile.cl', icono: 'people', tinte: 'info' },
-  { correo: 'valentina.aravena@aquachile.cl', icono: 'clipboard2-pulse', tinte: 'success' },
-].map((cuenta) => {
-  const usuario = USUARIOS.find((registrado) => registrado.correo === cuenta.correo);
-  return { ...cuenta, nombre: usuario.nombre, rol: obtenerRol(usuario.rol_id).nombre };
-});
 
 /**
  * Login
- * Vista publica de acceso al monolito. En el MVP el submit no llama a la API:
- * usa AuthProvider.login(), que busca el usuario por correo y redirige al
- * modulo que corresponde a su rol. No hay selector de modulo: para entrar a otro
- * modulo hay que iniciar sesion con otra cuenta.
+ * Vista publica de acceso al monolito. El submit llama a AuthProvider.login(),
+ * que valida contra el backend PHP (usuario existente, activo y contrasena
+ * correcta) y redirige al modulo que corresponde al rol. No hay selector de
+ * modulo: para entrar a otro modulo hay que iniciar sesion con otra cuenta.
  */
 export default function Login() {
   const [formulario, setFormulario] = useState({ correo: '', clave: '', recordarme: true });
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [enviando, setEnviando] = useState(false);
+  const { login, autenticado, cargando, rol } = useAuth();
   const navigate = useNavigate();
+
+  if (cargando) {
+    return (
+      <div className="min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="spinner-border text-primary" role="status" aria-hidden="true" />
+      </div>
+    );
+  }
+
+  if (autenticado && rol?.rutaInicio) {
+    return <Navigate to={rol.rutaInicio} replace />;
+  }
 
   function actualizarCampo(evento) {
     const { name, value, type, checked } = evento.target;
     setFormulario((actual) => ({ ...actual, [name]: type === 'checkbox' ? checked : value }));
   }
 
-  function manejarEnvio(evento) {
+  async function manejarEnvio(evento) {
     evento.preventDefault();
     setError('');
-    const resultado = login({ correo: formulario.correo, clave: formulario.clave });
+    setEnviando(true);
+
+    const resultado = await login({ correo: formulario.correo, clave: formulario.clave });
+
+    setEnviando(false);
 
     if (!resultado.ok) {
       setError(resultado.mensaje);
@@ -50,11 +49,6 @@ export default function Login() {
     }
 
     navigate(resultado.rol.rutaInicio, { replace: true });
-  }
-
-  function cargarCredencialesDemo(correo) {
-    setFormulario((actual) => ({ ...actual, correo, clave: CLAVE_DEMO }));
-    setError('');
   }
 
   return (
@@ -210,8 +204,8 @@ export default function Login() {
                 </div>
 
                 <div className="mb-4">
-                  <button type="submit" className="btn btn-aqua w-100 py-2">
-                    Iniciar Sesión
+                  <button type="submit" className="btn btn-aqua w-100 py-2" disabled={enviando}>
+                    {enviando ? 'Validando...' : 'Iniciar Sesión'}
                     <i className="bi bi-box-arrow-in-right ms-2" aria-hidden="true" />
                   </button>
                   <p className="text-muted-aqua mt-2 mb-0 text-center" style={{ fontSize: '0.76rem' }}>
@@ -219,37 +213,6 @@ export default function Login() {
                   </p>
                 </div>
               </form>
-
-              <div className="border-top pt-3">
-                <p className="mb-2">
-                  <span className="etiqueta-aqua">Cuentas de prueba</span>
-                </p>
-                <p className="text-muted-aqua mb-2" style={{ fontSize: '0.76rem' }}>
-                  Selecciona una cuenta para cargar sus credenciales y ver su módulo.
-                </p>
-                <div className="d-flex flex-column gap-2">
-                  {CUENTAS_DEMO.map((cuenta) => (
-                    <button
-                      key={cuenta.correo}
-                      type="button"
-                      className="demo-account"
-                      style={{ '--demo-accent': `var(--aqua-solid-${cuenta.tinte})` }}
-                      onClick={() => cargarCredencialesDemo(cuenta.correo)}
-                    >
-                      <span className="demo-avatar" aria-hidden="true">
-                        <i className={`bi bi-${cuenta.icono}`} />
-                      </span>
-                      <span className="flex-grow-1">
-                        <span className="demo-name">
-                          {cuenta.nombre} · {cuenta.rol}
-                        </span>
-                        <span className="demo-mail">{cuenta.correo}</span>
-                      </span>
-                      <i className="bi bi-arrow-right-circle text-muted-aqua" aria-hidden="true" />
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               {/* Tarjeta Portal de Empleo */}
               <div className="mt-4 p-3 rounded-3" style={{ backgroundColor: '#eff4ff', border: '1px solid #d3e4fe' }}>

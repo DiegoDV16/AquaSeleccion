@@ -1,4 +1,5 @@
 node_modules
+.vite
 dist
 dist-ssr
 dist*
@@ -9,3 +10,4 @@ dist*
 .idea
 *.log
 npm-debug.log*
+/backend/config/conexion.php
