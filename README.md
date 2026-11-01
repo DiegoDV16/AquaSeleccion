@@ -86,7 +86,7 @@ AquaSeleccion/
 ├── backend/
 │   ├── api/
 │   │   ├── auth/           login.php, logout.php, session.php
-│   │   ├── candidatos/     listar.php, crear.php, actualizar.php
+│   │   ├── candidatos/     listar.php, crear.php, actualizar.php, cv.php, descargar_cv.php
 │   │   ├── solicitudes/    listar.php, crear.php, detalle.php, evaluadores.php
 │   │   └── usuarios/       listar.php, c_usuario.php, u_usuario.php, d_usuario.php
 │   ├── config/             conexión, sesión, roles, catálogos y controlador de candidato
@@ -241,7 +241,7 @@ Reglas:
 - El Analista puede registrar candidatos externos manualmente y editar sus datos principales; el Administrador mantiene la postulación interna.
 - Los candidatos externos pueden tener currículum adjunto; las postulaciones internas se respaldan con el legajo del colaborador.
 - El estado del candidato se deriva de su última solicitud y evaluación: `pendiente`, `en_proceso`, `apto`, `no_apto` o `con_observaciones`.
-- El CV se previsualiza desde el archivo almacenado en el servidor; la descarga está deshabilitada en la interfaz actual.
+- El CV se previsualiza desde el archivo almacenado en el servidor: PDF en un visor integrado y DOCX convertido a HTML. Los `.doc` antiguos no se previsualizan, pero se pueden descargar. La descarga se hace mediante un endpoint autenticado y conserva el nombre `CV_<id>`.
 
 ### 5.7 Solicitudes de evaluación
 
@@ -255,10 +255,12 @@ Reglas:
   - `no_apto`
   - `con_observaciones`
 - Prioridades: `baja`, `normal`, `alta`.
-- La solicitud se persiste en MySQL: `solicitudevaluacion.idUsuario` identifica al evaluador asignado, `fechaSolicitud` la creación y `fechaAsignacion` la fecha ingresada por el Analista.
+- La solicitud se persiste en MySQL: `solicitudevaluacion.idUsuario` identifica al evaluador asignado, `fechaSolicitud` la creación y `fechaAsignacion` se registra automáticamente con la fecha del sistema.
+- En una postulación interna, `candidato.idUsuario` es el colaborador postulado; `solicitudevaluacion.idUsuario` es el evaluador asignado, que siempre debe tener rol Evaluador y estado activo.
+- El analista que crea la solicitud se obtiene de la sesión PHP; esta entrega no lo persiste en `solicitudevaluacion`.
 - Un candidato no puede tener más de una solicitud en estado `pendiente` o `en_proceso`.
 - Al crear una solicitud desde el módulo Analista, queda en estado `pendiente` hasta que el evaluador inicie el proceso.
-- Cada solicitud debe tener un candidato y un evaluador responsable; la fecha de asignación es obligatoria.
+- Cada solicitud debe tener un candidato y un evaluador responsable; la fecha de asignación se registra automáticamente con la fecha del sistema.
 - El evaluador solo ve las solicitudes cuyo `evaluador_id` coincide con su usuario.
 - Para finalizar una evaluación se exige fecha de evaluación, resultado y observaciones de al menos 20 caracteres.
 - Una solicitud finalizada queda en modo solo lectura; para editarla debe cambiarse el estado del proceso.
@@ -297,7 +299,7 @@ Reglas:
 - Registro de postulaciones externas e internas en la tabla `candidato`.
 - Carga de currículum con validación y almacenamiento.
 - Catálogo de familias y cargos desde base de datos.
-- Módulo Analista: listado, registro, edición y detalle de candidatos con previsualización del CV.
+- Módulo Analista: listado, registro, edición y detalle de candidatos con previsualización y descarga del CV en PDF, DOC y DOCX.
 - Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
 
 ### Implementado con datos simulados
@@ -308,7 +310,6 @@ Reglas:
 ### Pendiente o limitado
 - Persistencia real de evaluaciones e historial.
 - Endpoints para el módulo Evaluador.
-- Descarga del CV (solo se previsualiza en la interfaz).
 - Recuperación de contraseña.
 - Exportación CSV del historial.
 - Cobertura de pruebas limitada a los filtros del módulo Analista.

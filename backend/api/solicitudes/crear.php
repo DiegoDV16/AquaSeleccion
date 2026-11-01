@@ -20,7 +20,6 @@ requerirRoles(['analista']);
 $idCandidato = filter_var($_POST['idCandidato'] ?? null, FILTER_VALIDATE_INT);
 $idEvaluador = filter_var($_POST['idEvaluador'] ?? null, FILTER_VALIDATE_INT);
 $prioridad = trim((string) ($_POST['prioridad'] ?? 'normal'));
-$fechaAsignacion = trim((string) ($_POST['fechaAsignacion'] ?? ''));
 $observaciones = trim((string) ($_POST['observaciones'] ?? ''));
 
 if ($idCandidato === false || $idCandidato < 1) {
@@ -37,10 +36,6 @@ if ($prioridad === '') {
 
 if (!in_array($prioridad, ['baja', 'normal', 'alta'], true)) {
     responder(['ok' => false, 'mensaje' => 'La prioridad seleccionada no es valida.'], 400);
-}
-
-if ($fechaAsignacion === '' || !fechaValida($fechaAsignacion)) {
-    responder(['ok' => false, 'mensaje' => 'Ingresa una fecha de asignacion valida.'], 400);
 }
 
 if (mb_strlen($observaciones, 'UTF-8') > 250) {
@@ -91,14 +86,13 @@ try {
         "INSERT INTO solicitudevaluacion
             (idUsuario, idCandidato, estadoSolicitudEvaluacion, prioridad, fechaSolicitud, fechaAsignacion, Observaciones)
          VALUES
-            (:idEvaluador, :idCandidato, 'pendiente', :prioridad, CURDATE(), :fechaAsignacion, :observaciones)"
+            (:idEvaluador, :idCandidato, 'pendiente', :prioridad, CURDATE(), CURDATE(), :observaciones)"
     );
 
     $consulta->execute([
         ':idEvaluador' => $idEvaluador,
         ':idCandidato' => $idCandidato,
         ':prioridad' => $prioridad,
-        ':fechaAsignacion' => $fechaAsignacion,
         ':observaciones' => $observaciones,
     ]);
 

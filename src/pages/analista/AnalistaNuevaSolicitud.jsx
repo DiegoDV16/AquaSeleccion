@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
+import TipoPostulacionBadge from '../../components/ui/TipoPostulacionBadge.jsx';
 import { useAuth } from '../../context/AuthContext.js';
+import { formatearFecha } from '../../mock/solicitudes.js';
 import { listarCandidatos } from '../../services/candidatosApi.js';
 import { crearSolicitud, listarEvaluadores } from '../../services/solicitudesApi.js';
 
@@ -18,6 +20,13 @@ function fechaHoyLocal() {
   const dia = String(hoy.getDate()).padStart(2, '0');
 
   return `${hoy.getFullYear()}-${mes}-${dia}`;
+}
+
+function iniciales(candidato) {
+  const nombres = candidato?.nombres ?? '';
+  const apellido = candidato?.apellidoPaterno ?? '';
+
+  return `${nombres.charAt(0)}${apellido.charAt(0)}`.toUpperCase() || '??';
 }
 
 /**
@@ -116,7 +125,6 @@ export default function AnalistaNuevaSolicitud() {
     }
 
     if (!formulario.evaluador_id) nuevosErrores.evaluador_id = 'Asigna un evaluador responsable.';
-    if (!formulario.fecha_asignacion) nuevosErrores.fecha_asignacion = 'Ingresa la fecha de asignacion.';
 
     if (formulario.observaciones.length > 250) {
       nuevosErrores.observaciones = 'Maximo 250 caracteres.';
@@ -141,7 +149,6 @@ export default function AnalistaNuevaSolicitud() {
       idCandidato: Number(formulario.candidato_id),
       idEvaluador: Number(formulario.evaluador_id),
       prioridad: formulario.prioridad,
-      fechaAsignacion: formulario.fecha_asignacion,
       observaciones: formulario.observaciones.trim(),
     });
 
@@ -164,7 +171,7 @@ export default function AnalistaNuevaSolicitud() {
     await cargarDatos();
   }
 
-  const sinCandidatos = !cargando && candidatos.length === 0;
+  const sinCandidatos = !cargando && !errorCarga && candidatos.length === 0;
 
   return (
     <>
@@ -181,7 +188,10 @@ export default function AnalistaNuevaSolicitud() {
       />
 
       {errorCarga && (
-        <div className="alert alert-danger d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2" role="alert">
+        <div
+          className="alert alert-danger d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2"
+          role="alert"
+        >
           <span>
             <i className="bi bi-exclamation-triangle me-2" aria-hidden="true" />
             {errorCarga}
@@ -193,30 +203,32 @@ export default function AnalistaNuevaSolicitud() {
       )}
 
       {sinCandidatos && (
-        <div className="alert alert-warning" role="alert">
-          <i className="bi bi-info-circle me-2" aria-hidden="true" />
-          No hay candidatos registrados. Primero registra un candidato en el listado.
-          <Link to="/analista/candidatos" className="alert-link ms-1">
+        <div className="alert alert-warning d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2" role="alert">
+          <span>
+            <i className="bi bi-info-circle me-2" aria-hidden="true" />
+            No hay candidatos registrados. Primero registra un candidato para poder crear una solicitud.
+          </span>
+          <Link to="/analista/candidatos" className="btn btn-soft btn-sm">
             Ir a candidatos
           </Link>
         </div>
       )}
 
-      <div className="row g-3">
-        <div className="col-lg-7">
+      <div className="row g-4 align-items-start">
+        <div className="col-lg-8">
           <div className="aqua-card">
             <div className="card-header">
               <i className="bi bi-file-earmark-plus me-2" aria-hidden="true" />
               Datos de la solicitud
             </div>
-            <div className="card-body">
+            <div className="card-body p-3 p-md-4">
               {cargando ? (
                 <div className="text-center py-5 text-muted-aqua">
                   <div className="spinner-border text-primary mb-3" role="status" aria-hidden="true" />
                   <p className="mb-0 small">Cargando candidatos y evaluadores...</p>
                 </div>
               ) : (
-                <form className="aqua-form" onSubmit={manejarEnvio} noValidate>
+                <form className="aqua-form analista-form d-flex flex-column" onSubmit={manejarEnvio} noValidate>
                   {errorEnvio && (
                     <div className="alert alert-danger" role="alert">
                       <i className="bi bi-exclamation-triangle me-2" aria-hidden="true" />
@@ -224,99 +236,140 @@ export default function AnalistaNuevaSolicitud() {
                     </div>
                   )}
 
-                  <div className="mb-3">
-                    <label className="form-label" htmlFor="candidato_id">
-                      Candidato <span className="text-danger">*</span>
-                    </label>
-                    <select
-                      className={`form-select ${errores.candidato_id ? 'is-invalid' : ''}`}
-                      id="candidato_id"
-                      name="candidato_id"
-                      value={formulario.candidato_id}
-                      onChange={actualizarCampo}
-                      required
-                    >
-                      <option value="">Selecciona un candidato registrado</option>
-                      {candidatos.map((candidato) => (
-                        <option
-                          key={candidato.id}
-                          value={candidato.id}
-                          disabled={candidato.tieneSolicitudActiva}
+                  <section className="aqua-form-section">
+                    <div className="analista-section-head">
+                      <span className="analista-section-icon">
+                        <i className="bi bi-person-check" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <h3>Candidato y evaluador</h3>
+                        <p>Selecciona a quien se evaluara y quien sera el responsable del proceso.</p>
+                      </div>
+                    </div>
+
+                    <div className="row g-3">
+                      <div className="col-12">
+                        <label className="form-label" htmlFor="candidato_id">
+                          Candidato <span className="text-danger">*</span>
+                        </label>
+                        <select
+                          className={`form-select ${errores.candidato_id ? 'is-invalid' : ''}`}
+                          id="candidato_id"
+                          name="candidato_id"
+                          value={formulario.candidato_id}
+                          onChange={actualizarCampo}
+                          required
                         >
-                          {candidato.nombreCompleto} - {candidato.cargo}
-                          {candidato.tieneSolicitudActiva ? ' (solicitud activa)' : ''}
-                        </option>
-                      ))}
-                    </select>
-                    {errores.candidato_id && <div className="invalid-feedback">{errores.candidato_id}</div>}
-                  </div>
+                          <option value="">Selecciona un candidato registrado</option>
+                          {candidatos.map((candidato) => (
+                            <option
+                              key={candidato.id}
+                              value={candidato.id}
+                              disabled={candidato.tieneSolicitudActiva}
+                            >
+                              {candidato.nombreCompleto} - {candidato.cargo}
+                              {candidato.tieneSolicitudActiva ? ' (solicitud activa)' : ''}
+                            </option>
+                          ))}
+                        </select>
+                        {errores.candidato_id && <div className="invalid-feedback">{errores.candidato_id}</div>}
+                        <div className="form-text">
+                          Solo aparecen candidatos ya registrados. Si falta alguno, registralo desde Candidatos.
+                        </div>
+                      </div>
 
-                  <div className="mb-3">
-                    <label className="form-label" htmlFor="evaluador_id">
-                      Evaluador responsable <span className="text-danger">*</span>
-                    </label>
-                    <select
-                      className={`form-select ${errores.evaluador_id ? 'is-invalid' : ''}`}
-                      id="evaluador_id"
-                      name="evaluador_id"
-                      value={formulario.evaluador_id}
-                      onChange={actualizarCampo}
-                      required
-                    >
-                      <option value="">Selecciona un profesional evaluador</option>
-                      {evaluadores.map((evaluador) => (
-                        <option key={evaluador.id} value={evaluador.id}>
-                          {evaluador.nombre} - {evaluador.correo}
-                        </option>
-                      ))}
-                    </select>
-                    {errores.evaluador_id && <div className="invalid-feedback">{errores.evaluador_id}</div>}
-                    <div className="form-text">
-                      La solicitud queda en estado Pendiente hasta que el evaluador inicie el proceso.
+                      <div className="col-12">
+                        <label className="form-label" htmlFor="evaluador_id">
+                          Evaluador responsable <span className="text-danger">*</span>
+                        </label>
+                        <select
+                          className={`form-select ${errores.evaluador_id ? 'is-invalid' : ''}`}
+                          id="evaluador_id"
+                          name="evaluador_id"
+                          value={formulario.evaluador_id}
+                          onChange={actualizarCampo}
+                          required
+                        >
+                          <option value="">Selecciona un profesional evaluador</option>
+                          {evaluadores.map((evaluador) => (
+                            <option key={evaluador.id} value={evaluador.id}>
+                              {evaluador.nombre} - {evaluador.correo}
+                            </option>
+                          ))}
+                        </select>
+                        {errores.evaluador_id && <div className="invalid-feedback">{errores.evaluador_id}</div>}
+                        <div className="form-text">
+                          Solo se listan evaluadores activos. La solicitud queda Pendiente hasta que inicie el
+                          proceso.
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </section>
 
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label" htmlFor="fecha_asignacion">
-                        Fecha de asignacion <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="date"
-                        className={`form-control ${errores.fecha_asignacion ? 'is-invalid' : ''}`}
-                        id="fecha_asignacion"
-                        name="fecha_asignacion"
-                        value={formulario.fecha_asignacion}
-                        onChange={actualizarCampo}
-                        required
-                      />
-                      {errores.fecha_asignacion && (
-                        <div className="invalid-feedback">{errores.fecha_asignacion}</div>
-                      )}
+                  <section className="aqua-form-section">
+                    <div className="analista-section-head">
+                      <span className="analista-section-icon">
+                        <i className="bi bi-calendar2-week" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <h3>Programacion</h3>
+                        <p>Define la fecha de asignacion y la prioridad del proceso.</p>
+                      </div>
                     </div>
 
-                    <div className="col-md-6">
-                      <label className="form-label" htmlFor="prioridad">
-                        Prioridad
-                      </label>
-                      <select
-                        className="form-select"
-                        id="prioridad"
-                        name="prioridad"
-                        value={formulario.prioridad}
-                        onChange={actualizarCampo}
-                      >
-                        {PRIORIDADES.map((item) => (
-                          <option key={item.clave} value={item.clave}>
-                            {item.nombre}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label className="form-label" htmlFor="fecha_asignacion">
+                          Fecha de asignacion <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="date"
+                          className="form-control bg-light"
+                          id="fecha_asignacion"
+                          name="fecha_asignacion"
+                          value={formulario.fecha_asignacion}
+                          readOnly
+                          aria-readonly="true"
+                          title="Fecha del sistema, no editable"
+                          required
+                        />
+                        <div className="form-text">Se registra automaticamente con la fecha del sistema.</div>
+                      </div>
 
-                  <div className="mb-4">
-                    <label className="form-label" htmlFor="observaciones">
+                      <div className="col-md-6">
+                        <label className="form-label" htmlFor="prioridad">
+                          Prioridad
+                        </label>
+                        <select
+                          className="form-select"
+                          id="prioridad"
+                          name="prioridad"
+                          value={formulario.prioridad}
+                          onChange={actualizarCampo}
+                        >
+                          {PRIORIDADES.map((item) => (
+                            <option key={item.clave} value={item.clave}>
+                              {item.nombre}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="form-text">Alta prioridad se muestra destacada en el listado.</div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="aqua-form-section">
+                    <div className="analista-section-head">
+                      <span className="analista-section-icon">
+                        <i className="bi bi-chat-left-text" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <h3>Observaciones</h3>
+                        <p>Antecedentes o focos que el evaluador debe conocer antes de comenzar.</p>
+                      </div>
+                    </div>
+
+                    <label className="visually-hidden" htmlFor="observaciones">
                       Observaciones para el evaluador
                     </label>
                     <textarea
@@ -327,33 +380,46 @@ export default function AnalistaNuevaSolicitud() {
                       maxLength={250}
                       value={formulario.observaciones}
                       onChange={actualizarCampo}
-                      placeholder="Antecedentes relevantes, condiciones del cargo o focos de la evaluacion"
+                      placeholder="Ej. Experiencia previa en planta, condiciones del turno o competencias a profundizar."
                     />
                     {errores.observaciones ? (
                       <div className="invalid-feedback">{errores.observaciones}</div>
                     ) : (
-                      <div className="form-text">{formulario.observaciones.length}/250 caracteres</div>
+                      <div className="d-flex justify-content-between mt-1 analista-counter">
+                        <span>Opcional para el analista.</span>
+                        <span>{formulario.observaciones.length}/250 caracteres</span>
+                      </div>
                     )}
-                  </div>
+                  </section>
 
-                  <div className="d-flex flex-column flex-sm-row gap-2">
-                    <button type="submit" className="btn btn-aqua px-4" disabled={guardando || sinCandidatos}>
-                      {guardando ? (
-                        <>
-                          <span className="spinner-border spinner-border-sm me-1" aria-hidden="true" />
-                          Creando...
-                        </>
-                      ) : (
-                        <>
-                          <i className="bi bi-check2-circle me-1" aria-hidden="true" />
-                          Crear solicitud
-                        </>
-                      )}
-                    </button>
-                    <Link to="/analista/solicitudes" className="btn btn-soft px-4">
-                      <i className="bi bi-x-circle me-1" aria-hidden="true" />
-                      Cancelar
-                    </Link>
+                  <div className="analista-footer d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                    <p className="text-muted-aqua small mb-0">
+                      <i className="bi bi-shield-check me-1" aria-hidden="true" />
+                      Se guarda en MySQL y queda en estado Pendiente.
+                    </p>
+                    <div className="d-flex flex-column-reverse flex-sm-row gap-2">
+                      <Link to="/analista/solicitudes" className="btn btn-soft px-4">
+                        <i className="bi bi-x-circle me-1" aria-hidden="true" />
+                        Cancelar
+                      </Link>
+                      <button
+                        type="submit"
+                        className="btn btn-aqua px-4"
+                        disabled={guardando || sinCandidatos}
+                      >
+                        {guardando ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-1" aria-hidden="true" />
+                            Creando...
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-check2-circle me-1" aria-hidden="true" />
+                            Crear solicitud
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </form>
               )}
@@ -361,64 +427,116 @@ export default function AnalistaNuevaSolicitud() {
           </div>
         </div>
 
-        <div className="col-lg-5">
-          <div className="aqua-card mb-3">
+        <div className="col-lg-4">
+          <div className="aqua-card analista-aside-card mb-3">
             <div className="card-header">
-              <i className="bi bi-info-circle me-2" aria-hidden="true" />
+              <i className="bi bi-clipboard-check me-2" aria-hidden="true" />
               Resumen previo
             </div>
             <div className="card-body">
               {candidatoSeleccionado ? (
-                <dl className="row mb-0 small">
-                  <dt className="col-5 text-muted-aqua fw-semibold">Candidato</dt>
-                  <dd className="col-7">{candidatoSeleccionado.nombreCompleto}</dd>
-                  <dt className="col-5 text-muted-aqua fw-semibold">Cargo</dt>
-                  <dd className="col-7">{candidatoSeleccionado.cargo}</dd>
-                  <dt className="col-5 text-muted-aqua fw-semibold">Familia</dt>
-                  <dd className="col-7">{candidatoSeleccionado.familiaCargo}</dd>
-                  <dt className="col-5 text-muted-aqua fw-semibold">Origen</dt>
-                  <dd className="col-7 text-capitalize">{candidatoSeleccionado.tipoPostulacion}</dd>
-                  <dt className="col-5 text-muted-aqua fw-semibold">Postulado</dt>
-                  <dd className="col-7 mb-0">
-                    {candidatoSeleccionado.fechaPostulacion
-                      ? candidatoSeleccionado.fechaPostulacion.split('-').reverse().join('/')
-                      : '-'}
-                  </dd>
-                </dl>
+                <>
+                  <div className="d-flex align-items-center gap-2 border rounded-3 p-3 mb-3 bg-tint-primary">
+                    <span className="analista-avatar">{iniciales(candidatoSeleccionado)}</span>
+                    <div className="overflow-hidden">
+                      <p className="fw-semibold mb-0 small text-truncate">
+                        {candidatoSeleccionado.nombreCompleto}
+                      </p>
+                      <p className="text-muted-aqua mb-0 text-truncate" style={{ fontSize: '0.76rem' }}>
+                        {candidatoSeleccionado.correo}
+                      </p>
+                    </div>
+                  </div>
+
+                  <ul className="list-unstyled mb-0 small">
+                    <li className="d-flex justify-content-between gap-3 py-2 border-bottom">
+                      <span className="text-muted-aqua">Cargo</span>
+                      <span className="text-end fw-semibold">{candidatoSeleccionado.cargo}</span>
+                    </li>
+                    <li className="d-flex justify-content-between gap-3 py-2 border-bottom">
+                      <span className="text-muted-aqua">Familia</span>
+                      <span className="text-end fw-semibold">{candidatoSeleccionado.familiaCargo}</span>
+                    </li>
+                    <li className="d-flex justify-content-between align-items-center gap-3 py-2 border-bottom">
+                      <span className="text-muted-aqua">Origen</span>
+                      <TipoPostulacionBadge tipo={candidatoSeleccionado.tipoPostulacion} />
+                    </li>
+                    <li className="d-flex justify-content-between gap-3 py-2">
+                      <span className="text-muted-aqua">Postulacion</span>
+                      <span className="text-end fw-semibold">
+                        {formatearFecha(candidatoSeleccionado.fechaPostulacion)}
+                      </span>
+                    </li>
+                  </ul>
+                </>
               ) : (
-                <p className="text-muted-aqua small mb-0">Selecciona un candidato para ver el resumen.</p>
+                <div className="border rounded-3 p-4 text-center text-muted-aqua bg-light">
+                  <span className="analista-avatar d-flex mx-auto mb-2">
+                    <i className="bi bi-person-plus" aria-hidden="true" />
+                  </span>
+                  <p className="small mb-0">Selecciona un candidato para ver su ficha resumida.</p>
+                </div>
               )}
 
-              <hr />
+              <div className="border rounded-3 p-3 mt-3">
+                <p
+                  className="text-muted-aqua text-uppercase fw-semibold mb-2"
+                  style={{ fontSize: '0.68rem', letterSpacing: '0.08em' }}
+                >
+                  Evaluador asignado
+                </p>
+                <div className="analista-responsable">
+                  <span className="analista-avatar">
+                    <i className="bi bi-person-badge" aria-hidden="true" />
+                  </span>
+                  <div className="overflow-hidden">
+                    <p className="fw-semibold mb-0 small text-truncate">
+                      {evaluadorSeleccionado?.nombre ?? 'Sin asignar'}
+                    </p>
+                    <p className="text-muted-aqua mb-0 text-truncate" style={{ fontSize: '0.76rem' }}>
+                      {evaluadorSeleccionado?.correo ?? 'Selecciona un evaluador'}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-              <p className="small mb-1 text-muted-aqua">Evaluador asignado</p>
-              <p className="small fw-semibold mb-0">{evaluadorSeleccionado?.nombre ?? 'Sin asignar'}</p>
-
-              <hr />
-
-              <p className="small mb-1 text-muted-aqua">Registrado por</p>
-              <p className="small fw-semibold mb-0">{usuario?.nombre ?? 'Analista'}</p>
+              <div className="border rounded-3 p-3 mt-2 d-flex align-items-center gap-2">
+                <span className="analista-avatar" style={{ width: 34, height: 34, flexBasis: 34, fontSize: '0.9rem' }}>
+                  <i className="bi bi-person-gear" aria-hidden="true" />
+                </span>
+                <div>
+                  <p
+                    className="text-muted-aqua text-uppercase fw-semibold mb-1"
+                    style={{ fontSize: '0.68rem', letterSpacing: '0.08em' }}
+                  >
+                    Registrado por
+                  </p>
+                  <p className="fw-semibold mb-0 small">{usuario?.nombre ?? 'Analista'}</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="aqua-card">
+          <div className="aqua-card analista-aside-card">
             <div className="card-header">
               <i className="bi bi-lightbulb me-2" aria-hidden="true" />
               Reglas del proceso
             </div>
-            <div className="card-body small text-muted-aqua">
-              <p className="mb-2">
-                <i className="bi bi-dot" aria-hidden="true" />
-                La solicitud se guarda en MySQL y queda en estado <strong>Pendiente</strong>.
-              </p>
-              <p className="mb-2">
-                <i className="bi bi-dot" aria-hidden="true" />
-                Un candidato no puede tener dos solicitudes activas al mismo tiempo.
-              </p>
-              <p className="mb-0">
-                <i className="bi bi-dot" aria-hidden="true" />
-                El evaluador solo vera las solicitudes asignadas a su usuario.
-              </p>
+            <div className="card-body">
+              <ul className="list-unstyled d-grid gap-2 mb-0 small text-muted-aqua">
+                <li className="d-flex gap-2">
+                  <i className="bi bi-check2-circle text-success mt-1" aria-hidden="true" />
+                  <span>La solicitud se guarda en MySQL y queda en estado Pendiente.</span>
+                </li>
+                <li className="d-flex gap-2">
+                  <i className="bi bi-check2-circle text-success mt-1" aria-hidden="true" />
+                  <span>Un candidato no puede tener dos solicitudes activas al mismo tiempo.</span>
+                </li>
+                <li className="d-flex gap-2">
+                  <i className="bi bi-check2-circle text-success mt-1" aria-hidden="true" />
+                  <span>El evaluador solo vera las solicitudes asignadas a su usuario.</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
