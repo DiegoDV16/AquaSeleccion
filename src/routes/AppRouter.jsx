@@ -8,6 +8,7 @@ import Login from '../pages/auth/Login.jsx';
 import Postular from '../pages/public/Postular.jsx';
 
 import AdminDashboard from '../pages/admin/AdminDashboard.jsx';
+import AdminCandidatos from '../pages/admin/AdminCandidatos.jsx';
 import AdminPostularInterno from '../pages/admin/AdminPostularInterno.jsx';
 import AdminUsuarios from '../pages/admin/AdminUsuarios.jsx';
 import AdminHistorial from '../pages/admin/AdminHistorial.jsx';
@@ -15,6 +16,7 @@ import AdminHistorial from '../pages/admin/AdminHistorial.jsx';
 import AnalistaCandidatos from '../pages/analista/AnalistaCandidatos.jsx';
 import AnalistaSolicitudes from '../pages/analista/AnalistaSolicitudes.jsx';
 import AnalistaNuevaSolicitud from '../pages/analista/AnalistaNuevaSolicitud.jsx';
+import AnalistaSolicitudDetalle from '../pages/analista/AnalistaSolicitudDetalle.jsx';
 
 import EvaluadorMisSolicitudes from '../pages/evaluador/EvaluadorMisSolicitudes.jsx';
 import EvaluadorEvaluar from '../pages/evaluador/EvaluadorEvaluar.jsx';
@@ -56,6 +58,14 @@ export default function AppRouter() {
           element={
             <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
               <AdminDashboard />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/admin/candidatos"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+              <AdminCandidatos />
             </RutaProtegida>
           }
         />
@@ -114,6 +124,14 @@ export default function AppRouter() {
           element={
             <RutaProtegida rolesPermitidos={PERMISOS.ANALISTA}>
               <AnalistaNuevaSolicitud />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/analista/solicitudes/:id"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ANALISTA}>
+              <AnalistaSolicitudDetalle />
             </RutaProtegida>
           }
         />

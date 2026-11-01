@@ -58,7 +58,7 @@ export default function Navbar({ sidebarAbierto, onToggleSidebar }) {
           <i className="bi bi-list fs-5" aria-hidden="true" />
         </button>
 
-        <Link className="navbar-brand d-flex align-items-center gap-2 me-lg-3" to={rol.rutaInicio ?? '/login'}>
+        <Link className="navbar-brand d-flex align-items-center gap-2 me-lg-3" to={rol?.rutaInicio ?? '/login'}>
           <span className="aqua-brand-mark" aria-hidden="true">
             <i className="bi bi-water" />
           </span>
@@ -77,7 +77,7 @@ export default function Navbar({ sidebarAbierto, onToggleSidebar }) {
           </button>
 
           {/* Modulo asignado por el rol del usuario: informativo, no editable */}
-          {rol.rutaInicio && (
+          {rol?.rutaInicio && (
             <span className="aqua-modulo-chip d-none d-lg-inline-flex" title="Modulo asignado por tu rol">
               <i className={`bi bi-${rol.icono}`} aria-hidden="true" />
               {rol.nombre}
@@ -96,7 +96,7 @@ export default function Navbar({ sidebarAbierto, onToggleSidebar }) {
               <span className="d-none d-xl-inline text-start lh-sm">
                 <span className="d-block small fw-semibold">{usuario?.nombre ?? 'Usuario'}</span>
                 <span className="d-block text-muted-aqua" style={{ fontSize: '0.7rem' }}>
-                  {usuario?.unidad ?? rol.nombre}
+                  {usuario?.unidad ?? rol?.nombre}
                 </span>
               </span>
               <i className={`bi ${menuUsuarioAbierto ? 'bi-chevron-up' : 'bi-chevron-down'} text-muted-aqua`} aria-hidden="true" />
@@ -110,10 +110,10 @@ export default function Navbar({ sidebarAbierto, onToggleSidebar }) {
                     {usuario?.correo}
                   </p>
                   <span className={`badge badge-estado ${usuario?.estado === 'activo' ? 'badge-estado-activo' : 'badge-estado-inactivo'}`}>
-                    {rol.nombre}
+                    {rol?.nombre}
                   </span>
                 </div>
-                <Link className="dropdown-item small" to={rol.rutaInicio ?? '/login'}>
+                <Link className="dropdown-item small" to={rol?.rutaInicio ?? '/login'}>
                   <i className="bi bi-speedometer2 me-2" aria-hidden="true" />
                   Ir a mi modulo
                 </Link>
