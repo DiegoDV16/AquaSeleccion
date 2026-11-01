@@ -26,7 +26,7 @@ El proyecto es un monolito con frontend SPA en React y backend PHP sobre MySQL. 
 - Historial y trazabilidad de solicitudes.
 
 ### Módulo Analista de Reclutamiento
-- Registro y edición de candidatos, con listado, detalle y previsualización del CV almacenado.
+- Registro de postulaciones internas con CV opcional y edición de candidatos, con listado, detalle y previsualización/descarga del CV.
 - Creación, listado, filtros y detalle de solicitudes de evaluación.
 - Asignación de un evaluador responsable y de la prioridad del proceso.
 
@@ -239,8 +239,9 @@ Reglas:
 
 - Un candidato puede originarse por postulación externa o interna.
 - El origen se distingue por el tipo de postulación (`externa` / `interna`).
-- El Analista puede registrar candidatos externos manualmente y editar sus datos principales; el Administrador mantiene la postulación interna.
-- Los candidatos externos pueden tener currículum adjunto; las postulaciones internas se respaldan con el legajo del colaborador.
+- El Analista registra postulaciones internas manualmente y puede adjuntar el CV (opcional); el Administrador mantiene la postulación interna desde su módulo.
+- La postulación interna registrada por el Analista queda vinculada al usuario de la sesión (`candidato.idUsuario`), por lo que el origen se muestra como interna.
+- Los candidatos externos pueden tener currículum adjunto; las postulaciones internas pueden respaldarse con el CV cargado o con el legajo del colaborador.
 - El estado del candidato se deriva de su última solicitud y evaluación: `pendiente`, `en_proceso`, `apto`, `no_apto` o `con_observaciones`.
 - El CV se previsualiza desde el archivo almacenado en el servidor: PDF en un visor integrado y DOCX convertido a HTML. Los `.doc` antiguos no se previsualizan, pero se pueden descargar. La descarga se hace mediante un endpoint autenticado y conserva el nombre `CV_<id>`.
 
@@ -300,7 +301,7 @@ Reglas:
 - Registro de postulaciones externas e internas en la tabla `candidato`.
 - Carga de currículum con validación y almacenamiento.
 - Catálogo de familias y cargos desde base de datos.
-- Módulo Analista: listado, registro, edición y detalle de candidatos con previsualización y descarga del CV en PDF, DOC y DOCX.
+- Módulo Analista: registro de postulaciones internas con CV opcional, listado, edición y detalle de candidatos con previsualización y descarga del CV en PDF, DOC y DOCX.
 - Módulo Administrador: listado de candidatos con previsualización y descarga del CV.
 - Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
 

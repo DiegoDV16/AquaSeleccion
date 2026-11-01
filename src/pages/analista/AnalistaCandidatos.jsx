@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
@@ -55,6 +55,8 @@ export default function AnalistaCandidatos() {
   const [errores, setErrores] = useState({});
   const [errorFormulario, setErrorFormulario] = useState('');
   const [guardando, setGuardando] = useState(false);
+  const [cv, setCv] = useState(null);
+  const inputCvRef = useRef(null);
 
   const cargarCandidatos = useCallback(async () => {
     setCargando(true);
@@ -113,6 +115,8 @@ export default function AnalistaCandidatos() {
     setErrores({});
     setErrorFormulario('');
     setMensaje('');
+    setCv(null);
+    if (inputCvRef.current) inputCvRef.current.value = '';
     setModalAbierto(true);
   }
 
@@ -131,12 +135,16 @@ export default function AnalistaCandidatos() {
     setErrores({});
     setErrorFormulario('');
     setMensaje('');
+    setCv(null);
+    if (inputCvRef.current) inputCvRef.current.value = '';
     setModalAbierto(true);
   }
 
   function cerrarModal() {
     if (guardando) return;
     setModalAbierto(false);
+    setCv(null);
+    if (inputCvRef.current) inputCvRef.current.value = '';
   }
 
   function actualizarCampo(evento) {
@@ -152,6 +160,42 @@ export default function AnalistaCandidatos() {
       idCargo: '',
     }));
     setErrores((actual) => ({ ...actual, idFamiliaCargo: undefined, idCargo: undefined }));
+  }
+
+  function validarArchivoCv(archivo) {
+    if (!archivo) return '';
+
+    const extension = archivo.name.split('.').pop()?.toLowerCase();
+
+    if (!['pdf', 'doc', 'docx'].includes(extension)) {
+      return 'El curriculum debe ser un PDF o un documento Word (.doc o .docx).';
+    }
+
+    if (archivo.size > 5 * 1024 * 1024) {
+      return 'El curriculum supera el tamano maximo de 5 MB.';
+    }
+
+    if (archivo.name.length > 255) {
+      return 'El nombre del archivo no puede superar los 255 caracteres.';
+    }
+
+    return '';
+  }
+
+  function manejarArchivo(evento) {
+    const archivo = evento.target.files?.[0] ?? null;
+
+    setCv(archivo);
+    setErrores((actual) => ({
+      ...actual,
+      cv: archivo ? validarArchivoCv(archivo) || undefined : undefined,
+    }));
+  }
+
+  function quitarArchivo() {
+    setCv(null);
+    setErrores((actual) => ({ ...actual, cv: undefined }));
+    if (inputCvRef.current) inputCvRef.current.value = '';
   }
 
   function validarFormulario() {
@@ -184,6 +228,12 @@ export default function AnalistaCandidatos() {
       nuevosErrores.observaciones = 'Maximo 500 caracteres.';
     }
 
+    if (!formulario.id && cv) {
+      const mensajeCv = validarArchivoCv(cv);
+
+      if (mensajeCv) nuevosErrores.cv = mensajeCv;
+    }
+
     setErrores(nuevosErrores);
 
     return Object.keys(nuevosErrores).length === 0;
@@ -199,6 +249,8 @@ export default function AnalistaCandidatos() {
     setGuardando(true);
     setErrorFormulario('');
 
+    const esEdicion = Boolean(formulario.id);
+
     const datos = {
       nombres: formulario.nombres.trim(),
       apellidoPaterno: formulario.apellidoPaterno.trim(),
@@ -208,9 +260,9 @@ export default function AnalistaCandidatos() {
       idFamiliaCargo: Number(formulario.idFamiliaCargo),
       idCargo: Number(formulario.idCargo),
       observaciones: formulario.observaciones.trim(),
+      curriculumCv: esEdicion ? undefined : cv,
     };
 
-    const esEdicion = Boolean(formulario.id);
     const nombre = `${datos.nombres} ${datos.apellidoPaterno}`.trim();
     const cargo =
       cargosDisponibles.find((item) => item.id === datos.idCargo)?.nombre ?? 'el cargo seleccionado';
@@ -227,15 +279,19 @@ export default function AnalistaCandidatos() {
 
     setModalAbierto(false);
     setGuardando(false);
+    setCv(null);
+    if (inputCvRef.current) inputCvRef.current.value = '';
     setConfirmacionCandidato({
-      titulo: esEdicion ? 'Candidato actualizado' : 'Candidato registrado',
+      titulo: esEdicion ? 'Candidato actualizado' : 'Postulación interna registrada',
       mensaje: esEdicion ? (
         <>
           <strong>{nombre}</strong> fue actualizado correctamente.
         </>
       ) : (
         <>
-          <strong>{nombre}</strong> fue registrado para el cargo <strong>{cargo}</strong>.
+          <strong>{nombre}</strong> quedó registrado como postulación interna para el cargo{' '}
+          <strong>{cargo}</strong>.
+          {cv ? ' Se adjuntó el currículum.' : ''}
         </>
       ),
       acciones: esEdicion
@@ -604,17 +660,20 @@ export default function AnalistaCandidatos() {
             aria-modal="true"
             aria-labelledby="formulario-candidato-titulo"
           >
-            <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
               <div className="modal-content">
                 <div className="modal-header">
                   <h5 className="modal-title" id="formulario-candidato-titulo">
                     <i className="bi bi-person-plus me-2" aria-hidden="true" />
-                    {formulario.id ? 'Editar candidato' : 'Registrar candidato'}
+                    {formulario.id ? 'Editar candidato' : 'Registrar postulación interna'}
                   </h5>
+                  {!formulario.id && (
+                    <span className="badge rounded-pill bg-tint-success ms-2">Interna</span>
+                  )}
                   <button type="button" className="btn-close" onClick={cerrarModal} aria-label="Cerrar" />
                 </div>
-                <form className="aqua-form" onSubmit={guardar} noValidate>
-                  <div className="modal-body">
+                <form className="aqua-form analista-form" onSubmit={guardar} noValidate>
+                  <div className="modal-body p-3 p-md-4">
                     {errorFormulario && (
                       <div className="alert alert-danger" role="alert">
                         <i className="bi bi-exclamation-triangle me-2" aria-hidden="true" />
@@ -622,7 +681,27 @@ export default function AnalistaCandidatos() {
                       </div>
                     )}
 
-                    <div className="row g-3">
+                    {!formulario.id && (
+                      <div className="alert alert-info d-flex align-items-center gap-2" role="status">
+                        <i className="bi bi-info-circle" aria-hidden="true" />
+                        <span className="small">
+                          Esta postulación quedará registrada como interna y vinculada al analista que la crea.
+                        </span>
+                      </div>
+                    )}
+
+                    <section className="aqua-form-section">
+                      <div className="analista-section-head">
+                        <span className="analista-section-icon">
+                          <i className="bi bi-person" aria-hidden="true" />
+                        </span>
+                        <div>
+                          <h3>Datos del colaborador</h3>
+                          <p>Ingresa los datos personales del colaborador que postula.</p>
+                        </div>
+                      </div>
+
+                      <div className="row g-3">
                       <div className="col-md-6">
                         <label className="form-label" htmlFor="nombres">
                           Nombres <span className="text-danger">*</span>
@@ -712,7 +791,21 @@ export default function AnalistaCandidatos() {
                         />
                         {errores.telefono && <div className="invalid-feedback">{errores.telefono}</div>}
                       </div>
+                      </div>
+                    </section>
 
+                    <section className="aqua-form-section">
+                      <div className="analista-section-head">
+                        <span className="analista-section-icon">
+                          <i className="bi bi-briefcase" aria-hidden="true" />
+                        </span>
+                        <div>
+                          <h3>Cargo de interés del colaborador</h3>
+                          <p>Selecciona la familia y el cargo al que postula el colaborador.</p>
+                        </div>
+                      </div>
+
+                      <div className="row g-3">
                       <div className="col-md-6">
                         <label className="form-label" htmlFor="idFamiliaCargo">
                           Familia de cargo <span className="text-danger">*</span>
@@ -761,7 +854,66 @@ export default function AnalistaCandidatos() {
                         </select>
                         {errores.idCargo && <div className="invalid-feedback">{errores.idCargo}</div>}
                       </div>
+                      </div>
+                    </section>
 
+                    {!formulario.id && (
+                      <section className="aqua-form-section">
+                        <div className="analista-section-head">
+                          <span className="analista-section-icon">
+                            <i className="bi bi-file-earmark-arrow-up" aria-hidden="true" />
+                          </span>
+                          <div>
+                            <h3>Currículum</h3>
+                            <p>Adjunta el CV en PDF o Word. Es opcional y no puede superar los 5 MB.</p>
+                          </div>
+                        </div>
+
+                        <label className="form-label" htmlFor="curriculumCv">
+                          Currículum del colaborador
+                        </label>
+                        <input
+                          ref={inputCvRef}
+                          type="file"
+                          className={`form-control ${errores.cv ? 'is-invalid' : ''}`}
+                          id="curriculumCv"
+                          name="curriculumCv"
+                          accept=".pdf,.doc,.docx"
+                          onChange={manejarArchivo}
+                        />
+                        {errores.cv && <div className="invalid-feedback d-block">{errores.cv}</div>}
+                        {cv && (
+                          <div className="d-flex align-items-center justify-content-between gap-2 border rounded-3 p-2 mt-2">
+                            <span className="small text-truncate">
+                              <i className="bi bi-file-earmark-text me-1" aria-hidden="true" />
+                              {cv.name} ({Math.round(cv.size / 1024)} KB)
+                            </span>
+                            <button
+                              type="button"
+                              className="btn btn-link btn-sm text-danger p-0"
+                              onClick={quitarArchivo}
+                              title="Quitar archivo"
+                            >
+                              <i className="bi bi-x-lg" aria-hidden="true" />
+                            </button>
+                          </div>
+                        )}
+                        <div className="form-text">Formatos permitidos: PDF, DOC o DOCX. Máximo 5 MB.</div>
+                      </section>
+                    )}
+
+                    <section className="aqua-form-section">
+                      <div className="analista-section-head">
+                        <span className="analista-section-icon">
+                          <i className="bi bi-chat-left-text" aria-hidden="true" />
+                        </span>
+                        <div>
+                          <h3>Observaciones</h3>
+                          <p>Antecedentes o contexto que el evaluador debe conocer.</p>
+                        </div>
+                      </div>
+
+                      <div className="row g-3">
                       <div className="col-12">
                         <label className="form-label" htmlFor="observaciones">
                           Observaciones
@@ -782,7 +934,8 @@ export default function AnalistaCandidatos() {
                           <div className="form-text">{formulario.observaciones.length}/500 caracteres</div>
                         )}
                       </div>
-                    </div>
+                      </div>
+                    </section>
                   </div>
                   <div className="modal-footer">
                     <button type="button" className="btn btn-soft" onClick={cerrarModal} disabled={guardando}>
@@ -797,7 +950,7 @@ export default function AnalistaCandidatos() {
                       ) : (
                         <>
                           <i className="bi bi-check2-circle me-1" aria-hidden="true" />
-                          Guardar candidato
+                          {formulario.id ? 'Guardar cambios' : 'Registrar postulación'}
                         </>
                       )}
                     </button>
