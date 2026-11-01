@@ -3,7 +3,11 @@ import { obtenerCargo, obtenerFamilia } from '../../mock/cargos.js';
 import { formatearFecha } from '../../mock/solicitudes.js';
 import TipoPostulacionBadge from './TipoPostulacionBadge.jsx';
 
-/** Ficha resumida del postulante: identidad, contacto y cargo evaluado. */
+/**
+ * Ficha resumida del postulante: identidad, contacto y cargo evaluado.
+ * Acepta tanto candidatos del backend (cargo/familia ya resueltos) como los
+ * datos simulados anteriores (cargo_id).
+ */
 export default function FichaPostulante({ candidato, titulo = 'Datos del postulante' }) {
   if (!candidato) {
     return (
@@ -13,8 +17,13 @@ export default function FichaPostulante({ candidato, titulo = 'Datos del postula
     );
   }
 
-  const cargo = obtenerCargo(candidato.cargo_id);
-  const familia = cargo ? obtenerFamilia(cargo.familia_id) : null;
+  const cargoSimulado = obtenerCargo(candidato.cargo_id);
+  const nombreCargo = candidato.cargo ?? (cargoSimulado ? cargoSimulado.nombre : '-');
+  const nombreFamilia =
+    candidato.familiaCargo ??
+    (cargoSimulado ? (obtenerFamilia(cargoSimulado.familia_id)?.nombre ?? '-') : '-');
+  const nombre = candidato.nombreCompleto ?? nombreCompleto(candidato);
+  const fechaPostulacion = candidato.fechaPostulacion ?? candidato.fecha_postulacion;
 
   return (
     <div className="aqua-card h-100">
@@ -23,12 +32,12 @@ export default function FichaPostulante({ candidato, titulo = 'Datos del postula
           <i className="bi bi-person-vcard me-2" aria-hidden="true" />
           {titulo}
         </span>
-        <TipoPostulacionBadge tipo={candidato.tipo_postulacion} />
+        <TipoPostulacionBadge tipo={candidato.tipoPostulacion ?? candidato.tipo_postulacion} />
       </div>
       <div className="card-body">
         <dl className="row mb-0 small">
           <dt className="col-sm-5 text-muted-aqua fw-semibold">Nombre completo</dt>
-          <dd className="col-sm-7">{nombreCompleto(candidato)}</dd>
+          <dd className="col-sm-7">{nombre}</dd>
 
           <dt className="col-sm-5 text-muted-aqua fw-semibold">Correo</dt>
           <dd className="col-sm-7">{candidato.correo}</dd>
@@ -37,10 +46,10 @@ export default function FichaPostulante({ candidato, titulo = 'Datos del postula
           <dd className="col-sm-7">{candidato.telefono ?? '-'}</dd>
 
           <dt className="col-sm-5 text-muted-aqua fw-semibold">Familia de cargo</dt>
-          <dd className="col-sm-7">{familia ? familia.nombre : '-'}</dd>
+          <dd className="col-sm-7">{nombreFamilia}</dd>
 
           <dt className="col-sm-5 text-muted-aqua fw-semibold">Cargo evaluado</dt>
-          <dd className="col-sm-7">{cargo ? cargo.nombre : '-'}</dd>
+          <dd className="col-sm-7">{nombreCargo}</dd>
 
           {candidato.cargo_actual && (
             <>
@@ -50,7 +59,7 @@ export default function FichaPostulante({ candidato, titulo = 'Datos del postula
           )}
 
           <dt className="col-sm-5 text-muted-aqua fw-semibold">Fecha de postulacion</dt>
-          <dd className="col-sm-7 mb-0">{formatearFecha(candidato.fecha_postulacion)}</dd>
+          <dd className="col-sm-7 mb-0">{formatearFecha(fechaPostulacion)}</dd>
         </dl>
       </div>
     </div>
