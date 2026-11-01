@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
+import ConfirmacionModal from '../../components/ui/ConfirmacionModal.jsx';
 import TipoPostulacionBadge from '../../components/ui/TipoPostulacionBadge.jsx';
 import VisorCvModal from '../../components/ui/VisorCvModal.jsx';
 import { actualizarCandidato, crearCandidato, listarCandidatos } from '../../services/candidatosApi.js';
@@ -47,6 +48,7 @@ export default function AnalistaCandidatos() {
   const [detalle, setDetalle] = useState(null);
   const [candidatoCv, setCandidatoCv] = useState(null);
   const [mensaje, setMensaje] = useState('');
+  const [confirmacionCandidato, setConfirmacionCandidato] = useState(null);
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [formulario, setFormulario] = useState(FORMULARIO_INICIAL);
@@ -208,6 +210,11 @@ export default function AnalistaCandidatos() {
       observaciones: formulario.observaciones.trim(),
     };
 
+    const esEdicion = Boolean(formulario.id);
+    const nombre = `${datos.nombres} ${datos.apellidoPaterno}`.trim();
+    const cargo =
+      cargosDisponibles.find((item) => item.id === datos.idCargo)?.nombre ?? 'el cargo seleccionado';
+
     const respuesta = formulario.id
       ? await actualizarCandidato({ idCandidato: formulario.id, ...datos })
       : await crearCandidato(datos);
@@ -219,8 +226,42 @@ export default function AnalistaCandidatos() {
     }
 
     setModalAbierto(false);
-    setMensaje(respuesta.mensaje ?? 'Candidato guardado correctamente.');
     setGuardando(false);
+    setConfirmacionCandidato({
+      titulo: esEdicion ? 'Candidato actualizado' : 'Candidato registrado',
+      mensaje: esEdicion ? (
+        <>
+          <strong>{nombre}</strong> fue actualizado correctamente.
+        </>
+      ) : (
+        <>
+          <strong>{nombre}</strong> fue registrado para el cargo <strong>{cargo}</strong>.
+        </>
+      ),
+      acciones: esEdicion
+        ? [
+            {
+              etiqueta: 'Cerrar',
+              variante: 'btn-aqua',
+              onClick: () => setConfirmacionCandidato(null),
+            },
+          ]
+        : [
+            {
+              etiqueta: 'Registrar otro',
+              icono: 'person-plus',
+              onClick: () => {
+                setConfirmacionCandidato(null);
+                abrirCrear();
+              },
+            },
+            {
+              etiqueta: 'Cerrar',
+              variante: 'btn-aqua',
+              onClick: () => setConfirmacionCandidato(null),
+            },
+          ],
+    });
 
     await cargarCandidatos();
   }
@@ -767,6 +808,16 @@ export default function AnalistaCandidatos() {
           </div>
           <div className="modal-backdrop fade show" />
         </>
+      )}
+
+      {confirmacionCandidato && (
+        <ConfirmacionModal
+          visible
+          titulo={confirmacionCandidato.titulo}
+          acciones={confirmacionCandidato.acciones}
+        >
+          {confirmacionCandidato.mensaje}
+        </ConfirmacionModal>
       )}
 
       <VisorCvModal candidato={candidatoCv} visible={Boolean(candidatoCv)} onCerrar={() => setCandidatoCv(null)} />

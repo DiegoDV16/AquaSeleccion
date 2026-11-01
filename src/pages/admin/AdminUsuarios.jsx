@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
+import ConfirmacionModal from '../../components/ui/ConfirmacionModal.jsx';
 import { CLAVE_ROLES, ROLES, obtenerRol } from '../../mock/catalogoRoles.js';
 import { actualizarUsuario, crearUsuario, eliminarUsuario, listarUsuarios } from '../../services/usuariosApi.js';
 
@@ -54,6 +55,7 @@ export default function AdminUsuarios() {
   const [eliminando, setEliminando] = useState(false);
   const [errorModalEliminar, setErrorModalEliminar] = useState('');
   const [exitoModalEliminar, setExitoModalEliminar] = useState('');
+  const [confirmacionUsuario, setConfirmacionUsuario] = useState(null);
 
   const cargarUsuarios = useCallback(() => {
     setCargando(true);
@@ -140,11 +142,35 @@ export default function AdminUsuarios() {
         setErrorModalCrear(datosResp?.mensaje ?? 'No se pudo crear el usuario.');
         return;
       }
-      setExitoModalCrear(datosResp?.mensaje ?? 'Usuario creado correctamente.');
+      const nombre = `${formularioCrear.nombres.trim()} ${formularioCrear.apellidoPaterno.trim()}`.trim();
+      const rol = ROLES.find((item) => item.id === Number(formularioCrear.idRol))?.nombre ?? 'el rol seleccionado';
+
+      setMostrarModalCrear(false);
+      setFormularioCrear(ESTADO_INICIAL_FORMULARIO_CREAR);
+      setConfirmacionUsuario({
+        titulo: 'Usuario creado',
+        mensaje: (
+          <>
+            <strong>{nombre}</strong> fue creado correctamente con el rol <strong>{rol}</strong>.
+          </>
+        ),
+        acciones: [
+          {
+            etiqueta: 'Crear otro',
+            icono: 'person-plus',
+            onClick: () => {
+              setConfirmacionUsuario(null);
+              abrirModalCrear();
+            },
+          },
+          {
+            etiqueta: 'Cerrar',
+            variante: 'btn-aqua',
+            onClick: () => setConfirmacionUsuario(null),
+          },
+        ],
+      });
       cargarUsuarios();
-      setTimeout(() => {
-        cerrarModalCrear();
-      }, 800);
     } catch {
       setErrorModalCrear('Ocurrio un error al crear el usuario.');
     } finally {
@@ -234,11 +260,26 @@ export default function AdminUsuarios() {
         setErrorModalEditar(datosResp?.mensaje ?? 'No se pudo actualizar el usuario.');
         return;
       }
-      setExitoModalEditar(datosResp?.mensaje ?? 'Usuario actualizado correctamente.');
+      const nombre = `${formularioEditar.nombres.trim()} ${formularioEditar.apellidoPaterno.trim()}`.trim();
+
+      setMostrarModalEditar(false);
+      setFormularioEditar(ESTADO_INICIAL_FORMULARIO_EDITAR);
+      setConfirmacionUsuario({
+        titulo: 'Usuario actualizado',
+        mensaje: (
+          <>
+            <strong>{nombre}</strong> fue actualizado correctamente.
+          </>
+        ),
+        acciones: [
+          {
+            etiqueta: 'Cerrar',
+            variante: 'btn-aqua',
+            onClick: () => setConfirmacionUsuario(null),
+          },
+        ],
+      });
       cargarUsuarios();
-      setTimeout(() => {
-        cerrarModalEditar();
-      }, 800);
     } catch {
       setErrorModalEditar('Ocurrio un error al actualizar el usuario.');
     } finally {
@@ -273,11 +314,28 @@ export default function AdminUsuarios() {
         setErrorModalEliminar(datosResp?.mensaje ?? 'No se pudo eliminar el usuario.');
         return;
       }
-      setExitoModalEliminar(datosResp?.mensaje ?? 'Usuario eliminado correctamente.');
+      const nombre = usuarioEliminar.nombre;
+
+      setMostrarModalEliminar(false);
+      setUsuarioEliminar(null);
+      setConfirmacionUsuario({
+        titulo: 'Usuario eliminado',
+        mensaje: (
+          <>
+            <strong>{nombre}</strong> fue eliminado del sistema.
+          </>
+        ),
+        icono: 'trash',
+        tinte: 'bg-tint-danger',
+        acciones: [
+          {
+            etiqueta: 'Cerrar',
+            variante: 'btn-aqua',
+            onClick: () => setConfirmacionUsuario(null),
+          },
+        ],
+      });
       cargarUsuarios();
-      setTimeout(() => {
-        cerrarModalEliminar();
-      }, 800);
     } catch {
       setErrorModalEliminar('Ocurrio un error al eliminar el usuario.');
     } finally {
@@ -844,6 +902,18 @@ export default function AdminUsuarios() {
           </div>
           <div className="modal-backdrop fade show"></div>
         </>
+      )}
+
+      {confirmacionUsuario && (
+        <ConfirmacionModal
+          visible
+          titulo={confirmacionUsuario.titulo}
+          acciones={confirmacionUsuario.acciones}
+          icono={confirmacionUsuario.icono}
+          tinte={confirmacionUsuario.tinte}
+        >
+          {confirmacionUsuario.mensaje}
+        </ConfirmacionModal>
       )}
     </>
   );
