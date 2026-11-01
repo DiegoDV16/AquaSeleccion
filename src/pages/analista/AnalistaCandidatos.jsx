@@ -28,9 +28,18 @@ const FORMULARIO_INICIAL = {
   idFamiliaCargo: '',
   idCargo: '',
   observaciones: '',
+  fecha_registro: fechaHoyLocal(),
 };
 
 const CORREO_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function fechaHoyLocal() {
+  const hoy = new Date();
+  const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dia = String(hoy.getDate()).padStart(2, '0');
+
+  return `${hoy.getFullYear()}-${mes}-${dia}`;
+}
 
 /**
  * AnalistaCandidatos
@@ -111,7 +120,7 @@ export default function AnalistaCandidatos() {
   const catalogosListos = familias.length > 0;
 
   function abrirCrear() {
-    setFormulario(FORMULARIO_INICIAL);
+    setFormulario({ ...FORMULARIO_INICIAL, fecha_registro: fechaHoyLocal() });
     setErrores({});
     setErrorFormulario('');
     setMensaje('');
@@ -131,6 +140,7 @@ export default function AnalistaCandidatos() {
       idFamiliaCargo: String(candidato.idFamiliaCargo ?? ''),
       idCargo: String(candidato.idCargo ?? ''),
       observaciones: candidato.observaciones ?? '',
+      fecha_registro: candidato.fechaPostulacion ?? '',
     });
     setErrores({});
     setErrorFormulario('');
@@ -660,8 +670,8 @@ export default function AnalistaCandidatos() {
             aria-modal="true"
             aria-labelledby="formulario-candidato-titulo"
           >
-            <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-              <div className="modal-content">
+            <div className="modal-dialog modal-lg modal-dialog-scrollable" style={{ maxHeight: '90vh' }}>
+              <div className="modal-content" style={{ maxHeight: '90vh' }}>
                 <div className="modal-header">
                   <h5 className="modal-title" id="formulario-candidato-titulo">
                     <i className="bi bi-person-plus me-2" aria-hidden="true" />
@@ -673,7 +683,7 @@ export default function AnalistaCandidatos() {
                   <button type="button" className="btn-close" onClick={cerrarModal} aria-label="Cerrar" />
                 </div>
                 <form className="aqua-form analista-form" onSubmit={guardar} noValidate>
-                  <div className="modal-body p-3 p-md-4">
+                  <div className="modal-body p-3 p-md-4" style={{ maxHeight: '72vh', overflowY: 'auto' }}>
                     {errorFormulario && (
                       <div className="alert alert-danger" role="alert">
                         <i className="bi bi-exclamation-triangle me-2" aria-hidden="true" />
@@ -790,6 +800,23 @@ export default function AnalistaCandidatos() {
                           required
                         />
                         {errores.telefono && <div className="invalid-feedback">{errores.telefono}</div>}
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label" htmlFor="fecha_registro">
+                          Fecha de registro
+                        </label>
+                        <input
+                          type="date"
+                          className="form-control bg-light"
+                          id="fecha_registro"
+                          name="fecha_registro"
+                          value={formulario.fecha_registro}
+                          readOnly
+                          aria-readonly="true"
+                          title="Fecha del sistema, no editable"
+                        />
+                        <div className="form-text">Se registra automaticamente con la fecha del sistema.</div>
                       </div>
                       </div>
                     </section>
