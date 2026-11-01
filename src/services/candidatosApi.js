@@ -4,7 +4,7 @@
  * (backend/api/candidatos/*.php).
  */
 
-import { peticionFormulario } from './http.js';
+import { peticionArchivo, peticionFormulario } from './http.js';
 
 /** POST listar.php -> candidatos con cargo, familia y estado derivado. */
 export function listarCandidatos() {
@@ -19,4 +19,14 @@ export function crearCandidato(datos) {
 /** POST actualizar.php -> actualiza los datos principales del candidato. */
 export function actualizarCandidato(datos) {
   return peticionFormulario('backend/api/candidatos/actualizar.php', datos);
+}
+
+/** POST cv.php -> vista previa del CV (HTML para Word, URL para PDF). */
+export function previsualizarCv(idCandidato) {
+  return peticionFormulario('backend/api/candidatos/cv.php', { idCandidato });
+}
+
+/** POST descargar_cv.php -> descarga autenticada del CV como Blob. */
+export function descargarCv(idCandidato) {
+  return peticionArchivo('backend/api/candidatos/descargar_cv.php', { idCandidato });
 }

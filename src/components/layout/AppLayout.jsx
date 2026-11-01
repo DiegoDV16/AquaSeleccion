@@ -4,6 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar.jsx';
 import Sidebar from './Sidebar.jsx';
 import Footer from './Footer.jsx';
+import { useAuth } from '../../context/AuthContext.js';
 
 /**
  * AppLayout
@@ -11,6 +12,7 @@ import Footer from './Footer.jsx';
  * El <Outlet /> renderiza la vista del modulo activo definida en AppRouter.
  */
 export default function AppLayout() {
+  const { cargando, autenticado } = useAuth();
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
   const [sidebarColapsado, setSidebarColapsado] = useState(false);
   const location = useLocation();
@@ -18,6 +20,24 @@ export default function AppLayout() {
   useEffect(() => {
     setSidebarAbierto(false);
   }, [location.pathname]);
+
+  // Mientras se restaura la sesion no se renderiza el layout: el rol todavia
+  // es null y el Navbar lo necesita para el enlace del modulo.
+  if (cargando) {
+    return (
+      <div className="min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-center text-muted-aqua">
+          <div className="spinner-border text-primary mb-3" role="status" aria-hidden="true" />
+          <p className="mb-0 small">Restaurando sesion...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Sin sesion, RutaProtegida se encarga de redirigir al login.
+  if (!autenticado) {
+    return <Outlet />;
+  }
 
   return (
     <div className="app-shell d-flex flex-column min-vh-100">

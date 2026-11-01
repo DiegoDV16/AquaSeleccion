@@ -873,27 +873,33 @@ body {
 }
 
 /* Postulacion interna (modulo administrador) */
-.interna-form .aqua-form-section {
+.interna-form .aqua-form-section,
+.analista-form .aqua-form-section {
   margin-bottom: 1rem;
 }
 
-.interna-form .aqua-form-section:last-of-type {
+.interna-form .aqua-form-section:last-of-type,
+.analista-form .aqua-form-section:last-of-type {
   margin-bottom: 0;
 }
 
 .interna-form .form-control,
-.interna-form .form-select {
+.interna-form .form-select,
+.analista-form .form-control,
+.analista-form .form-select {
   padding: 0.55rem 0.75rem;
 }
 
-.interna-section-head {
+.interna-section-head,
+.analista-section-head {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
   margin-bottom: 1.1rem;
 }
 
-.interna-section-icon {
+.interna-section-icon,
+.analista-section-icon {
   width: 38px;
   height: 38px;
   flex: 0 0 38px;
@@ -906,45 +912,53 @@ body {
   font-size: 1.05rem;
 }
 
-.interna-section-head h3 {
+.interna-section-head h3,
+.analista-section-head h3 {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--aqua-primary-dark);
 }
 
-.interna-section-head p {
+.interna-section-head p,
+.analista-section-head p {
   margin: 0.15rem 0 0;
   font-size: 0.78rem;
   color: var(--aqua-muted);
 }
 
-.interna-footer {
+.interna-footer,
+.analista-footer {
   margin-top: 1.25rem;
   padding-top: 1rem;
   border-top: 1px solid var(--aqua-border);
 }
 
-.interna-counter {
+.interna-counter,
+.analista-counter {
   font-size: 0.72rem;
   color: var(--aqua-muted);
 }
 
-.interna-aside-card .card-body {
+.interna-aside-card .card-body,
+.analista-aside-card .card-body {
   padding: 1.1rem 1.15rem;
 }
 
-.interna-aside-card + .interna-aside-card {
+.interna-aside-card + .interna-aside-card,
+.analista-aside-card + .analista-aside-card {
   margin-top: 1rem;
 }
 
-.interna-responsable {
+.interna-responsable,
+.analista-responsable {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.interna-avatar {
+.interna-avatar,
+.analista-avatar {
   width: 44px;
   height: 44px;
   flex: 0 0 44px;
@@ -984,5 +998,69 @@ body {
   .interna-aside {
     position: sticky;
     top: 1rem;
+  }
+}
+
+/* Vista previa de documentos Word (.docx) convertidos a HTML */
+.cv-word-preview {
+  max-height: 65vh;
+  overflow: auto;
+  padding: 1.25rem;
+  border: 1px solid var(--aqua-border);
+  border-radius: 10px;
+  background-color: #f8fafb;
+}
+
+.cv-word-preview .word-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 30px rgba(0, 36, 63, 0.08);
+  color: #1f2937;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.cv-word-preview .word-page h3 {
+  margin: 1rem 0 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--aqua-primary-dark);
+}
+
+.cv-word-preview .word-page h4 {
+  margin: 0.9rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--aqua-primary-dark);
+}
+
+.cv-word-preview .word-page p {
+  margin-bottom: 0.5rem;
+}
+
+.cv-word-preview .word-page .text-justify {
+  text-align: justify;
+}
+
+.cv-word-preview .word-page table {
+  font-size: 0.82rem;
+}
+
+.cv-word-preview .word-page td {
+  vertical-align: top;
+}
+
+@media (max-width: 575.98px) {
+  .cv-word-preview {
+    padding: 0.5rem;
+  }
+
+  .cv-word-preview .word-page {
+    padding: 1rem;
   }
 }
