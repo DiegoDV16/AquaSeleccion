@@ -25,9 +25,9 @@ El proyecto es un monolito con frontend SPA en React y backend PHP sobre MySQL. 
 - Historial y trazabilidad de solicitudes.
 
 ### Módulo Analista de Reclutamiento
-- Listado y detalle de candidatos, con previsualización del CV.
-- Listado de solicitudes con filtros por estado y búsqueda.
-- Creación de solicitudes vinculando candidato y evaluador responsable.
+- Registro y edición de candidatos, con listado, detalle y previsualización del CV almacenado.
+- Creación, listado, filtros y detalle de solicitudes de evaluación.
+- Asignación de un evaluador responsable y de la prioridad del proceso.
 
 ### Módulo Profesional Evaluador
 - Bandeja con las solicitudes asignadas al evaluador autenticado.
@@ -86,9 +86,12 @@ AquaSeleccion/
 ├── backend/
 │   ├── api/
 │   │   ├── auth/           login.php, logout.php, session.php
+│   │   ├── candidatos/     listar.php, crear.php, actualizar.php
+│   │   ├── solicitudes/    listar.php, crear.php, detalle.php, evaluadores.php
 │   │   └── usuarios/       listar.php, c_usuario.php, u_usuario.php, d_usuario.php
 │   ├── config/             conexión, sesión, roles, catálogos y controlador de candidato
-│   ├── helpers/            utilidades de respuesta JSON
+│   ├── helpers/            respuesta JSON, permisos, mapeos y validaciones
+│   ├── sql/                ajustes de esquema del MVP
 │   └── uploads/cv/         currículums almacenados
 ├── docs/                   documentación y estrategia de ramas
 ├── src/
@@ -119,16 +122,22 @@ npm install
 ```
 
 1. Crear la base de datos `aquaseleccion` en MySQL.
-2. Crear las tablas utilizadas por el backend: `rol`, `usuario`, `familiacargo`, `cargo` y `candidato`.
-3. Copiar la plantilla de conexión:
+2. Crear las tablas utilizadas por el backend: `rol`, `usuario`, `familiacargo`, `cargo`, `candidato`, `solicitudevaluacion` y `evaluacion`.
+3. Aplicar el ajuste de esquema del módulo Analista (prioridad y fecha de asignación):
+
+```bash
+mysql -u root aquaseleccion < backend/sql/2026-11-01_analista.sql
+```
+
+4. Copiar la plantilla de conexión:
 
 ```bash
 cp backend/config/conexion.example.php backend/config/conexion.php
 ```
 
-4. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
-5. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
-6. Iniciar el frontend:
+5. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
+6. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
+7. Iniciar el frontend:
 
 ```bash
 npm run dev
@@ -229,9 +238,10 @@ Reglas:
 
 - Un candidato puede originarse por postulación externa o interna.
 - El origen se distingue por el tipo de postulación (`externa` / `interna`).
-- Los candidatos externos pueden tener currículum adjunto; las postulaciones internas simuladas se respaldan con el legajo del colaborador.
-- Los estados de candidato usados en la interfaz son: `pendiente`, `en_proceso`, `apto` y `no_apto`.
-- El CV solo se previsualiza; la descarga está deshabilitada en la interfaz actual.
+- El Analista puede registrar candidatos externos manualmente y editar sus datos principales; el Administrador mantiene la postulación interna.
+- Los candidatos externos pueden tener currículum adjunto; las postulaciones internas se respaldan con el legajo del colaborador.
+- El estado del candidato se deriva de su última solicitud y evaluación: `pendiente`, `en_proceso`, `apto`, `no_apto` o `con_observaciones`.
+- El CV se previsualiza desde el archivo almacenado en el servidor; la descarga está deshabilitada en la interfaz actual.
 
 ### 5.7 Solicitudes de evaluación
 
@@ -245,12 +255,14 @@ Reglas:
   - `no_apto`
   - `con_observaciones`
 - Prioridades: `baja`, `normal`, `alta`.
+- La solicitud se persiste en MySQL: `solicitudevaluacion.idUsuario` identifica al evaluador asignado, `fechaSolicitud` la creación y `fechaAsignacion` la fecha ingresada por el Analista.
+- Un candidato no puede tener más de una solicitud en estado `pendiente` o `en_proceso`.
 - Al crear una solicitud desde el módulo Analista, queda en estado `pendiente` hasta que el evaluador inicie el proceso.
 - Cada solicitud debe tener un candidato y un evaluador responsable; la fecha de asignación es obligatoria.
 - El evaluador solo ve las solicitudes cuyo `evaluador_id` coincide con su usuario.
 - Para finalizar una evaluación se exige fecha de evaluación, resultado y observaciones de al menos 20 caracteres.
 - Una solicitud finalizada queda en modo solo lectura; para editarla debe cambiarse el estado del proceso.
-- Al finalizar se registra un movimiento en la trazabilidad (`historialsolicitudes`).
+- La trazabilidad histórica en `historialsolicitudes` queda fuera de esta entrega; el módulo Administrador la muestra con datos simulados.
 
 ### 5.8 Trazabilidad
 
@@ -285,21 +297,21 @@ Reglas:
 - Registro de postulaciones externas e internas en la tabla `candidato`.
 - Carga de currículum con validación y almacenamiento.
 - Catálogo de familias y cargos desde base de datos.
+- Módulo Analista: listado, registro, edición y detalle de candidatos con previsualización del CV.
+- Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
 
 ### Implementado con datos simulados
 - Dashboard y métricas.
-- Listado y detalle de candidatos.
-- Creación y listado de solicitudes.
 - Evaluación psicolaboral.
 - Historial de solicitudes.
 
 ### Pendiente o limitado
-- Persistencia real de solicitudes, evaluaciones e historial.
-- Endpoints para el módulo Analista y Evaluador.
-- Descarga y visor real del CV almacenado.
+- Persistencia real de evaluaciones e historial.
+- Endpoints para el módulo Evaluador.
+- Descarga del CV (solo se previsualiza en la interfaz).
 - Recuperación de contraseña.
 - Exportación CSV del historial.
-- Pruebas automatizadas.
+- Cobertura de pruebas limitada a los filtros del módulo Analista.
 - Configuración de entorno para producción (las URLs del backend están fijadas a `localhost/AquaSeleccion`).
 
 ---

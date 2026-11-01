@@ -15,6 +15,7 @@ import AdminHistorial from '../pages/admin/AdminHistorial.jsx';
 import AnalistaCandidatos from '../pages/analista/AnalistaCandidatos.jsx';
 import AnalistaSolicitudes from '../pages/analista/AnalistaSolicitudes.jsx';
 import AnalistaNuevaSolicitud from '../pages/analista/AnalistaNuevaSolicitud.jsx';
+import AnalistaSolicitudDetalle from '../pages/analista/AnalistaSolicitudDetalle.jsx';
 
 import EvaluadorMisSolicitudes from '../pages/evaluador/EvaluadorMisSolicitudes.jsx';
 import EvaluadorEvaluar from '../pages/evaluador/EvaluadorEvaluar.jsx';
@@ -114,6 +115,14 @@ export default function AppRouter() {
           element={
             <RutaProtegida rolesPermitidos={PERMISOS.ANALISTA}>
               <AnalistaNuevaSolicitud />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/analista/solicitudes/:id"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ANALISTA}>
+              <AnalistaSolicitudDetalle />
             </RutaProtegida>
           }
         />
