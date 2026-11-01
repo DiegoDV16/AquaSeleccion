@@ -48,11 +48,17 @@ try {
     $usuarios = array_map(static function (array $fila): array {
         $rol = rolDelSistema((int) $fila['idRol']);
 
+        $nombres = $fila['nombres'] ?? '';
+        $apellidoPaterno = $fila['apellidoPaterno'] ?? '';
+        $apellidoMaterno = $fila['apellidoMaterno'] ?? '';
+
         return [
             'id' => (int) $fila['idUsuario'],
-            'nombre' => trim(
-                $fila['nombres'] . ' ' . $fila['apellidoPaterno'] . ' ' . ($fila['apellidoMaterno'] ?? '')
-            ),
+            'idRol' => (int) $fila['idRol'],
+            'nombres' => $nombres,
+            'apellidoPaterno' => $apellidoPaterno,
+            'apellidoMaterno' => $apellidoMaterno,
+            'nombre' => trim($nombres . ' ' . $apellidoPaterno . ' ' . $apellidoMaterno),
             'correo' => $fila['correo'],
             'rol_id' => $rol['clave'] ?? '',
             'rol_nombre' => $fila['nombreRol'],
