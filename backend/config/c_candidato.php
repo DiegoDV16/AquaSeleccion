@@ -3,8 +3,32 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/sesion.php';
 
 header('Content-Type: text/html; charset=utf-8');
+
+function destinoFormulario(): string
+{
+    $referer = $_SERVER['HTTP_REFERER'] ?? '';
+    $partes = parse_url($referer);
+    $esInterna = !empty($_POST['idUsuario']);
+
+    if (is_array($partes) && isset($partes['scheme'], $partes['host'])) {
+        $puerto = isset($partes['port']) ? ':' . $partes['port'] : '';
+        $ruta = $partes['path'] ?? '';
+        $esInterna = $esInterna || str_contains($ruta, '/admin/');
+        $marcador = $esInterna ? '/admin/' : '/postular';
+        $posicion = strpos($ruta, $marcador);
+        $base = $posicion !== false ? substr($ruta, 0, $posicion) : '';
+        $destino = $esInterna ? '/admin/postular-interno' : '/postular';
+
+        return $partes['scheme'] . '://' . $partes['host'] . $puerto . $base . $destino;
+    }
+
+    return $esInterna
+        ? 'http://localhost:5173/admin/postular-interno'
+        : 'http://localhost:5173/postular';
+}
 
 function responder(int $estado, string $mensaje): void
 {
@@ -13,9 +37,10 @@ function responder(int $estado, string $mensaje): void
         $mensaje,
         JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
     );
+    $destinoJson = json_encode(destinoFormulario(), JSON_UNESCAPED_SLASHES);
 
     echo '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Postulación</title></head><body>';
-    echo '<script>alert(' . $mensajeJson . '); window.location.replace("http://localhost:5173/postular");</script>';
+    echo '<script>alert(' . $mensajeJson . '); window.location.replace(' . $destinoJson . ');</script>';
     echo '</body></html>';
     exit;
 }
@@ -40,9 +65,25 @@ $apellidoPaterno = trim($_POST['apellidoPaterno'] ?? '');
 $apellidoMaterno = trim($_POST['apellidoMaterno'] ?? '');
 $correo = trim($_POST['correo'] ?? '');
 $telefono = trim($_POST['telefono'] ?? '');
+$observaciones = trim($_POST['observaciones'] ?? '');
 $idFamiliaCargo = filter_var($_POST['idFamiliaCargo'] ?? '', FILTER_VALIDATE_INT);
 $idCargo = filter_var($_POST['idCargo'] ?? '', FILTER_VALIDATE_INT);
 $autorizacion = trim($_POST['autorizacion'] ?? '');
+$idUsuarioSolicitado = filter_var($_POST['idUsuario'] ?? '', FILTER_VALIDATE_INT);
+$idUsuario = null;
+
+if ($idUsuarioSolicitado !== false && $idUsuarioSolicitado > 0) {
+    $sesion = usuarioAutenticado();
+
+    if ($sesion === null || ($sesion['rol_id'] ?? null) !== 'administrador') {
+        responder(403, 'No tienes permisos para registrar una postulación interna.');
+    }
+
+    $idUsuario = (int) ($sesion['id'] ?? 0);
+    if ($idUsuario <= 0) {
+        responder(401, 'No se pudo identificar al usuario administrador.');
+    }
+}
 
 if (
     empty($nombres)
@@ -52,7 +93,7 @@ if (
     || empty($telefono)
     || empty($idFamiliaCargo)
     || empty($idCargo)
-    || empty($autorizacion)
+    || ($idUsuario === null && empty($autorizacion))
 ) {
     responder(400, 'Completa todos los campos obligatorios y acepta el consentimiento para continuar.');
 }
@@ -80,6 +121,9 @@ if (mb_strlen($correo, 'UTF-8') > 50) {
 }
 if (mb_strlen($telefono, 'UTF-8') > 15) {
     responder(400, 'El teléfono no puede superar los 15 caracteres.');
+}
+if (mb_strlen($observaciones, 'UTF-8') > 500) {
+    responder(400, 'Las observaciones no pueden superar los 500 caracteres.');
 }
 
 if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
@@ -137,10 +181,15 @@ $fechaSolicitud = date('Y-m-d');
 
 $stmt = $pdo->prepare(
     'INSERT INTO candidato
-        (idCargo, nombres, apellidoPaterno, apellidoMaterno, correo, telefono, curriculumCv, fechaSolicitud)
+        (idUsuario, idCargo, nombres, apellidoPaterno, apellidoMaterno, correo, telefono, curriculumCv, fechaSolicitud, observaciones)
      VALUES
-        (:idCargo, :nombres, :apellidoPaterno, :apellidoMaterno, :correo, :telefono, :curriculumCv, :fechaSolicitud)'
+        (:idUsuario, :idCargo, :nombres, :apellidoPaterno, :apellidoMaterno, :correo, :telefono, :curriculumCv, :fechaSolicitud, :observaciones)'
 );
+if ($idUsuario === null) {
+    $stmt->bindValue(':idUsuario', null, PDO::PARAM_NULL);
+} else {
+    $stmt->bindValue(':idUsuario', $idUsuario, PDO::PARAM_INT);
+}
 $stmt->bindParam(':idCargo', $idCargo, PDO::PARAM_INT);
 $stmt->bindParam(':nombres', $nombres);
 $stmt->bindParam(':apellidoPaterno', $apellidoPaterno);
@@ -149,6 +198,7 @@ $stmt->bindParam(':correo', $correo);
 $stmt->bindParam(':telefono', $telefono);
 $stmt->bindParam(':curriculumCv', $rutaCv);
 $stmt->bindParam(':fechaSolicitud', $fechaSolicitud);
+$stmt->bindParam(':observaciones', $observaciones);
 if (!$stmt->execute() || $stmt->rowCount() !== 1) {
     throw new RuntimeException('La base de datos no confirmó la inserción del candidato.');
 }
@@ -159,6 +209,11 @@ if ($idCandidato === false || $idCandidato === '0' || $idCandidato === '') {
 }
 
 $fechaSolicitudMostrar = date('d-m-y');
+
+if ($idUsuario !== null) {
+    responder(201, "Postulación interna registrada el {$fechaSolicitudMostrar}. Número de seguimiento: {$idCandidato}.");
+}
+
 responder(201, "¡Listo! Recibimos tu postulación el {$fechaSolicitudMostrar}. Tu número de seguimiento es {$idCandidato}.");
 } catch (Throwable $e) {
     restore_error_handler();

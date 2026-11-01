@@ -871,3 +871,118 @@ body {
     padding: 1.5rem 2rem;
   }
 }
+
+/* Postulacion interna (modulo administrador) */
+.interna-form .aqua-form-section {
+  margin-bottom: 1rem;
+}
+
+.interna-form .aqua-form-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.interna-form .form-control,
+.interna-form .form-select {
+  padding: 0.55rem 0.75rem;
+}
+
+.interna-section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+}
+
+.interna-section-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #d0e4ff;
+  color: #22496d;
+  font-size: 1.05rem;
+}
+
+.interna-section-head h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--aqua-primary-dark);
+}
+
+.interna-section-head p {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--aqua-muted);
+}
+
+.interna-footer {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--aqua-border);
+}
+
+.interna-counter {
+  font-size: 0.72rem;
+  color: var(--aqua-muted);
+}
+
+.interna-aside-card .card-body {
+  padding: 1.1rem 1.15rem;
+}
+
+.interna-aside-card + .interna-aside-card {
+  margin-top: 1rem;
+}
+
+.interna-responsable {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.interna-avatar {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #d0e4ff;
+  color: #22496d;
+  font-size: 1.2rem;
+}
+
+.interna-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.interna-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--aqua-muted);
+}
+
+.interna-list li .bi {
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
+  color: var(--aqua-primary);
+}
+
+@media (min-width: 992px) {
+  .interna-aside {
+    position: sticky;
+    top: 1rem;
+  }
+}
