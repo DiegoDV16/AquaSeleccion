@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../helpers/autorizacion.php';
 require_once __DIR__ . '/../../helpers/mapeos.php';
 
 requerirPost();
-requerirRoles(['analista']);
+requerirRoles(['analista', 'administrador']);
 
 try {
     $pdo = obtenerConexion();

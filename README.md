@@ -20,6 +20,7 @@ El proyecto es un monolito con frontend SPA en React y backend PHP sobre MySQL. 
 
 ### Módulo Administrador
 - Dashboard con métricas de postulaciones y evaluaciones.
+- Listado de candidatos con previsualización y descarga del CV.
 - Registro manual de postulaciones internas.
 - CRUD de usuarios del sistema (crear, editar, eliminar, activar/inactivar).
 - Historial y trazabilidad de solicitudes.
@@ -300,6 +301,7 @@ Reglas:
 - Carga de currículum con validación y almacenamiento.
 - Catálogo de familias y cargos desde base de datos.
 - Módulo Analista: listado, registro, edición y detalle de candidatos con previsualización y descarga del CV en PDF, DOC y DOCX.
+- Módulo Administrador: listado de candidatos con previsualización y descarga del CV.
 - Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
 
 ### Implementado con datos simulados

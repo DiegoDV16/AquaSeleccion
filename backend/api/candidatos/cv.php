@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../helpers/curriculum.php';
 require_once __DIR__ . '/../../helpers/docx.php';
 
 requerirPost();
-$sesion = requerirRoles(['analista', 'evaluador']);
+$sesion = requerirRoles(['analista', 'evaluador', 'administrador']);
 
 $idCandidato = filter_var($_POST['idCandidato'] ?? null, FILTER_VALIDATE_INT);
 

@@ -20,7 +20,7 @@ if (!in_array($metodo, ['GET', 'POST'], true)) {
     responder(['ok' => false, 'mensaje' => 'Metodo no permitido.'], 405);
 }
 
-$sesion = requerirRoles(['analista', 'evaluador']);
+$sesion = requerirRoles(['analista', 'evaluador', 'administrador']);
 
 $idCandidato = filter_var($_GET['idCandidato'] ?? $_POST['idCandidato'] ?? null, FILTER_VALIDATE_INT);
 

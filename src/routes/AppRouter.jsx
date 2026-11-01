@@ -8,6 +8,7 @@ import Login from '../pages/auth/Login.jsx';
 import Postular from '../pages/public/Postular.jsx';
 
 import AdminDashboard from '../pages/admin/AdminDashboard.jsx';
+import AdminCandidatos from '../pages/admin/AdminCandidatos.jsx';
 import AdminPostularInterno from '../pages/admin/AdminPostularInterno.jsx';
 import AdminUsuarios from '../pages/admin/AdminUsuarios.jsx';
 import AdminHistorial from '../pages/admin/AdminHistorial.jsx';
@@ -57,6 +58,14 @@ export default function AppRouter() {
           element={
             <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
               <AdminDashboard />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/admin/candidatos"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+              <AdminCandidatos />
             </RutaProtegida>
           }
         />

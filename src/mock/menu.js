@@ -15,6 +15,7 @@ export const MENU_POR_ROL = {
       titulo: 'Administracion',
       items: [
         { to: '/admin/dashboard', label: 'Dashboard', icono: 'speedometer2' },
+        { to: '/admin/candidatos', label: 'Candidatos', icono: 'person-vcard' },
         { to: '/admin/postular-interno', label: 'Postulacion interna', icono: 'person-plus' },
         { to: '/admin/usuarios', label: 'Usuarios del sistema', icono: 'people' },
         { to: '/admin/historial', label: 'Historial de solicitudes', icono: 'clock-history' },
