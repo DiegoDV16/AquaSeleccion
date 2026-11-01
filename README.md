@@ -1,0 +1,322 @@
+# AquaSeleccion
+
+Sistema de Gestión de Evaluaciones Psicolaborales y Reclutamiento para **Empresas AquaChile S.A.**
+
+El proyecto es un monolito con frontend SPA en React y backend PHP sobre MySQL. Cubre el flujo de postulación externa e interna, la gestión de usuarios, la asignación de evaluaciones psicolaborales y la trazabilidad de las solicitudes.
+
+- **Versión actual:** `0.1.0` (MVP)
+- **Repositorio:** https://github.com/DiegoDV16/AquaSeleccion
+- **Rama principal:** `main`
+- **Estrategia de ramas:** ver [`docs/ESTRATEGIA-RAMAS.md`](docs/ESTRATEGIA-RAMAS.md)
+
+---
+
+## 1. Funcionalidades
+
+### Portal público
+- Formulario de postulación externa en `/postular`.
+- Datos personales, selección dependiente **Familia de cargo → Cargo**, carga de currículum y consentimiento de tratamiento de datos.
+- Confirmación con número de seguimiento del candidato.
+
+### Módulo Administrador
+- Dashboard con métricas de postulaciones y evaluaciones.
+- Registro manual de postulaciones internas.
+- CRUD de usuarios del sistema (crear, editar, eliminar, activar/inactivar).
+- Historial y trazabilidad de solicitudes.
+
+### Módulo Analista de Reclutamiento
+- Listado y detalle de candidatos, con previsualización del CV.
+- Listado de solicitudes con filtros por estado y búsqueda.
+- Creación de solicitudes vinculando candidato y evaluador responsable.
+
+### Módulo Profesional Evaluador
+- Bandeja con las solicitudes asignadas al evaluador autenticado.
+- Formulario de evaluación psicolaboral: fecha, resultado, estado y observaciones.
+- Guardado de borrador o finalización de la evaluación.
+
+### Autenticación
+- Login institucional por correo y contraseña.
+- Sesión PHP en el servidor; el rol determina automáticamente el módulo de destino.
+- Rutas protegidas por rol en el frontend y validación de permisos en los endpoints PHP.
+
+---
+
+## 2. Stack y versiones
+
+### Entorno verificado
+
+| Componente | Versión |
+| --- | --- |
+| Node.js | `24.20.0` |
+| npm | `12.2.1` |
+| PHP | `8.2.12` |
+| Servidor web | Apache (XAMPP) |
+| Base de datos | MySQL/MariaDB de XAMPP, puerto `3306`, base `aquaseleccion` |
+
+### Dependencias del frontend
+
+| Dependencia | Declarada en `package.json` | Instalada |
+| --- | --- | --- |
+| React | `^18.3.1` | `18.3.1` |
+| React DOM | `^18.3.1` | `18.3.1` |
+| React Router DOM | `^6.28.0` | `6.30.6` |
+| Bootstrap | `^5.3.3` | `5.3.8` |
+| Bootstrap Icons | `^1.11.3` | `1.13.1` |
+| Vite | `^8.3.5` | `8.3.5` |
+| `@vitejs/plugin-react` | `^6.1.2` | `6.1.2` |
+| ESLint | `^9.15.0` | `9.39.5` |
+| `@eslint/js` | `^9.15.0` | `9.39.5` |
+| `eslint-plugin-react-hooks` | `^5.0.0` | `5.2.0` |
+| `eslint-plugin-react-refresh` | `^0.4.14` | `0.4.26` |
+| `globals` | `^15.12.0` | `15.15.0` |
+| Vitest | `^5.0.5` | `5.0.5` |
+
+### Backend
+- PHP 8.2 con PDO y `declare(strict_types=1)`.
+- MySQL/MariaDB.
+- Autenticación con `password_hash` / `password_verify` y sesiones nativas de PHP.
+- Sin framework PHP ni ORM.
+
+---
+
+## 3. Estructura del proyecto
+
+```text
+AquaSeleccion/
+├── backend/
+│   ├── api/
+│   │   ├── auth/           login.php, logout.php, session.php
+│   │   └── usuarios/       listar.php, c_usuario.php, u_usuario.php, d_usuario.php
+│   ├── config/             conexión, sesión, roles, catálogos y controlador de candidato
+│   ├── helpers/            utilidades de respuesta JSON
+│   └── uploads/cv/         currículums almacenados
+├── docs/                   documentación y estrategia de ramas
+├── src/
+│   ├── components/         layout y componentes UI reutilizables
+│   ├── context/            autenticación y sesión
+│   ├── mock/               datos simulados de módulos aún no persistidos
+│   ├── pages/              vistas por módulo
+│   ├── routes/             router y guardas de acceso
+│   └── services/           cliente HTTP y APIs
+├── index.html
+├── package.json
+└── vite.config.js
+```
+
+---
+
+## 4. Instalación y ejecución
+
+### Requisitos
+- XAMPP con Apache y MySQL/MariaDB iniciados.
+- Node.js y npm.
+- El proyecto debe ubicarse en `C:\xampp\htdocs\AquaSeleccion`, porque el frontend y el proxy usan esa ruta.
+
+### Pasos
+
+```bash
+npm install
+```
+
+1. Crear la base de datos `aquaseleccion` en MySQL.
+2. Crear las tablas utilizadas por el backend: `rol`, `usuario`, `familiacargo`, `cargo` y `candidato`.
+3. Copiar la plantilla de conexión:
+
+```bash
+cp backend/config/conexion.example.php backend/config/conexion.php
+```
+
+4. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
+5. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
+6. Iniciar el frontend:
+
+```bash
+npm run dev
+```
+
+- Frontend: `http://localhost:5173`
+- Postulación pública: `http://localhost:5173/postular`
+- Login: `http://localhost:5173/login`
+- Backend: `http://localhost/AquaSeleccion/backend`
+
+### Scripts disponibles
+
+| Comando | Descripción |
+| --- | --- |
+| `npm run dev` | Servidor de desarrollo Vite en el puerto 5173 |
+| `npm run build` | Compilación de producción |
+| `npm run preview` | Previsualización de la compilación |
+| `npm run lint` | Análisis estático con ESLint |
+
+> Vitest está instalado, pero actualmente no existen scripts ni archivos de pruebas en el repositorio.
+
+---
+
+## 5. Reglas de negocio actuales
+
+### 5.1 Roles y permisos
+
+| ID | Rol | Acceso |
+| --- | --- | --- |
+| 1 | Administrador | `/admin/dashboard`, postulación interna, usuarios e historial |
+| 2 | Analista de Reclutamiento | Candidatos, solicitudes y creación de solicitudes |
+| 3 | Profesional Evaluador | Solo las solicitudes asignadas a su usuario |
+| 4 | Colaborador | Sin acceso a módulos de gestión; puede ser postulante interno |
+
+Reglas:
+- El rol se obtiene desde la base de datos al iniciar sesión; el usuario no puede elegir módulo.
+- Un usuario con rol sin módulo asignado (por ejemplo, Colaborador) no puede iniciar sesión en la plataforma.
+- Las rutas del frontend están protegidas por rol y los endpoints de usuarios validan la sesión de Administrador en el servidor.
+- Cada usuario tiene un rol único y un estado `activo` o `inactivo`.
+
+### 5.2 Autenticación y sesión
+
+- El correo debe existir en la tabla `usuario`.
+- El usuario debe estar activo (`estado = 1`); si está inactivo, se rechaza el acceso.
+- La contraseña se valida con `password_verify` contra el hash almacenado.
+- Al iniciar sesión se regenera el ID de sesión.
+- La sesión PHP es la única fuente de verdad; al recargar la página se restaura consultando `session.php`.
+- La cookie de sesión es `HttpOnly` y `SameSite=Lax`.
+- El cierre de sesión destruye la sesión en el servidor y elimina la cookie.
+- No existe actualmente recuperación de contraseña; el enlace es solo visual.
+
+### 5.3 Postulación externa
+
+- Disponible públicamente en `/postular`, sin autenticación.
+- Campos obligatorios: nombres, apellido paterno, apellido materno, correo, teléfono, familia de cargo, cargo, currículum y autorización de tratamiento de datos.
+- Largos máximos validados en backend:
+  - Nombres: 50 caracteres.
+  - Apellido paterno: 25 caracteres.
+  - Apellido materno: 25 caracteres.
+  - Correo: 50 caracteres.
+  - Teléfono: 15 caracteres.
+  - Observaciones: 500 caracteres.
+- El correo debe tener formato válido.
+- El cargo seleccionado debe pertenecer a la familia seleccionada.
+- El currículum es obligatorio y debe ser `.pdf`, `.doc` o `.docx`.
+- El archivo se valida por extensión y tipo MIME real.
+- Tamaño máximo de archivo: 5 MB; nombre de archivo máximo: 255 caracteres.
+- El archivo se guarda con un nombre aleatorio en `backend/uploads/cv`.
+- Si falla el registro en base de datos, el archivo subido se elimina.
+- La postulación se registra como candidato externo (`idUsuario = NULL`) con fecha de solicitud y número de seguimiento.
+- La autorización de tratamiento de datos es obligatoria, conforme a la Ley N° 19.628.
+- Al finalizar se muestra un mensaje con el número de seguimiento y se redirige al formulario.
+
+### 5.4 Postulación interna
+
+- Solo puede registrarla un usuario autenticado con rol **Administrador**.
+- Se accede desde `/admin/postular-interno`.
+- Reutiliza el mismo controlador `c_candidato.php`, enviando el `idUsuario` del administrador en sesión.
+- Si se envía `idUsuario` sin sesión de Administrador, el backend responde `403`.
+- Los campos obligatorios y validaciones son los mismos que en la postulación externa, excepto la autorización de consentimiento, que no se exige en el formulario interno.
+- La postulación queda asociada al usuario administrador que la registra y se identifica como interna.
+- El currículum también es obligatorio en el formulario interno actual.
+- El formulario permite observaciones de hasta 500 caracteres.
+
+### 5.5 Gestión de usuarios
+
+- Solo el Administrador puede listar, crear, editar y eliminar usuarios.
+- Para crear un usuario son obligatorios: rol, nombres, apellido paterno, correo y contraseña.
+- El correo debe ser válido y único en el sistema.
+- La contraseña se almacena siempre como hash.
+- En la edición, si el campo contraseña queda vacío, la contraseña actual no cambia.
+- El estado se normaliza a `1` (activo) o `0` (inactivo).
+- Un administrador no puede eliminar su propio usuario.
+- La interfaz solo permite asignar los roles Administrador, Analista y Evaluador; el rol Colaborador se reserva para empleados sin acceso.
+- Las operaciones requieren sesión activa de Administrador; sin sesión responden `401` y con otro rol `403`.
+
+### 5.6 Candidatos
+
+- Un candidato puede originarse por postulación externa o interna.
+- El origen se distingue por el tipo de postulación (`externa` / `interna`).
+- Los candidatos externos pueden tener currículum adjunto; las postulaciones internas simuladas se respaldan con el legajo del colaborador.
+- Los estados de candidato usados en la interfaz son: `pendiente`, `en_proceso`, `apto` y `no_apto`.
+- El CV solo se previsualiza; la descarga está deshabilitada en la interfaz actual.
+
+### 5.7 Solicitudes de evaluación
+
+- Una solicitud vincula un candidato con un evaluador responsable y un cargo.
+- Estados posibles:
+  - `pendiente`: creada y asignada, aún no iniciada.
+  - `en_proceso`: evaluación en curso.
+  - `finalizada`: proceso cerrado.
+- Resultados posibles, solo al finalizar:
+  - `apto`
+  - `no_apto`
+  - `con_observaciones`
+- Prioridades: `baja`, `normal`, `alta`.
+- Al crear una solicitud desde el módulo Analista, queda en estado `pendiente` hasta que el evaluador inicie el proceso.
+- Cada solicitud debe tener un candidato y un evaluador responsable; la fecha de asignación es obligatoria.
+- El evaluador solo ve las solicitudes cuyo `evaluador_id` coincide con su usuario.
+- Para finalizar una evaluación se exige fecha de evaluación, resultado y observaciones de al menos 20 caracteres.
+- Una solicitud finalizada queda en modo solo lectura; para editarla debe cambiarse el estado del proceso.
+- Al finalizar se registra un movimiento en la trazabilidad (`historialsolicitudes`).
+
+### 5.8 Trazabilidad
+
+- Cada movimiento del historial registra: solicitud, candidato, tipo de gestión, acción, detalle, usuario que ejecutó la acción, estado y fecha.
+- Tipos de gestión: `externa` e `interna`.
+- El historial permite filtrar por tipo, estado y texto (ID de solicitud o candidato).
+- La exportación CSV está prevista, pero deshabilitada en la versión actual.
+
+### 5.9 Catálogos de cargos
+
+- Los cargos se agrupan por familia de cargo.
+- El formulario de postulación carga familias y cargos desde `c_listaCargosDisponibles.php`.
+- La selección de cargo depende de la familia elegida; al cambiar de familia se limpia el cargo.
+- En los datos simulados solo se muestran cargos con estado `activo`; el endpoint actual devuelve las familias con sus cargos asociados.
+
+### 5.10 Seguridad y datos
+
+- Todas las consultas usan sentencias preparadas con PDO.
+- Los errores de base de datos se registran en el log y no se exponen al usuario.
+- Los endpoints responden JSON con la estructura `{ ok, mensaje, ... }`.
+- Los archivos subidos se validan por extensión y MIME, se renombran aleatoriamente y se eliminan si el registro falla.
+- El archivo `backend/config/conexion.php` está excluido de Git; se usa `conexion.example.php` como plantilla.
+- No se deben subir credenciales, `node_modules`, `dist` ni archivos `.env`.
+
+---
+
+## 6. Estado actual del MVP
+
+### Implementado con backend real
+- Login, logout y restauración de sesión.
+- CRUD de usuarios con control de permisos.
+- Registro de postulaciones externas e internas en la tabla `candidato`.
+- Carga de currículum con validación y almacenamiento.
+- Catálogo de familias y cargos desde base de datos.
+
+### Implementado con datos simulados
+- Dashboard y métricas.
+- Listado y detalle de candidatos.
+- Creación y listado de solicitudes.
+- Evaluación psicolaboral.
+- Historial de solicitudes.
+
+### Pendiente o limitado
+- Persistencia real de solicitudes, evaluaciones e historial.
+- Endpoints para el módulo Analista y Evaluador.
+- Descarga y visor real del CV almacenado.
+- Recuperación de contraseña.
+- Exportación CSV del historial.
+- Pruebas automatizadas.
+- Configuración de entorno para producción (las URLs del backend están fijadas a `localhost/AquaSeleccion`).
+
+---
+
+## 7. Flujo de trabajo Git
+
+El proyecto sigue una estrategia de ramas con `main`, `develop` y ramas `feature/*` integradas mediante Pull Request. Los detalles completos están en [`docs/ESTRATEGIA-RAMAS.md`](docs/ESTRATEGIA-RAMAS.md).
+
+Antes de cada entrega:
+
+```bash
+npm run lint
+npm run build
+```
+
+Los mensajes de commit siguen el formato Conventional Commits: `tipo(ámbito): descripción en imperativo`.
+
+---
+
+© AquaChile S.A. — AquaSeleccion v0.1.0 (MVP)
