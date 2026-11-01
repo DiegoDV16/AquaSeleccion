@@ -22,18 +22,25 @@ function iniciales(nombre = '') {
 export default function Navbar({ sidebarAbierto, onToggleSidebar }) {
   const { usuario, rol, logout } = useAuth();
   const [menuUsuarioAbierto, setMenuUsuarioAbierto] = useState(false);
+  const [menuNotificacionesAbierto, setMenuNotificacionesAbierto] = useState(false);
   const menuRef = useRef(null);
+  const notificacionesRef = useRef(null);
+  const notificaciones = [];
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     setMenuUsuarioAbierto(false);
+    setMenuNotificacionesAbierto(false);
   }, [location.pathname]);
 
   useEffect(() => {
     function cerrarAlClickFuera(evento) {
       if (menuRef.current && !menuRef.current.contains(evento.target)) {
         setMenuUsuarioAbierto(false);
+      }
+      if (notificacionesRef.current && !notificacionesRef.current.contains(evento.target)) {
+        setMenuNotificacionesAbierto(false);
       }
     }
     document.addEventListener('mousedown', cerrarAlClickFuera);
@@ -71,10 +78,40 @@ export default function Navbar({ sidebarAbierto, onToggleSidebar }) {
         </Link>
 
         <div className="d-flex align-items-center gap-2 ms-auto">
-          <button className="btn btn-sm btn-soft position-relative" type="button" aria-label="Notificaciones">
-            <i className="bi bi-bell" aria-hidden="true" />
-            <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" aria-hidden="true" />
-          </button>
+          <div className="dropdown position-relative" ref={notificacionesRef}>
+            <button
+              className="btn btn-sm btn-soft position-relative"
+              type="button"
+              aria-label="Notificaciones"
+              aria-expanded={menuNotificacionesAbierto}
+              aria-haspopup="true"
+              onClick={() => {
+                setMenuNotificacionesAbierto((abierto) => !abierto);
+                setMenuUsuarioAbierto(false);
+              }}
+            >
+              <i className="bi bi-bell" aria-hidden="true" />
+              {notificaciones.length > 0 && (
+                <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" aria-hidden="true" />
+              )}
+            </button>
+
+            {menuNotificacionesAbierto && (
+              <div className="dropdown-menu dropdown-menu-end show aqua-notificaciones-menu mt-2" style={{ right: 0, left: 'auto' }}>
+                {notificaciones.length === 0 ? (
+                  <div className="aqua-notificaciones-vacio" role="status">
+                    Sin notificaciones recientes
+                  </div>
+                ) : (
+                  notificaciones.map((notificacion) => (
+                    <button className="dropdown-item small" type="button" key={notificacion.id}>
+                      {notificacion.texto}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Modulo asignado por el rol del usuario: informativo, no editable */}
           {rol?.rutaInicio && (

@@ -8,7 +8,7 @@ import TipoPostulacionBadge from './TipoPostulacionBadge.jsx';
  * Acepta tanto candidatos del backend (cargo/familia ya resueltos) como los
  * datos simulados anteriores (cargo_id).
  */
-export default function FichaPostulante({ candidato, titulo = 'Datos del postulante' }) {
+export default function FichaPostulante({ candidato, titulo = 'Datos del postulante', onCvPreview, onCvDownload, onCvTestDownload }) {
   if (!candidato) {
     return (
       <div className="alert alert-warning mb-0" role="alert">
@@ -26,7 +26,8 @@ export default function FichaPostulante({ candidato, titulo = 'Datos del postula
   const fechaPostulacion = candidato.fechaPostulacion ?? candidato.fecha_postulacion;
 
   return (
-    <div className="aqua-card h-100">
+    <>
+    <div className="aqua-card ficha-postulante">
       <div className="card-header d-flex justify-content-between align-items-center">
         <span>
           <i className="bi bi-person-vcard me-2" aria-hidden="true" />
@@ -61,7 +62,54 @@ export default function FichaPostulante({ candidato, titulo = 'Datos del postula
           <dt className="col-sm-5 text-muted-aqua fw-semibold">Fecha de postulacion</dt>
           <dd className="col-sm-7 mb-0">{formatearFecha(fechaPostulacion)}</dd>
         </dl>
+
+        {candidato.cv_archivo || candidato.cvArchivo ? (
+          <div className="cv-postulante border-top">
+            <div className="cv-postulante-header d-flex align-items-center mb-2 position-relative">
+              <span className="small fw-semibold text-muted-aqua">
+                <i className="bi bi-file-earmark-text me-1" aria-hidden="true" />
+                Curriculum Vitae
+              </span>
+              <span className="badge text-bg-light border cv-postulante-extension">
+                {(candidato.cv_archivo || candidato.cvArchivo).split('.').pop().toUpperCase()}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="cv-preview-card"
+              onClick={onCvPreview}
+              aria-label="Abrir vista previa del currículum"
+            >
+              <div className="cv-preview-sheet">
+                <span className="cv-preview-avatar"><i className="bi bi-person-fill" aria-hidden="true" /></span>
+                <span className="cv-preview-name">{nombre}</span>
+                <span className="cv-preview-line cv-preview-line-wide" />
+                <span className="cv-preview-line" />
+                <span className="cv-preview-line cv-preview-line-wide" />
+                <span className="cv-preview-line cv-preview-line-short" />
+              </div>
+              <span className="cv-preview-overlay">
+                <i className="bi bi-arrows-fullscreen me-1" aria-hidden="true" />
+                Ver CV completo
+              </span>
+            </button>
+            <button type="button" className="cv-descarga-btn btn btn-soft btn-sm w-100 mt-2" onClick={onCvDownload}>
+              <i className="bi bi-download me-1" aria-hidden="true" />
+              Descargar CV
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
+    {(candidato.cv_archivo || candidato.cvArchivo) && (
+      <button
+        type="button"
+        className="cv-prueba-link"
+        onClick={onCvTestDownload}
+      >
+        CV de prueba
+      </button>
+    )}
+    </>
   );
 }
