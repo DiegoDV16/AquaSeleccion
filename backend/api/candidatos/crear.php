@@ -3,9 +3,10 @@
 /**
  * crear.php
  * POST /backend/api/candidatos/crear.php
- * Registra una postulacion interna creada por el Analista. El candidato queda
- * vinculado al usuario de la sesion, por lo que el origen se muestra como
- * `interna`; el curriculum adjunto es opcional y se guarda en uploads/cv.
+ * Registra una postulacion interna creada por el Analista o el Administrador.
+ * El candidato queda vinculado al usuario de la sesion, por lo que el origen se
+ * muestra como `interna`; el curriculum adjunto es opcional y se guarda en
+ * uploads/cv.
  */
 
 declare(strict_types=1);
@@ -16,12 +17,12 @@ require_once __DIR__ . '/../../helpers/validacion_candidato.php';
 require_once __DIR__ . '/../../helpers/archivo_cv.php';
 
 requerirPost();
-$sesion = requerirRoles(['analista']);
+$sesion = requerirRoles(['analista', 'administrador']);
 
 $idUsuario = (int) ($sesion['id'] ?? 0);
 
 if ($idUsuario <= 0) {
-    responder(['ok' => false, 'mensaje' => 'No se pudo identificar al analista de la sesion.'], 401);
+    responder(['ok' => false, 'mensaje' => 'No se pudo identificar al usuario de la sesion.'], 401);
 }
 
 $validacion = validarDatosCandidato($_POST);
