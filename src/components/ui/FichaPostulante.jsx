@@ -60,12 +60,9 @@ export default function FichaPostulante({
               {iniciales(nombre)}
             </span>
             <div style={{ minWidth: 0 }}>
-              <h6 className="mb-1 text-truncate" title={nombre}>
+              <h6 className="mb-0 text-truncate" title={nombre}>
                 {nombre}
               </h6>
-              <p className="text-muted-aqua small mb-0 text-truncate" title={nombreCargo}>
-                {nombreCargo}
-              </p>
             </div>
           </div>
 
