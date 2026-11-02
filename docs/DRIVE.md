@@ -250,3 +250,94 @@ Antes de implementar se debe confirmar:
 4. ¿Se permiten imágenes para cédula o solo PDF?
 5. ¿Cuánto tiempo se conservan los documentos?
 6. ¿Quién puede eliminar definitivamente un documento?
+
+---
+
+## 12. Contraste con los documentos originales del MVP
+
+Se revisaron los documentos originales:
+
+- `Caso_DSY1104_FullStackII_MVP_Evaluacion_Psicolaboral_AquaChile.docx`
+- `Anexo_Requerimiento_MVP_Evaluacion_Psicolaboral_AquaChile_FullStack II.pdf`
+
+### 12.1 Alcance funcional original
+
+Los requerimientos funcionales del MVP son:
+
+| Código | Requerimiento | Prioridad |
+| --- | --- | --- |
+| RF01 | Ingreso con usuarios ficticios o roles simulados | Alta |
+| RF02 | Registrar candidatos con datos mínimos | Alta |
+| RF03 | Editar y consultar candidatos | Alta |
+| RF04 | Crear solicitudes asociadas a un candidato | Alta |
+| RF05 | Registrar cargo, familia, fecha y responsable | Alta |
+| RF06 | Listar y consultar solicitudes | Alta |
+| RF07 | Buscar o filtrar solicitudes | Media |
+| RF08 | Actualizar estado de la solicitud | Alta |
+| RF09 | Registrar fecha, observaciones o resultado | Alta |
+| RF10 | Mostrar dashboard simple | Media |
+
+**No existe un requerimiento funcional de gestión de documentos, carga múltiple de archivos ni Drive del postulante.**
+
+El caso original tampoco exige currículum. El proyecto lo agregó como mejora acotada, pero no debe convertirse en un repositorio de documentos reales.
+
+### 12.2 Restricciones explícitas de privacidad
+
+El caso original indica:
+
+- No usar nombres, RUT, teléfonos, correos, **currículums**, informes ni antecedentes reales.
+- No publicar información interna de AquaChile en repositorios, videos, capturas o presentaciones.
+- Usar registros ficticios, anonimizados o simulados durante todo el desarrollo y la demostración.
+- No usar credenciales, bases productivas ni sistemas internos.
+
+Por lo tanto, un Drive para documentos reales de postulantes **no corresponde al MVP académico**.
+
+### 12.3 Funcionalidades fuera del alcance
+
+El anexo declara fuera del alcance obligatorio:
+
+- Integración con Microsoft Copilot.
+- Power Automate.
+- Microsoft Planner.
+- Automatización corporativa de OneDrive o SharePoint.
+- Generación automática de informes con IA.
+- Integraciones que requieran licencias o credenciales corporativas.
+- Microservicios o infraestructura distribuida.
+
+El Drive de documentos se acerca más a una evolución tipo OneDrive/SharePoint que a un requisito del MVP.
+
+### 12.4 Roles según los documentos originales
+
+| Rol original | Función |
+| --- | --- |
+| Administrador académico | Configura usuarios ficticios, roles, catálogos y datos de prueba |
+| Analista de Reclutamiento | Registra candidatos, crea solicitudes, consulta y filtra |
+| Profesional Evaluador | Consulta solicitudes asignadas y registra la evaluación |
+| Jefatura o contraparte simulada | Consulta dashboard y listados en modo lectura |
+
+El rol de **postulante público** no aparece en el alcance original; fue una ampliación del proyecto. Por eso tampoco existe un portal de seguimiento para él.
+
+### 12.5 Implicancias para `feature/drive`
+
+- El Drive es una **mejora fuera del MVP obligatorio**, no un requisito de la rúbrica.
+- No se deben cargar documentos reales de postulantes.
+- Si se implementa con fines demostrativos, solo debe usar archivos ficticios claramente identificados.
+- No se deben definir documentos obligatorios por cargo sin validación de AquaChile.
+- La rama debe mantenerse como diseño/experimento hasta que el equipo confirme el alcance.
+- No se debe integrar a `main` como si fuera parte del MVP sin justificarlo.
+
+### 12.6 Recomendación
+
+Priorizar los requerimientos RF01–RF10 y la rúbrica del frontend. El Drive puede quedar como:
+
+1. Documento de evolución futura.
+2. Prototipo académico con archivos ficticios.
+3. Módulo separado que no se presente como funcionalidad oficial del MVP.
+
+Si se decide implementar, la primera versión debería limitarse a:
+
+- Catálogo ficticio de tipos.
+- Archivos de ejemplo anonimizados.
+- Metadatos y permisos.
+- Sin documentos personales reales.
+- Sin integración con almacenamiento corporativo.
