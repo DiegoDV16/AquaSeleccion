@@ -202,8 +202,8 @@ npm test -- --run
 **Resultado de la ejecución:**
 
 ```text
-Test Files  11 passed (11)
-Tests       65 passed (65)
+Test Files  17 passed (17)
+Tests       76 passed (76)
 ```
 
 **Archivos principales:**
@@ -211,13 +211,17 @@ Tests       65 passed (65)
 | Archivo | Qué verifica |
 | --- | --- |
 | `src/pages/analista/filtros.test.js` | Búsqueda, filtros combinados y estados |
-| `src/pages/admin/AdminHistorial.test.jsx` | Renderizado del historial, filtro y modal de detalle |
+| `src/pages/public/Postular.test.jsx` | Validación del formulario público y carga de catálogos |
+| `src/pages/analista/AnalistaNuevaSolicitud.test.jsx` | Validación y creación de solicitudes |
+| `src/pages/evaluador/EvaluadorEvaluar.test.jsx` | Validación, borrador y finalización de evaluación |
+| `src/pages/admin/AdminUsuarios.test.jsx` | Lectura de usuarios sin acciones para Jefatura |
+| `src/pages/admin/AdminHistorial.test.jsx` | Historial, filtros, URL y modal de detalle |
 | `src/routes/RutaProtegida.test.jsx` | Restauración de sesión, acceso y rechazo por rol |
 | `src/context/AuthProvider.test.jsx` | Inicio/cierre de sesión y persistencia |
 | `src/components/layout/*.test.jsx` | Navbar, Sidebar, Footer y layout |
 | `src/mock/*.test.js` | Roles, menús y funciones de solicitudes |
 
-**Limitación:** no se mide cobertura formal. Las pruebas cubren componentes de layout, autenticación, permisos, filtros e historial; no todos los formularios CRUD ni todos los endpoints.
+**Limitación:** no se mide cobertura formal. Las pruebas cubren componentes de layout, autenticación, permisos, filtros, historial y formularios principales; no todos los formularios CRUD ni todos los endpoints.
 
 ---
 
@@ -228,7 +232,7 @@ Tests       65 passed (65)
 | IE2.1.1 Estructura React y pertinencia VcM | Flujo completo de candidato, solicitud, evaluación y auditoría |
 | IE2.1.2 Componentes, props y responsive | Componentes UI reutilizables, `.map()`, Bootstrap 5 y vistas adaptables |
 | IE2.1.5 Estado, formularios, filtros y navegación | `useState`, `useEffect`, validaciones, filtros y React Router |
-| IE2.2.1 / IE2.3.1 Pruebas Vitest | 11 archivos y 65 pruebas ejecutadas correctamente |
+| IE2.2.1 / IE2.3.1 Pruebas Vitest | 17 archivos y 76 pruebas ejecutadas correctamente |
 | IE2.1.3 Problema y diseño frontend | Este documento y README explican problema, alcance y solución |
 | IE2.1.4 Dominio de componentes y responsividad | Arquitectura de componentes y uso de Bootstrap documentados |
 | IE2.1.6 Flujo interactivo y coherencia | Recorrido funcional de postulación a historial |
