@@ -1186,6 +1186,105 @@ padding-bottom: 1.25rem;
   border-bottom-color: rgba(11, 94, 215, 0.14);
 }
 
+.ficha-postulante .card-body {
+  padding: 0.9rem;
+}
+
+.ficha-identidad {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgba(14, 58, 93, 0.12);
+  border-radius: 10px;
+  background: var(--aqua-surface-alt);
+}
+
+.ficha-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--aqua-primary);
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.ficha-identidad h6 {
+  color: var(--aqua-primary-dark);
+  font-size: 0.9rem;
+}
+
+.ficha-seccion {
+  margin-top: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--aqua-border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.ficha-seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.45rem;
+  color: var(--aqua-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ficha-seccion-titulo i {
+  color: var(--aqua-primary);
+  font-size: 0.82rem;
+}
+
+.ficha-dato {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.38rem 0;
+  font-size: 0.82rem;
+}
+
+.ficha-dato + .ficha-dato {
+  border-top: 1px dashed rgba(14, 58, 93, 0.12);
+}
+
+.ficha-dato > span:first-child {
+  flex: 0 0 auto;
+  color: var(--aqua-muted);
+}
+
+.ficha-dato-valor {
+  overflow-wrap: anywhere;
+  color: var(--aqua-primary-dark);
+  font-weight: 600;
+  text-align: right;
+}
+
+.ficha-seccion-cv {
+  background: #fbfcff;
+}
+
+@media (max-width: 575.98px) {
+  .ficha-dato {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .ficha-dato-valor {
+    text-align: left;
+  }
+}
+
 .ficha-postulante dl {
   font-family: 'Montserrat', 'Inter', sans-serif;
 }
