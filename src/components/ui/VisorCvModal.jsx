@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { formatearFecha } from '../../mock/solicitudes.js';
 import { obtenerCargo } from '../../mock/cargos.js';
 import { previsualizarCv } from '../../services/candidatosApi.js';
+import { useDialogoAccesible } from '../../hooks/useDialogoAccesible.js';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -46,6 +47,7 @@ function esCvAlmacenado(ruta) {
  * maqueta anterior. La descarga sigue deshabilitada.
  */
 export default function VisorCvModal({ candidato, visible, onCerrar }) {
+  const contenedorRef = useDialogoAccesible(visible, onCerrar);
   const [cargandoWord, setCargandoWord] = useState(false);
   const [htmlWord, setHtmlWord] = useState('');
   const [errorWord, setErrorWord] = useState('');
@@ -137,7 +139,7 @@ export default function VisorCvModal({ candidato, visible, onCerrar }) {
         aria-labelledby="visor-cv-titulo"
         style={{ display: visible ? 'block' : 'none' }}
       >
-        <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" ref={contenedorRef}>
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="visor-cv-titulo">

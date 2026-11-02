@@ -1,5 +1,6 @@
 import EstadoBadge from './EstadoBadge.jsx';
 import TipoPostulacionBadge from './TipoPostulacionBadge.jsx';
+import { useDialogoAccesible } from '../../hooks/useDialogoAccesible.js';
 
 function formatearFechaHora(valor) {
   if (!valor) return '-';
@@ -15,6 +16,8 @@ function formatearFechaHora(valor) {
  * Muestra toda la informacion disponible de un movimiento del historial.
  */
 export default function DetalleMovimientoModal({ movimiento, visible, onCerrar }) {
+  const contenedorRef = useDialogoAccesible(visible, onCerrar);
+
   if (!visible || !movimiento) return null;
 
   return (
@@ -27,7 +30,7 @@ export default function DetalleMovimientoModal({ movimiento, visible, onCerrar }
         aria-labelledby="detalle-movimiento-titulo"
         style={{ zIndex: 1070 }}
       >
-        <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" ref={contenedorRef}>
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="detalle-movimiento-titulo">

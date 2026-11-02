@@ -505,10 +505,10 @@ export default function AdminUsuarios() {
                         <span className="text-muted-aqua small">Solo lectura</span>
                       ) : (
                         <div className="btn-group btn-group-sm">
-                          <button type="button" className="btn btn-soft" title="Editar usuario" onClick={() => abrirModalEditar(usuario)}>
+                          <button type="button" className="btn btn-soft" title="Editar usuario" aria-label={`Editar usuario ${usuario.nombre}`} onClick={() => abrirModalEditar(usuario)}>
                             <i className="bi bi-pencil" aria-hidden="true" />
                           </button>
-                          <button type="button" className="btn btn-soft text-danger" title="Eliminar usuario" onClick={() => abrirModalEliminar(usuario)}>
+                          <button type="button" className="btn btn-soft text-danger" title="Eliminar usuario" aria-label={`Eliminar usuario ${usuario.nombre}`} onClick={() => abrirModalEliminar(usuario)}>
                             <i className="bi bi-trash" aria-hidden="true" />
                           </button>
                         </div>

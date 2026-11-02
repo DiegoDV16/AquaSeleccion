@@ -41,6 +41,10 @@ export default function AppLayout() {
 
   return (
     <div className="app-shell d-flex flex-column min-vh-100">
+      <a className="skip-link" href="#contenido-principal">
+        Saltar al contenido principal
+      </a>
+
       <Navbar
         sidebarAbierto={sidebarAbierto}
         onToggleSidebar={() => setSidebarAbierto((abierto) => !abierto)}
@@ -62,7 +66,7 @@ export default function AppLayout() {
           />
         )}
 
-        <main className="aqua-main">
+        <main id="contenido-principal" className="aqua-main" tabIndex={-1}>
           <div className="container-fluid px-3 px-lg-4">
             <Outlet />
           </div>
