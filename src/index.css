@@ -549,13 +549,15 @@ body {
   letter-spacing: 0.03em;
 }
 
-.evaluador-antecedentes .card-body,
-.evaluacion-acciones-bar .card-body {
+.evaluador-antecedentes .card-body {
   background: #fff;
 }
 
-.evaluacion-acciones-bar {
-  border-top: 3px solid var(--aqua-primary-light);
+.evaluador-antecedentes .evaluacion-acciones-bar {
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--aqua-border);
+  border-radius: 0 0 8px 8px;
+  background: #fff;
 }
 
 .evaluacion-formulario .card-body {

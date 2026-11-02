@@ -425,20 +425,18 @@ export default function EvaluadorEvaluar() {
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="aqua-card evaluacion-acciones-bar mt-3">
-              <div className="card-body d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+              <div className="card-footer evaluacion-acciones-bar d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <p className="text-muted-aqua small mb-0">
                   <i className="bi bi-info-circle me-1" aria-hidden="true" />
                   {soloLectura
                     ? 'La evaluación está cerrada y no admite cambios.'
-                    : 'Puedes guardar un borrador y completar la evaluación más tarde.'}
+                    : 'Puedes guardar un borrador y continuar después.'}
                 </p>
-                <div className="d-flex flex-column flex-sm-row gap-2">
+                <div className="d-flex flex-column flex-sm-row flex-wrap gap-2">
                   {!soloLectura && (
                     <>
-                      <button type="submit" className="btn btn-aqua px-4" disabled={guardando}>
+                      <button type="submit" className="btn btn-aqua btn-sm px-3 text-nowrap" disabled={guardando}>
                         {guardando ? (
                           <>
                             <span className="spinner-border spinner-border-sm me-1" aria-hidden="true" />
@@ -447,13 +445,13 @@ export default function EvaluadorEvaluar() {
                         ) : (
                           <>
                             <i className="bi bi-check2-circle me-1" aria-hidden="true" />
-                            Guardar y Finalizar Evaluación
+                            Finalizar evaluación
                           </>
                         )}
                       </button>
                       <button
                         type="button"
-                        className="btn btn-soft px-4"
+                        className="btn btn-soft btn-sm px-3 text-nowrap"
                         onClick={() => guardar('borrador')}
                         disabled={guardando}
                       >
@@ -462,7 +460,7 @@ export default function EvaluadorEvaluar() {
                       </button>
                     </>
                   )}
-                  <Link to="/evaluador/mis-solicitudes" className="btn btn-outline-aqua px-4">
+                  <Link to="/evaluador/mis-solicitudes" className="btn btn-outline-aqua btn-sm px-3 text-nowrap">
                     <i className="bi bi-x-circle me-1" aria-hidden="true" />
                     {soloLectura ? 'Volver a mis solicitudes' : 'Cancelar'}
                   </Link>
