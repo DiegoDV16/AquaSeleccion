@@ -1,12 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import EstadoBadge from '../../components/ui/EstadoBadge.jsx';
 import TipoPostulacionBadge from '../../components/ui/TipoPostulacionBadge.jsx';
 import DetalleMovimientoModal from '../../components/ui/DetalleMovimientoModal.jsx';
+import Paginacion from '../../components/ui/Paginacion.jsx';
+import { useValorDiferido } from '../../hooks/useValorDiferido.js';
 import { ESTADOS_SOLICITUD } from '../../mock/solicitudes.js';
 import { TIPOS_GESTION } from '../../mock/historialSolicitudes.js';
 import { listarHistorial } from '../../services/historialApi.js';
+
+const TAMANO_PAGINA = 8;
+const TIPOS_VALIDOS = new Set(['externa', 'interna']);
+const ESTADOS_VALIDOS = new Set(ESTADOS_SOLICITUD.map((estado) => estado.clave));
+
+function filtrosDesdeParams(params) {
+  const tipo = params.get('tipo');
+  const estado = params.get('estado');
+  const mes = params.get('mes') ?? '';
+
+  return {
+    tipoGestion: TIPOS_VALIDOS.has(tipo) ? tipo : 'todas',
+    estado: ESTADOS_VALIDOS.has(estado) ? estado : 'todos',
+    texto: params.get('texto') ?? '',
+    mes: /^\d{4}-\d{2}$/.test(mes) ? mes : '',
+  };
+}
 
 function formatearFechaHora(valor) {
   if (!valor) return '-';
@@ -40,17 +60,45 @@ function fechaArchivo() {
  * Trazabilidad real de los movimientos del ciclo de vida de las solicitudes.
  */
 export default function AdminHistorial() {
-  const [filtros, setFiltros] = useState({
-    tipoGestion: 'todas',
-    estado: 'todos',
-    texto: '',
-    mes: '',
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [filtros, setFiltros] = useState(() => filtrosDesdeParams(searchParams));
   const [movimientos, setMovimientos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [recarga, setRecarga] = useState(0);
   const [movimientoDetalle, setMovimientoDetalle] = useState(null);
+  const [pagina, setPagina] = useState(1);
+
+  const textoDiferido = useValorDiferido(filtros.texto, 300);
+  const { tipoGestion, estado, mes } = filtros;
+  const filtrosConsulta = useMemo(
+    () => ({ tipoGestion, estado, mes, texto: textoDiferido }),
+    [tipoGestion, estado, mes, textoDiferido]
+  );
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (filtros.tipoGestion !== 'todas') params.set('tipo', filtros.tipoGestion);
+    if (filtros.estado !== 'todos') params.set('estado', filtros.estado);
+    if (filtros.texto.trim() !== '') params.set('texto', filtros.texto);
+    if (filtros.mes !== '') params.set('mes', filtros.mes);
+
+    setSearchParams(params, { replace: true });
+  }, [filtros, setSearchParams]);
+
+  useEffect(() => {
+    const desdeUrl = filtrosDesdeParams(searchParams);
+
+    setFiltros((actual) =>
+      actual.tipoGestion === desdeUrl.tipoGestion &&
+      actual.estado === desdeUrl.estado &&
+      actual.texto === desdeUrl.texto &&
+      actual.mes === desdeUrl.mes
+        ? actual
+        : desdeUrl
+    );
+  }, [searchParams]);
 
   useEffect(() => {
     let vigente = true;
@@ -58,7 +106,7 @@ export default function AdminHistorial() {
     setCargando(true);
     setError('');
 
-    listarHistorial(filtros)
+    listarHistorial(filtrosConsulta)
       .then((datos) => {
         if (!vigente) return;
 
@@ -76,7 +124,21 @@ export default function AdminHistorial() {
     return () => {
       vigente = false;
     };
-  }, [filtros, recarga]);
+  }, [filtrosConsulta, recarga]);
+
+  useEffect(() => {
+    setPagina(1);
+  }, [filtros.tipoGestion, filtros.estado, filtros.mes, textoDiferido]);
+
+  const totalPaginas = Math.max(1, Math.ceil(movimientos.length / TAMANO_PAGINA));
+  const movimientosPagina = useMemo(
+    () => movimientos.slice((pagina - 1) * TAMANO_PAGINA, pagina * TAMANO_PAGINA),
+    [movimientos, pagina]
+  );
+
+  useEffect(() => {
+    if (pagina > totalPaginas) setPagina(totalPaginas);
+  }, [pagina, totalPaginas]);
 
   function actualizarFiltro(campo, valor) {
     setFiltros((actual) => ({ ...actual, [campo]: valor }));
@@ -268,7 +330,7 @@ export default function AdminHistorial() {
         ) : (
           <>
             <div className="table-responsive">
-              <table className="table aqua-table mb-0">
+              <table className="table aqua-table mb-0" aria-busy={cargando}>
                 <thead>
                   <tr>
                     <th scope="col">ID</th>
@@ -285,7 +347,7 @@ export default function AdminHistorial() {
                   </tr>
                 </thead>
                 <tbody>
-                  {movimientos.map((movimiento) => (
+                  {movimientosPagina.map((movimiento) => (
                     <tr key={movimiento.id}>
                       <td className="text-muted-aqua">{movimiento.id}</td>
                       <td className="fw-semibold text-nowrap">{movimiento.solicitud}</td>
@@ -330,8 +392,21 @@ export default function AdminHistorial() {
               </table>
             </div>
 
-            <div className="card-footer bg-white small text-muted-aqua">
-              Mostrando {movimientos.length} movimientos.
+            <div className="card-footer bg-white small text-muted-aqua d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <span>
+                {movimientos.length === 0
+                  ? 'Sin movimientos para mostrar.'
+                  : `Mostrando ${(pagina - 1) * TAMANO_PAGINA + 1}–${Math.min(
+                      pagina * TAMANO_PAGINA,
+                      movimientos.length
+                    )} de ${movimientos.length} movimientos.`}
+              </span>
+              <Paginacion
+                pagina={pagina}
+                totalPaginas={totalPaginas}
+                onCambiar={setPagina}
+                etiqueta="Paginacion del historial"
+              />
             </div>
           </>
         )}

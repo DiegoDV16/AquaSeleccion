@@ -1,8 +1,10 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AdminHistorial from './AdminHistorial.jsx';
+import { FUTURO_ROUTER } from '../../routes/futuroRouter.js';
 import { listarHistorial } from '../../services/historialApi.js';
 
 vi.mock('../../services/historialApi.js', () => ({
@@ -40,6 +42,14 @@ const MOVIMIENTOS = [
   },
 ];
 
+function renderizarHistorial(initialEntries = ['/admin/historial']) {
+  return render(
+    <MemoryRouter initialEntries={initialEntries} future={FUTURO_ROUTER}>
+      <AdminHistorial />
+    </MemoryRouter>
+  );
+}
+
 describe('AdminHistorial', () => {
   beforeEach(() => {
     listarHistorial.mockReset();
@@ -47,7 +57,7 @@ describe('AdminHistorial', () => {
   });
 
   it('renderiza los movimientos que devuelve el backend', async () => {
-    render(<AdminHistorial />);
+    renderizarHistorial();
 
     expect(await screen.findByText('Evaluación finalizada')).toBeInTheDocument();
     expect(screen.getAllByText('Camila Rojas Pérez')).toHaveLength(2);
@@ -56,7 +66,7 @@ describe('AdminHistorial', () => {
 
   it('abre el detalle completo de un movimiento', async () => {
     const user = userEvent.setup();
-    render(<AdminHistorial />);
+    renderizarHistorial();
 
     const botones = await screen.findAllByRole('button', { name: /^Ver$/ });
     await user.click(botones[0]);
@@ -72,7 +82,7 @@ describe('AdminHistorial', () => {
 
   it('envía el texto de búsqueda al endpoint del historial', async () => {
     const user = userEvent.setup();
-    render(<AdminHistorial />);
+    renderizarHistorial();
 
     await screen.findByText('Evaluación finalizada');
     await user.type(screen.getByRole('searchbox'), 'SOL-0002');
@@ -80,6 +90,23 @@ describe('AdminHistorial', () => {
     await waitFor(() => {
       expect(listarHistorial).toHaveBeenLastCalledWith(
         expect.objectContaining({ texto: 'SOL-0002' })
+      );
+    });
+  });
+
+  it('recupera los filtros desde la URL', async () => {
+    renderizarHistorial([
+      '/admin/historial?tipo=interna&estado=pendiente&texto=SOL-0001&mes=2026-10',
+    ]);
+
+    await waitFor(() => {
+      expect(listarHistorial).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tipoGestion: 'interna',
+          estado: 'pendiente',
+          texto: 'SOL-0001',
+          mes: '2026-10',
+        })
       );
     });
   });

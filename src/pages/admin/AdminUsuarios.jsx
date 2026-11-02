@@ -2,9 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import ConfirmacionModal from '../../components/ui/ConfirmacionModal.jsx';
+import Paginacion from '../../components/ui/Paginacion.jsx';
 import { useAuth } from '../../context/AuthContext.js';
+import { useValorDiferido } from '../../hooks/useValorDiferido.js';
 import { CLAVE_ROLES, ROLES, obtenerRol } from '../../mock/catalogoRoles.js';
 import { actualizarUsuario, crearUsuario, eliminarUsuario, listarUsuarios } from '../../services/usuariosApi.js';
+
+const TAMANO_PAGINA = 8;
 
 const ESTADO_INICIAL_FORMULARIO_CREAR = {
   idUsuario: '',
@@ -40,6 +44,8 @@ export default function AdminUsuarios() {
   const [busqueda, setBusqueda] = useState('');
   const [filtroRol, setFiltroRol] = useState('todos');
   const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [pagina, setPagina] = useState(1);
+  const busquedaDiferida = useValorDiferido(busqueda, 250);
 
   const [mostrarModalCrear, setMostrarModalCrear] = useState(false);
   const [formularioCrear, setFormularioCrear] = useState(ESTADO_INICIAL_FORMULARIO_CREAR);
@@ -347,7 +353,7 @@ export default function AdminUsuarios() {
   };
 
   const usuariosFiltrados = useMemo(() => {
-    const texto = busqueda.trim().toLowerCase();
+    const texto = busquedaDiferida.trim().toLowerCase();
     return usuarios.filter((usuario) => {
       const coincideTexto =
         texto === '' ||
@@ -357,7 +363,21 @@ export default function AdminUsuarios() {
       const coincideEstado = filtroEstado === 'todos' || usuario.estado === filtroEstado;
       return coincideTexto && coincideRol && coincideEstado;
     });
-  }, [usuarios, busqueda, filtroRol, filtroEstado]);
+  }, [usuarios, busquedaDiferida, filtroRol, filtroEstado]);
+
+  const totalPaginas = Math.max(1, Math.ceil(usuariosFiltrados.length / TAMANO_PAGINA));
+  const usuariosPagina = useMemo(
+    () => usuariosFiltrados.slice((pagina - 1) * TAMANO_PAGINA, pagina * TAMANO_PAGINA),
+    [usuariosFiltrados, pagina]
+  );
+
+  useEffect(() => {
+    setPagina(1);
+  }, [busquedaDiferida, filtroRol, filtroEstado]);
+
+  useEffect(() => {
+    if (pagina > totalPaginas) setPagina(totalPaginas);
+  }, [pagina, totalPaginas]);
 
   return (
     <>
@@ -468,10 +488,13 @@ export default function AdminUsuarios() {
                   <td colSpan={7} className="text-center text-danger py-4">
                     <i className="bi bi-exclamation-circle me-1" aria-hidden="true" />
                     {error}
+                    <button type="button" className="btn btn-soft btn-sm ms-2" onClick={cargarUsuarios}>
+                      Reintentar
+                    </button>
                   </td>
                 </tr>
               )}
-              {!cargando && !error && usuariosFiltrados.map((usuario) => {
+              {!cargando && !error && usuariosPagina.map((usuario) => {
                 const rol = obtenerRol(usuario.rol_id);
                 return (
                   <tr key={usuario.id}>
@@ -526,6 +549,22 @@ export default function AdminUsuarios() {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="card-footer bg-white small text-muted-aqua d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <span>
+            {usuariosFiltrados.length === 0
+              ? 'Sin usuarios para mostrar.'
+              : `Mostrando ${(pagina - 1) * TAMANO_PAGINA + 1}–${Math.min(
+                  pagina * TAMANO_PAGINA,
+                  usuariosFiltrados.length
+                )} de ${usuariosFiltrados.length} usuarios.`}
+          </span>
+          <Paginacion
+            pagina={pagina}
+            totalPaginas={totalPaginas}
+            onCambiar={setPagina}
+            etiqueta="Paginacion de usuarios"
+          />
         </div>
       </div>
 
