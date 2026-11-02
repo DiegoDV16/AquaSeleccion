@@ -1,9 +1,21 @@
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthContext } from '../../context/AuthContext.js';
 import Sidebar from './Sidebar.jsx';
+import { contarSolicitudes } from '../../services/solicitudesApi.js';
+
+vi.mock('../../services/solicitudesApi.js', () => ({
+  contarSolicitudes: vi.fn(),
+}));
+
+beforeEach(() => {
+  contarSolicitudes.mockResolvedValue({
+    ok: true,
+    contadores: { solicitudes: 3, misSolicitudes: 1 },
+  });
+});
 
 function renderizarSidebar({ rolActivo = null, usuario = null, colapsado = false, onToggleColapsado = vi.fn() } = {}) {
   return render(
@@ -43,18 +55,18 @@ describe('Sidebar: items por rol', () => {
 });
 
 describe('Sidebar: contadores', () => {
-  it('el analista ve el total de solicitudes pendientes', () => {
+  it('el analista ve el total real de solicitudes', async () => {
     renderizarSidebar(analista);
 
     const enlace = screen.getByRole('link', { name: 'Solicitudes' });
-    expect(within(enlace).getByText('5')).toBeInTheDocument();
+    expect(await within(enlace).findByText('3')).toBeInTheDocument();
   });
 
-  it('el evaluador ve solo sus solicitudes pendientes', () => {
+  it('el evaluador ve solo sus solicitudes pendientes', async () => {
     renderizarSidebar(evaluador);
 
     const enlace = screen.getByRole('link', { name: 'Mis solicitudes' });
-    expect(within(enlace).getByText('2')).toBeInTheDocument();
+    expect(await within(enlace).findByText('1')).toBeInTheDocument();
   });
 
   it('un item sin contador no muestra badge', () => {

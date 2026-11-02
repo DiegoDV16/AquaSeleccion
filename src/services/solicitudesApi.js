@@ -26,6 +26,11 @@ export function listarEvaluadores() {
   return peticionFormulario('backend/api/solicitudes/evaluadores.php');
 }
 
+/** POST contadores.php -> totales reales para el menu lateral. */
+export function contarSolicitudes() {
+  return peticionFormulario('backend/api/solicitudes/contadores.php');
+}
+
 /** POST evaluaciones/listar.php -> solicitudes asignadas al evaluador en sesion. */
 export function listarMisSolicitudes() {
   return peticionFormulario('backend/api/evaluaciones/listar.php');

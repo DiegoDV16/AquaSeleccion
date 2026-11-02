@@ -78,7 +78,9 @@ export default function AnalistaNuevaSolicitud() {
       return;
     }
 
-    const listaCandidatos = respuestaCandidatos.candidatos ?? [];
+    const listaCandidatos = (respuestaCandidatos.candidatos ?? []).filter(
+      (candidato) => !['apto', 'no_apto'].includes(candidato.estado),
+    );
     setCandidatos(listaCandidatos);
     setEvaluadores(respuestaEvaluadores.evaluadores ?? []);
 
@@ -206,7 +208,8 @@ export default function AnalistaNuevaSolicitud() {
         <div className="alert alert-warning d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2" role="alert">
           <span>
             <i className="bi bi-info-circle me-2" aria-hidden="true" />
-            No hay candidatos registrados. Primero registra un candidato para poder crear una solicitud.
+            No hay candidatos disponibles para una nueva evaluación. Los candidatos aprobados o rechazados
+            se excluyen automáticamente.
           </span>
           <Link to="/analista/candidatos" className="btn btn-soft btn-sm">
             Ir a candidatos
@@ -274,7 +277,7 @@ export default function AnalistaNuevaSolicitud() {
                         </select>
                         {errores.candidato_id && <div className="invalid-feedback">{errores.candidato_id}</div>}
                         <div className="form-text">
-                          Solo aparecen candidatos ya registrados. Si falta alguno, registralo desde Candidatos.
+                          Solo aparecen candidatos disponibles. No se listan los ya aprobados o rechazados.
                         </div>
                       </div>
 
@@ -395,7 +398,7 @@ export default function AnalistaNuevaSolicitud() {
                   <div className="analista-footer d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                     <p className="text-muted-aqua small mb-0">
                       <i className="bi bi-shield-check me-1" aria-hidden="true" />
-                      Se guarda en MySQL y queda en estado Pendiente.
+                      La solicitud quedará asignada al evaluador seleccionado.
                     </p>
                     <div className="d-flex flex-column-reverse flex-sm-row gap-2">
                       <Link to="/analista/solicitudes" className="btn btn-soft px-4">
@@ -526,7 +529,7 @@ export default function AnalistaNuevaSolicitud() {
               <ul className="list-unstyled d-grid gap-2 mb-0 small text-muted-aqua">
                 <li className="d-flex gap-2">
                   <i className="bi bi-check2-circle text-success mt-1" aria-hidden="true" />
-                  <span>La solicitud se guarda en MySQL y queda en estado Pendiente.</span>
+                  <span>La solicitud quedará disponible para el evaluador responsable.</span>
                 </li>
                 <li className="d-flex gap-2">
                   <i className="bi bi-check2-circle text-success mt-1" aria-hidden="true" />
