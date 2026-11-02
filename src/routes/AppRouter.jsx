@@ -47,7 +47,7 @@ export default function AppRouter() {
         <Route
           path="/admin"
           element={
-            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRACION}>
               <Navigate to="/admin/dashboard" replace />
             </RutaProtegida>
           }
@@ -55,7 +55,7 @@ export default function AppRouter() {
         <Route
           path="/admin/dashboard"
           element={
-            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRACION}>
               <AdminDashboard />
             </RutaProtegida>
           }
@@ -71,7 +71,7 @@ export default function AppRouter() {
         <Route
           path="/admin/usuarios"
           element={
-            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRACION}>
               <AdminUsuarios />
             </RutaProtegida>
           }
@@ -79,7 +79,7 @@ export default function AppRouter() {
         <Route
           path="/admin/historial"
           element={
-            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRADOR}>
+            <RutaProtegida rolesPermitidos={PERMISOS.ADMINISTRACION}>
               <AdminHistorial />
             </RutaProtegida>
           }

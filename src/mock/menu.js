@@ -39,6 +39,16 @@ export const MENU_POR_ROL = {
       ],
     },
   ],
+  [CLAVE_ROLES.JEFATURA]: [
+    {
+      titulo: 'Supervision',
+      items: [
+        { to: '/admin/dashboard', label: 'Panel de resoluciones', icono: 'bar-chart-line' },
+        { to: '/admin/usuarios', label: 'Usuarios', icono: 'people' },
+        { to: '/admin/historial', label: 'Historial y auditoria', icono: 'clock-history' },
+      ],
+    },
+  ],
 };
 
 /**

@@ -24,6 +24,11 @@ const ROLES_SISTEMA = [
         'nombre' => 'Profesional Evaluador',
         'rutaInicio' => '/evaluador/mis-solicitudes',
     ],
+    5 => [
+        'clave' => 'jefatura',
+        'nombre' => 'Jefatura',
+        'rutaInicio' => '/admin/dashboard',
+    ],
 ];
 
 /**

@@ -16,7 +16,8 @@ const COLORES_ESTADO = {
 
 /** Dashboard del modulo Administrador con datos reales de MySQL. */
 export default function AdminDashboard() {
-  const { usuario } = useAuth();
+  const { usuario, rolActivo } = useAuth();
+  const esJefatura = rolActivo === 'jefatura';
   const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
@@ -104,6 +105,14 @@ export default function AdminDashboard() {
     postulaciones: Number(item.postulaciones ?? 0),
   }));
 
+  const porEvaluador = (datos.porEvaluador ?? []).map((item) => ({
+    ...item,
+    total: Number(item.total ?? 0),
+    aptos: Number(item.aptos ?? 0),
+    no_aptos: Number(item.no_aptos ?? 0),
+    observaciones: Number(item.observaciones ?? 0),
+  }));
+
   const metricas = [
     {
       clave: 'externas',
@@ -174,23 +183,26 @@ export default function AdminDashboard() {
 
   const maxFamilia = Math.max(...porFamilia.map((familia) => familia.total), 1);
   const maxCargo = Math.max(...topCargos.map((item) => item.postulaciones), 1);
+  const maxResoluciones = Math.max(...porEvaluador.map((item) => item.total), 1);
 
   return (
     <>
       <PageHeader
-        etiqueta="Modulo Administrador"
-        titulo="Panel general de reclutamiento"
-        descripcion={`Sesion activa: ${usuario?.nombre ?? 'Administrador'} · ${totalSolicitudes} solicitudes y ${totalCandidatos} candidatos registrados.`}
+        etiqueta={esJefatura ? 'Modulo Jefatura' : 'Modulo Administrador'}
+        titulo={esJefatura ? 'Panel de resoluciones' : 'Panel general de reclutamiento'}
+        descripcion={`Sesion activa: ${usuario?.nombre ?? 'Usuario'} · ${totalSolicitudes} solicitudes y ${totalCandidatos} candidatos registrados.`}
         acciones={
           <>
             <button type="button" className="btn btn-soft btn-sm" onClick={() => setRecarga((valor) => valor + 1)}>
               <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
               Actualizar
             </button>
-            <Link to="/admin/candidatos?nueva=1" className="btn btn-aqua btn-sm">
-              <i className="bi bi-person-plus me-1" aria-hidden="true" />
-              Nueva postulación interna
-            </Link>
+            {!esJefatura && (
+              <Link to="/admin/candidatos?nueva=1" className="btn btn-aqua btn-sm">
+                <i className="bi bi-person-plus me-1" aria-hidden="true" />
+                Nueva postulación interna
+              </Link>
+            )}
             <Link to="/admin/historial" className="btn btn-soft btn-sm">
               <i className="bi bi-clock-history me-1" aria-hidden="true" />
               Ver historial
@@ -245,14 +257,16 @@ export default function AdminDashboard() {
                           </div>
                           <div className="d-flex flex-column align-items-end gap-2">
                             <EstadoBadge estado={solicitud.estado} />
-                            <Link
-                              to="/admin/candidatos"
-                              className="btn btn-soft btn-sm"
-                              aria-label={`Ver candidatos de ${codigo}`}
-                              title="Ver candidatos"
-                            >
-                              <i className="bi bi-eye" aria-hidden="true" />
-                            </Link>
+                            {!esJefatura && (
+                              <Link
+                                to="/admin/candidatos"
+                                className="btn btn-soft btn-sm"
+                                aria-label={`Ver candidatos de ${codigo}`}
+                                title="Ver candidatos"
+                              >
+                                <i className="bi bi-eye" aria-hidden="true" />
+                              </Link>
+                            )}
                           </div>
                         </div>
 
@@ -274,10 +288,12 @@ export default function AdminDashboard() {
 
               <div className="dashboard-panel-footer">
                 <span>Mostrando {recientes.length} de {totalSolicitudes}</span>
-                <Link to="/admin/candidatos" className="btn btn-soft btn-sm">
-                  Ver candidatos
-                  <i className="bi bi-arrow-right ms-1" aria-hidden="true" />
-                </Link>
+                {!esJefatura && (
+                  <Link to="/admin/candidatos" className="btn btn-soft btn-sm">
+                    Ver candidatos
+                    <i className="bi bi-arrow-right ms-1" aria-hidden="true" />
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -429,6 +445,53 @@ export default function AdminDashboard() {
                           backgroundColor: 'var(--aqua-solid-primary)',
                         }}
                       />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="col-12">
+          <div className="aqua-card dashboard-panel-card">
+            <div className="card-header">
+              <i className="bi bi-bar-chart-line me-2" aria-hidden="true" />
+              Resoluciones por evaluador
+              <span className="text-muted-aqua float-end" style={{ fontSize: '0.78rem' }}>
+                Evaluaciones finalizadas
+              </span>
+            </div>
+            <div className="card-body">
+              {porEvaluador.length === 0 ? (
+                <p className="text-muted-aqua small mb-0">Aún no hay evaluaciones finalizadas.</p>
+              ) : (
+                porEvaluador.map((evaluador) => (
+                  <div className="dist-row dashboard-dist-item" key={evaluador.clave}>
+                    <div className="dist-head">
+                      <span className="dist-name">{evaluador.nombre}</span>
+                      <span className="dist-value">{evaluador.total}</span>
+                    </div>
+                    <div
+                      className="dist-bar"
+                      role="progressbar"
+                      aria-label={`${evaluador.total} resoluciones de ${evaluador.nombre}`}
+                      aria-valuenow={evaluador.total}
+                      aria-valuemin={0}
+                      aria-valuemax={maxResoluciones}
+                    >
+                      <span
+                        style={{
+                          width: anchoBarra(evaluador.total, maxResoluciones),
+                          backgroundColor: 'var(--aqua-solid-primary)',
+                        }}
+                      />
+                    </div>
+                    <div className="d-flex flex-wrap gap-2 mt-2">
+                      <span className="badge badge-estado badge-estado-apto">Apto {evaluador.aptos}</span>
+                      <span className="badge badge-estado badge-estado-noapto">No apto {evaluador.no_aptos}</span>
+                      <span className="badge badge-estado badge-estado-observaciones">
+                        Con observaciones {evaluador.observaciones}
+                      </span>
                     </div>
                   </div>
                 ))

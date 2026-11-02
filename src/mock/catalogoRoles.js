@@ -10,6 +10,7 @@ export const CLAVE_ROLES = {
   ANALISTA: 'analista',
   EVALUADOR: 'evaluador',
   COLABORADOR: 'colaborador',
+  JEFATURA: 'jefatura',
 };
 
 export const ROLES = [
@@ -49,6 +50,15 @@ export const ROLES = [
     color: 'secondary',
     rutaInicio: null,
   },
+  {
+    clave: CLAVE_ROLES.JEFATURA,
+    id: 5,
+    nombre: 'Jefatura',
+    descripcion: 'Perfil de supervision con acceso de solo lectura a indicadores, usuarios e historial.',
+    icono: 'bar-chart-line',
+    color: 'info',
+    rutaInicio: '/admin/dashboard',
+  },
 ];
 
 export function obtenerRol(clave) {
@@ -58,6 +68,7 @@ export function obtenerRol(clave) {
 /** Roles autorizados por modulo: se consumen en las rutas protegidas. */
 export const PERMISOS_POR_MODULO = {
   ADMINISTRADOR: [CLAVE_ROLES.ADMINISTRADOR],
+  ADMINISTRACION: [CLAVE_ROLES.ADMINISTRADOR, CLAVE_ROLES.JEFATURA],
   ANALISTA: [CLAVE_ROLES.ANALISTA],
   EVALUADOR: [CLAVE_ROLES.EVALUADOR],
 };

@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../helpers/autorizacion.php';
 
 requerirPost();
-requerirRoles(['administrador']);
+requerirRoles(['administrador', 'jefatura']);
 
 $tipoGestion = trim((string) ($_POST['tipoGestion'] ?? 'todas'));
 $estado = trim((string) ($_POST['estado'] ?? 'todos'));

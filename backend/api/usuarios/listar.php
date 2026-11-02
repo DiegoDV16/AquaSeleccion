@@ -24,7 +24,7 @@ if ($sesion === null) {
     responder(['ok' => false, 'mensaje' => 'Sesion no iniciada.'], 401);
 }
 
-if (($sesion['rol_id'] ?? null) !== 'administrador') {
+if (!in_array($sesion['rol_id'] ?? '', ['administrador', 'jefatura'], true)) {
     responder(['ok' => false, 'mensaje' => 'No tienes permisos para ver los usuarios.'], 403);
 }
 

@@ -25,6 +25,11 @@ El proyecto es un monolito con frontend SPA en React y backend PHP sobre MySQL. 
 - CRUD de usuarios del sistema (crear, editar, eliminar, activar/inactivar).
 - Historial y trazabilidad de solicitudes.
 
+### Módulo Jefatura
+- Panel de resoluciones con indicadores globales y evaluaciones finalizadas por evaluador.
+- Consulta de usuarios del sistema en modo solo lectura.
+- Historial y auditoría con filtros y exportación CSV, sin permisos de modificación.
+
 ### Módulo Analista de Reclutamiento
 - Registro de postulaciones internas con CV opcional y edición de candidatos, con listado, detalle y previsualización/descarga del CV.
 - Creación, listado, filtros y detalle de solicitudes de evaluación.
@@ -145,15 +150,21 @@ mysql -u root aquaseleccion < backend/sql/migracion_evaluacion_bateria.sql
 mysql -u root aquaseleccion < backend/sql/migracion_historial.sql
 ```
 
-6. Copiar la plantilla de conexión:
+6. Crear el rol Jefatura:
+
+```bash
+mysql -u root aquaseleccion < backend/sql/migracion_jefatura.sql
+```
+
+7. Copiar la plantilla de conexión:
 
 ```bash
 cp backend/config/conexion.example.php backend/config/conexion.php
 ```
 
-7. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
-8. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
-9. Iniciar el frontend:
+8. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
+9. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
+10. Iniciar el frontend:
 
 ```bash
 npm run dev
@@ -187,11 +198,12 @@ npm run dev
 | 2 | Analista de Reclutamiento | Candidatos, solicitudes y creación de solicitudes |
 | 3 | Profesional Evaluador | Solo las solicitudes asignadas a su usuario |
 | 4 | Colaborador | Sin acceso a módulos de gestión; puede ser postulante interno |
+| 5 | Jefatura | Solo lectura de indicadores, usuarios e historial |
 
 Reglas:
 - El rol se obtiene desde la base de datos al iniciar sesión; el usuario no puede elegir módulo.
 - Un usuario con rol sin módulo asignado (por ejemplo, Colaborador) no puede iniciar sesión en la plataforma.
-- Las rutas del frontend están protegidas por rol y los endpoints de usuarios validan la sesión de Administrador en el servidor.
+- Las rutas del frontend están protegidas por rol y los endpoints de lectura validan la sesión; las mutaciones de usuarios siguen reservadas al Administrador.
 - Cada usuario tiene un rol único y un estado `activo` o `inactivo`.
 
 ### 5.2 Autenticación y sesión
@@ -246,7 +258,7 @@ Reglas:
 - En la edición, si el campo contraseña queda vacío, la contraseña actual no cambia.
 - El estado se normaliza a `1` (activo) o `0` (inactivo).
 - Un administrador no puede eliminar su propio usuario.
-- La interfaz solo permite asignar los roles Administrador, Analista y Evaluador; el rol Colaborador se reserva para empleados sin acceso.
+- La interfaz permite asignar los roles Administrador, Analista, Evaluador y Jefatura; el rol Colaborador se reserva para empleados sin acceso.
 - Las operaciones requieren sesión activa de Administrador; sin sesión responden `401` y con otro rol `403`.
 
 ### 5.6 Candidatos
@@ -325,6 +337,7 @@ Reglas:
 - Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
 - Módulo Evaluador: bandeja de solicitudes asignadas, ficha del postulante, CV, borrador y finalización de la evaluación psicolaboral con persistencia en `evaluacion`.
 - Módulo Administrador: dashboard con métricas, solicitudes recientes, actividad y distribuciones calculadas desde MySQL.
+- Módulo Jefatura: panel de resoluciones por evaluador, usuarios e historial en modo solo lectura.
 - Historial y trazabilidad de solicitudes en `historialsolicitudes`, con filtros por tipo, estado, texto y mes.
 - Exportación CSV del historial filtrado.
 

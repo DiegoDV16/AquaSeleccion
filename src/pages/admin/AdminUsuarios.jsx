@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import ConfirmacionModal from '../../components/ui/ConfirmacionModal.jsx';
+import { useAuth } from '../../context/AuthContext.js';
 import { CLAVE_ROLES, ROLES, obtenerRol } from '../../mock/catalogoRoles.js';
 import { actualizarUsuario, crearUsuario, eliminarUsuario, listarUsuarios } from '../../services/usuariosApi.js';
 
@@ -31,6 +32,8 @@ const ESTADO_INICIAL_FORMULARIO_EDITAR = {
 
 /** Listado de usuarios del sistema con filtro por rol, estado y busqueda. */
 export default function AdminUsuarios() {
+  const { rolActivo } = useAuth();
+  const soloLectura = rolActivo === CLAVE_ROLES.JEFATURA;
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
@@ -359,14 +362,21 @@ export default function AdminUsuarios() {
   return (
     <>
       <PageHeader
-        etiqueta="Modulo Administrador"
+        etiqueta={soloLectura ? 'Modulo Jefatura' : 'Modulo Administrador'}
         titulo="Usuarios del sistema"
         descripcion={`${usuarios.length} usuarios registrados - ${usuarios.filter((u) => u.estado === 'activo').length} activos`}
         acciones={
-          <button type="button" className="btn btn-success btn-sm" onClick={abrirModalCrear}>
-            <i className="bi bi-person-plus me-1" aria-hidden="true" />
-            Nuevo usuario
-          </button>
+          soloLectura ? (
+            <span className="badge badge-estado badge-estado-inactivo">
+              <i className="bi bi-eye me-1" aria-hidden="true" />
+              Solo lectura
+            </span>
+          ) : (
+            <button type="button" className="btn btn-success btn-sm" onClick={abrirModalCrear}>
+              <i className="bi bi-person-plus me-1" aria-hidden="true" />
+              Nuevo usuario
+            </button>
+          )
         }
       />
 
@@ -405,6 +415,7 @@ export default function AdminUsuarios() {
                 <option value={CLAVE_ROLES.ADMINISTRADOR}>Administrador</option>
                 <option value={CLAVE_ROLES.ANALISTA}>Analista de reclutamiento</option>
                 <option value={CLAVE_ROLES.EVALUADOR}>Profesional evaluador</option>
+                <option value={CLAVE_ROLES.JEFATURA}>Jefatura</option>
               </select>
             </div>
             <div className="col-sm-6 col-lg-3">
@@ -490,14 +501,18 @@ export default function AdminUsuarios() {
                     </td>
                     <td className="text-muted-aqua small">{usuario.ultimo_acceso ?? '—'}</td>
                     <td className="text-end">
-                      <div className="btn-group btn-group-sm">
-                        <button type="button" className="btn btn-soft" title="Editar usuario" onClick={() => abrirModalEditar(usuario)}>
-                          <i className="bi bi-pencil" aria-hidden="true" />
-                        </button>
-                        <button type="button" className="btn btn-soft text-danger" title="Eliminar usuario" onClick={() => abrirModalEliminar(usuario)}>
-                          <i className="bi bi-trash" aria-hidden="true" />
-                        </button>
-                      </div>
+                      {soloLectura ? (
+                        <span className="text-muted-aqua small">Solo lectura</span>
+                      ) : (
+                        <div className="btn-group btn-group-sm">
+                          <button type="button" className="btn btn-soft" title="Editar usuario" onClick={() => abrirModalEditar(usuario)}>
+                            <i className="bi bi-pencil" aria-hidden="true" />
+                          </button>
+                          <button type="button" className="btn btn-soft text-danger" title="Eliminar usuario" onClick={() => abrirModalEliminar(usuario)}>
+                            <i className="bi bi-trash" aria-hidden="true" />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );

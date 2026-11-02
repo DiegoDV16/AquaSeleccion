@@ -14,7 +14,7 @@ require_once __DIR__ . '/../../helpers/consulta_solicitudes.php';
 require_once __DIR__ . '/../../helpers/mapeos.php';
 
 requerirPost();
-requerirRoles(['administrador']);
+requerirRoles(['administrador', 'jefatura']);
 
 try {
     $pdo = obtenerConexion();
@@ -109,6 +109,21 @@ try {
           GROUP BY ca.idCargo, ca.cargo
           ORDER BY postulaciones DESC, ca.cargo ASC
           LIMIT 5'
+    )->fetchAll();
+
+    $porEvaluador = $pdo->query(
+        "SELECT u.idUsuario AS clave,
+                TRIM(CONCAT_WS(' ', u.nombres, u.apellidoPaterno, u.apellidoMaterno)) AS nombre,
+                COUNT(e.idEvaluacion) AS total,
+                COALESCE(SUM(e.estadoEvaluacion = 'apto'), 0) AS aptos,
+                COALESCE(SUM(e.estadoEvaluacion = 'no_apto'), 0) AS no_aptos,
+                COALESCE(SUM(e.estadoEvaluacion = 'con_observaciones'), 0) AS observaciones
+           FROM evaluacion e
+           INNER JOIN solicitudevaluacion s ON s.idSolicitudEvaluacion = e.idSolicitudEvaluacion
+           INNER JOIN usuario u ON u.idUsuario = e.idUsuario
+          WHERE s.estadoSolicitudEvaluacion = 'finalizada'
+          GROUP BY u.idUsuario, u.nombres, u.apellidoPaterno, u.apellidoMaterno
+          ORDER BY total DESC, nombre ASC"
     )->fetchAll();
 
     $actividad = [];
@@ -236,6 +251,7 @@ try {
         'porEstado' => $porEstado,
         'porFamilia' => $porFamilia,
         'topCargos' => $topCargos,
+        'porEvaluador' => $porEvaluador,
     ]);
 } catch (PDOException $e) {
     error_log('Error al obtener el dashboard administrativo: ' . $e->getMessage());
