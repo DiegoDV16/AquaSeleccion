@@ -3,7 +3,7 @@
 /**
  * login.php
  * POST /backend/api/auth/login.php
- * Cuerpo JSON: { "correo": "...", "contrasena": "..." }
+ * Cuerpo JSON: { "correo": "...", "contraseña": "..." }
  *
  * Valida que el usuario exista, que este activo y que la contrasena coincida
  * con el hash almacenado (password_verify). Si todo es correcto abre la sesion
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $datos = cuerpoJson();
 $correo = trim((string) ($datos['correo'] ?? ''));
-$contrasena = (string) ($datos['contrasena'] ?? $datos['clave'] ?? '');
+$contrasena = (string) ($datos['contraseña'] ?? $datos['contrasena'] ?? $datos['clave'] ?? '');
 
 if ($correo === '' || $contrasena === '') {
     responder(['ok' => false, 'mensaje' => 'Ingresa tu correo institucional y contrasena.'], 400);
