@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../config/sesion.php';
 require_once __DIR__ . '/respuesta.php';
+require_once __DIR__ . '/csrf.php';
 
 /**
  * Exige que la peticion use POST (convencion del proyecto para las llamadas
@@ -39,6 +40,12 @@ function requerirRoles(array $roles): array
 
     if (!in_array($sesion['rol_id'] ?? '', $roles, true)) {
         responder(['ok' => false, 'mensaje' => 'No tienes permisos para realizar esta accion.'], 403);
+    }
+
+    $metodo = $_SERVER['REQUEST_METHOD'] ?? '';
+
+    if (!in_array($metodo, ['GET', 'HEAD', 'OPTIONS'], true)) {
+        validarCsrf();
     }
 
     return $sesion;

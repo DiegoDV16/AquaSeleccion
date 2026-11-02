@@ -158,15 +158,21 @@ mysql -u root aquaseleccion < backend/sql/migracion_historial_cargo.sql
 mysql -u root aquaseleccion < backend/sql/migracion_jefatura.sql
 ```
 
-7. Copiar la plantilla de conexión:
+7. Crear las tablas y protecciones de seguridad:
+
+```bash
+mysql -u root aquaseleccion < backend/sql/migracion_seguridad.sql
+```
+
+8. Copiar la plantilla de conexión:
 
 ```bash
 cp backend/config/conexion.example.php backend/config/conexion.php
 ```
 
-8. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
-9. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
-10. Iniciar el frontend:
+9. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
+10. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
+11. Iniciar el frontend:
 
 ```bash
 npm run dev

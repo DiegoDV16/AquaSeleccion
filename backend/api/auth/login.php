@@ -16,6 +16,8 @@ require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../config/sesion.php';
 require_once __DIR__ . '/../../config/roles.php';
 require_once __DIR__ . '/../../helpers/respuesta.php';
+require_once __DIR__ . '/../../helpers/csrf.php';
+require_once __DIR__ . '/../../helpers/seguridad.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     responder(['ok' => false, 'mensaje' => 'Metodo no permitido.'], 405);
@@ -31,6 +33,14 @@ if ($correo === '' || $contrasena === '') {
 
 try {
     $pdo = obtenerConexion();
+    $ip = ipCliente();
+
+    if (loginBloqueado($pdo, $correo, $ip)) {
+        responder([
+            'ok' => false,
+            'mensaje' => 'Demasiados intentos fallidos. Espera 15 minutos antes de volver a intentarlo.',
+        ], 429);
+    }
 
     $sql = 'SELECT u.idUsuario,
                    u.idRol,
@@ -49,10 +59,12 @@ try {
     $registro = $stmt->fetch();
 
     if (!$registro) {
+        registrarIntentoLogin($pdo, $correo, $ip, false);
         responder(['ok' => false, 'mensaje' => 'El correo no esta registrado en el sistema.'], 401);
     }
 
     if ((int) $registro['estado'] !== 1) {
+        registrarIntentoLogin($pdo, $correo, $ip, false);
         responder([
             'ok' => false,
             'mensaje' => 'Tu usuario se encuentra inactivo. Contacta al administrador del sistema.',
@@ -60,6 +72,7 @@ try {
     }
 
     if (!password_verify($contrasena, $registro['contrasena'])) {
+        registrarIntentoLogin($pdo, $correo, $ip, false);
         responder(['ok' => false, 'mensaje' => 'La contrasena es incorrecta. Vuelve a intentarlo.'], 401);
     }
 
@@ -75,6 +88,8 @@ try {
     $nombreCompleto = trim(
         $registro['nombres'] . ' ' . $registro['apellidoPaterno'] . ' ' . ($registro['apellidoMaterno'] ?? '')
     );
+
+    registrarIntentoLogin($pdo, $correo, $ip, true);
 
     $usuario = [
         'id' => (int) $registro['idUsuario'],
@@ -97,6 +112,7 @@ try {
         'ok' => true,
         'usuario' => $usuario,
         'rol' => array_merge(['id' => (int) $registro['idRol']], $rolSistema),
+        'csrfToken' => tokenCsrf(),
     ]);
 } catch (PDOException $e) {
     responder([

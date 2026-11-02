@@ -10,8 +10,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../config/sesion.php';
 require_once __DIR__ . '/../../helpers/respuesta.php';
+require_once __DIR__ . '/../../helpers/csrf.php';
 
 iniciarSesion();
+validarCsrf();
 
 $_SESSION = [];
 

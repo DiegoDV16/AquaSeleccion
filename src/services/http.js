@@ -6,6 +6,39 @@
  */
 
 const BASE = import.meta.env.BASE_URL;
+const CLAVE_CSRF = 'aquaseleccion_csrf';
+
+let tokenCsrf = null;
+
+function leerTokenCsrf() {
+  if (tokenCsrf) return tokenCsrf;
+
+  try {
+    tokenCsrf = window.sessionStorage.getItem(CLAVE_CSRF);
+  } catch {
+    tokenCsrf = null;
+  }
+
+  return tokenCsrf;
+}
+
+function guardarTokenCsrf(datos) {
+  if (!datos?.csrfToken) return;
+
+  tokenCsrf = datos.csrfToken;
+
+  try {
+    window.sessionStorage.setItem(CLAVE_CSRF, tokenCsrf);
+  } catch {
+    // sessionStorage puede no estar disponible; el token queda en memoria.
+  }
+}
+
+function conCsrf(encabezados = {}) {
+  const token = leerTokenCsrf();
+
+  return token ? { ...encabezados, 'X-CSRF-Token': token } : encabezados;
+}
 
 /**
  * Mensaje accionable cuando el backend responde algo distinto de JSON
@@ -24,7 +57,7 @@ export async function peticionJson(ruta, opciones = {}) {
   try {
     respuesta = await fetch(`${BASE}${ruta}`, {
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: conCsrf({ 'Content-Type': 'application/json' }),
       ...opciones,
     });
   } catch {
@@ -32,7 +65,9 @@ export async function peticionJson(ruta, opciones = {}) {
   }
 
   try {
-    return await respuesta.json();
+    const datos = await respuesta.json();
+    guardarTokenCsrf(datos);
+    return datos;
   } catch {
     return respuestaNoJson(respuesta);
   }
@@ -63,6 +98,7 @@ export async function peticionFormulario(ruta, datos = {}, opciones = {}) {
     respuesta = await fetch(`${BASE}${ruta}`, {
       method: 'POST',
       credentials: 'include',
+      headers: conCsrf(),
       ...opciones,
       body: formData,
     });
@@ -71,7 +107,9 @@ export async function peticionFormulario(ruta, datos = {}, opciones = {}) {
   }
 
   try {
-    return await respuesta.json();
+    const datos = await respuesta.json();
+    guardarTokenCsrf(datos);
+    return datos;
   } catch {
     return respuestaNoJson(respuesta);
   }
@@ -106,6 +144,7 @@ export async function peticionArchivo(ruta, datos = {}) {
     respuesta = await fetch(`${BASE}${ruta}`, {
       method: 'POST',
       credentials: 'include',
+      headers: conCsrf(),
       body: formData,
     });
   } catch {

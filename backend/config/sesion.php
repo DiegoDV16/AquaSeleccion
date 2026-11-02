@@ -14,14 +14,25 @@ function iniciarSesion(): void
         return;
     }
 
+    $esHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
+        'secure' => $esHttps,
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
 
     session_start();
+
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: DENY');
+    header('Referrer-Policy: same-origin');
 }
 
 /**
