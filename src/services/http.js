@@ -42,9 +42,19 @@ export async function peticionFormulario(ruta, datos = {}, opciones = {}) {
   const formData = new FormData();
 
   Object.entries(datos).forEach(([clave, valor]) => {
-    if (valor !== undefined && valor !== null) {
-      formData.append(clave, String(valor));
+    if (valor === undefined || valor === null) return;
+
+    if (typeof File !== 'undefined' && valor instanceof File) {
+      formData.append(clave, valor, valor.name);
+      return;
     }
+
+    if (typeof Blob !== 'undefined' && valor instanceof Blob) {
+      formData.append(clave, valor);
+      return;
+    }
+
+    formData.append(clave, String(valor));
   });
 
   let respuesta;
@@ -75,9 +85,19 @@ export async function peticionArchivo(ruta, datos = {}) {
   const formData = new FormData();
 
   Object.entries(datos).forEach(([clave, valor]) => {
-    if (valor !== undefined && valor !== null) {
-      formData.append(clave, String(valor));
+    if (valor === undefined || valor === null) return;
+
+    if (typeof File !== 'undefined' && valor instanceof File) {
+      formData.append(clave, valor, valor.name);
+      return;
     }
+
+    if (typeof Blob !== 'undefined' && valor instanceof Blob) {
+      formData.append(clave, valor);
+      return;
+    }
+
+    formData.append(clave, String(valor));
   });
 
   let respuesta;
