@@ -36,6 +36,9 @@ async function renderizarYEsperar() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  iniciarSesion.mockReset();
+  cerrarSesion.mockReset();
+  sesionActual.mockReset();
   auth = null;
   sesionActual.mockResolvedValue({ ok: true, autenticado: false });
 });
@@ -71,7 +74,7 @@ describe('AuthProvider: restaurar sesion', () => {
 });
 
 describe('AuthProvider: login', () => {
-  it('rechaza el login sin correo o contrasena sin llamar al backend', async () => {
+  it('rechaza el login sin correo o contraseña sin llamar al backend', async () => {
     await renderizarYEsperar();
 
     let resultado;
@@ -80,12 +83,12 @@ describe('AuthProvider: login', () => {
     });
 
     expect(resultado.ok).toBe(false);
-    expect(resultado.mensaje).toBe('Ingresa tu correo institucional y contrasena.');
+    expect(resultado.mensaje).toBe('Ingresa tu correo institucional y contraseña.');
     expect(iniciarSesion).not.toHaveBeenCalled();
   });
 
   it('muestra el mensaje del backend cuando las credenciales son incorrectas', async () => {
-    iniciarSesion.mockResolvedValue({ ok: false, mensaje: 'La contrasena es incorrecta.' });
+    iniciarSesion.mockResolvedValue({ ok: false, mensaje: 'La contraseña es incorrecta.' });
     await renderizarYEsperar();
 
     let resultado;
@@ -93,7 +96,7 @@ describe('AuthProvider: login', () => {
       resultado = await auth.login({ correo: 'mariajose.rojas@aquachile.cl', clave: 'mala' });
     });
 
-    expect(resultado).toEqual({ ok: false, mensaje: 'La contrasena es incorrecta.' });
+    expect(resultado).toEqual({ ok: false, mensaje: 'La contraseña es incorrecta.' });
     expect(auth.autenticado).toBe(false);
   });
 
@@ -103,12 +106,12 @@ describe('AuthProvider: login', () => {
 
     let resultado;
     await act(async () => {
-      resultado = await auth.login({ correo: '  mariajose.rojas@aquachile.cl ', clave: 'Vicente2026' });
+      resultado = await auth.login({ correo: '  mariajose.rojas@aquachile.cl ', clave: 'AquaChile2026!' });
     });
 
     expect(iniciarSesion).toHaveBeenCalledWith({
       correo: 'mariajose.rojas@aquachile.cl',
-      contrasena: 'Vicente2026',
+      contraseña: 'AquaChile2026!',
     });
     expect(resultado.ok).toBe(true);
     expect(resultado.rol.clave).toBe('analista');
@@ -124,7 +127,7 @@ describe('AuthProvider: logout', () => {
     await renderizarYEsperar();
 
     await act(async () => {
-      await auth.login({ correo: 'mariajose.rojas@aquachile.cl', clave: 'Vicente2026' });
+      await auth.login({ correo: 'mariajose.rojas@aquachile.cl', clave: 'AquaChile2026!' });
     });
     await act(async () => {
       await auth.logout();

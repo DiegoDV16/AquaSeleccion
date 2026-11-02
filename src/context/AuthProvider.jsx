@@ -45,10 +45,10 @@ export function AuthProvider({ children }) {
    */
   const login = useCallback(async ({ correo, clave }) => {
     if (!correo?.trim() || !clave?.trim()) {
-      return { ok: false, mensaje: 'Ingresa tu correo institucional y contrasena.' };
+      return { ok: false, mensaje: 'Ingresa tu correo institucional y contraseña.' };
     }
 
-    const datos = await iniciarSesion({ correo: correo.trim(), contrasena: clave });
+    const datos = await iniciarSesion({ correo: correo.trim(), contraseña: clave });
 
     if (!datos?.ok) {
       return { ok: false, mensaje: datos?.mensaje ?? 'No se pudo iniciar sesion.' };

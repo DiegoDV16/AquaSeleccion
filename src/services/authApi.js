@@ -6,11 +6,11 @@
 
 import { peticionJson } from './http.js';
 
-/** POST login.php -> valida existencia, estado, contrasena y rol. */
-export function iniciarSesion({ correo, contrasena }) {
+/** POST login.php -> valida existencia, estado, contraseña y rol. */
+export function iniciarSesion({ correo, contraseña }) {
   return peticionJson('backend/api/auth/login.php', {
     method: 'POST',
-    body: JSON.stringify({ correo, contrasena }),
+    body: JSON.stringify({ correo, contraseña }),
   });
 }
 
