@@ -89,6 +89,7 @@ AquaSeleccion/
 │   │   ├── auth/           login.php, logout.php, session.php
 │   │   ├── candidatos/     listar.php, crear.php, actualizar.php, cv.php, descargar_cv.php
 │   │   ├── evaluaciones/   listar.php, detalle.php, guardar.php
+│   │   ├── historial/      listar.php
 │   │   ├── solicitudes/    listar.php, crear.php, detalle.php, evaluadores.php
 │   │   └── usuarios/       listar.php, c_usuario.php, u_usuario.php, d_usuario.php
 │   ├── config/             conexión, sesión, roles, catálogos y controlador de candidato
@@ -138,15 +139,21 @@ mysql -u root aquaseleccion < backend/sql/migracion_evaluacion.sql
 mysql -u root aquaseleccion < backend/sql/migracion_evaluacion_bateria.sql
 ```
 
-5. Copiar la plantilla de conexión:
+5. Crear y poblar la tabla de historial:
+
+```bash
+mysql -u root aquaseleccion < backend/sql/migracion_historial.sql
+```
+
+6. Copiar la plantilla de conexión:
 
 ```bash
 cp backend/config/conexion.example.php backend/config/conexion.php
 ```
 
-6. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
-7. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
-7. Iniciar el frontend:
+7. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
+8. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
+9. Iniciar el frontend:
 
 ```bash
 npm run dev
@@ -277,13 +284,14 @@ Reglas:
 - La evaluación admite antecedentes de entrevista opcionales: cargo actual o de referencia y comentario del evaluador. No son una batería de tests psicométricos.
 - Las observaciones se limitan a 250 caracteres; `estadoEvaluacion` se amplió a `VARCHAR(20)` para almacenar `con_observaciones`.
 - Una solicitud finalizada queda en modo solo lectura; para editarla debe cambiarse el estado del proceso.
-- La trazabilidad histórica en `historialsolicitudes` queda fuera de esta entrega; el módulo Administrador la muestra con datos simulados.
+- La trazabilidad se guarda en `historialsolicitudes` y se consulta desde el módulo Administrador.
 
 ### 5.8 Trazabilidad
 
 - Cada movimiento del historial registra: solicitud, candidato, tipo de gestión, acción, detalle, usuario que ejecutó la acción, estado y fecha.
 - Tipos de gestión: `externa` e `interna`.
-- El historial permite filtrar por tipo, estado y texto (ID de solicitud o candidato).
+- El historial permite filtrar por tipo, estado, texto (ID de solicitud o candidato) y mes.
+- Los movimientos se registran al crear solicitudes y al iniciar, guardar borrador o finalizar una evaluación.
 - La exportación CSV está prevista, pero deshabilitada en la versión actual.
 
 ### 5.9 Catálogos de cargos
@@ -316,13 +324,10 @@ Reglas:
 - Módulo Administrador: listado de candidatos y registro de postulaciones internas con CV opcional mediante modal.
 - Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
 - Módulo Evaluador: bandeja de solicitudes asignadas, ficha del postulante, CV, borrador y finalización de la evaluación psicolaboral con persistencia en `evaluacion`.
-
-### Implementado con datos simulados
-- Dashboard y métricas.
-- Historial de solicitudes.
+- Módulo Administrador: dashboard con métricas, solicitudes recientes, actividad y distribuciones calculadas desde MySQL.
+- Historial y trazabilidad de solicitudes en `historialsolicitudes`, con filtros por tipo, estado, texto y mes.
 
 ### Pendiente o limitado
-- Historial de solicitudes y trazabilidad.
 - Recuperación de contraseña.
 - Exportación CSV del historial.
 - Cobertura de pruebas limitada a los filtros del módulo Analista.

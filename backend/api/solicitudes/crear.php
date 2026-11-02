@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../helpers/autorizacion.php';
+require_once __DIR__ . '/../../helpers/historial.php';
 
 requerirPost();
-requerirRoles(['analista']);
+$sesion = requerirRoles(['analista']);
 
 $idCandidato = filter_var($_POST['idCandidato'] ?? null, FILTER_VALIDATE_INT);
 $idEvaluador = filter_var($_POST['idEvaluador'] ?? null, FILTER_VALIDATE_INT);
@@ -46,20 +47,27 @@ try {
     $pdo = obtenerConexion();
     $pdo->beginTransaction();
 
-    $candidato = $pdo->prepare('SELECT idCandidato FROM candidato WHERE idCandidato = :idCandidato FOR UPDATE');
+    $candidato = $pdo->prepare(
+        'SELECT idCandidato, idUsuario FROM candidato WHERE idCandidato = :idCandidato FOR UPDATE'
+    );
     $candidato->execute([':idCandidato' => $idCandidato]);
+    $candidatoFila = $candidato->fetch();
 
-    if (!$candidato->fetchColumn()) {
+    if (!$candidatoFila) {
         $pdo->rollBack();
         responder(['ok' => false, 'mensaje' => 'El candidato indicado no existe.'], 404);
     }
 
     $evaluador = $pdo->prepare(
-        'SELECT idUsuario FROM usuario WHERE idUsuario = :idEvaluador AND idRol = 3 AND estado = 1 LIMIT 1'
+        'SELECT idUsuario, nombres, apellidoPaterno
+           FROM usuario
+          WHERE idUsuario = :idEvaluador AND idRol = 3 AND estado = 1
+          LIMIT 1'
     );
     $evaluador->execute([':idEvaluador' => $idEvaluador]);
+    $evaluadorFila = $evaluador->fetch();
 
-    if (!$evaluador->fetchColumn()) {
+    if (!$evaluadorFila) {
         $pdo->rollBack();
         responder(['ok' => false, 'mensaje' => 'El evaluador seleccionado no existe o no esta activo.'], 400);
     }
@@ -101,6 +109,20 @@ try {
     if ($idSolicitud <= 0) {
         throw new RuntimeException('La base de datos no devolvio el identificador de la solicitud.');
     }
+
+    $evaluadorNombre = trim(
+        (string) $evaluadorFila['nombres'] . ' ' . (string) $evaluadorFila['apellidoPaterno']
+    );
+
+    registrarHistorial($pdo, [
+        'idSolicitud' => $idSolicitud,
+        'idCandidato' => $idCandidato,
+        'tipoGestion' => $candidatoFila['idUsuario'] === null ? 'externa' : 'interna',
+        'accion' => 'Solicitud de evaluación creada',
+        'detalle' => 'Asignada a ' . $evaluadorNombre . ' · Prioridad ' . $prioridad . '.',
+        'idUsuario' => (int) ($sesion['id'] ?? 0),
+        'estado' => 'pendiente',
+    ]);
 
     $pdo->commit();
 

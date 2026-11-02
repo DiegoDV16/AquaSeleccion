@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../helpers/autorizacion.php';
+require_once __DIR__ . '/../../helpers/historial.php';
 
 requerirPost();
 $sesion = requerirRoles(['evaluador']);
@@ -68,19 +69,23 @@ try {
     $pdo->beginTransaction();
 
     $solicitud = $pdo->prepare(
-        'SELECT estadoSolicitudEvaluacion
-           FROM solicitudevaluacion
-          WHERE idSolicitudEvaluacion = :idSolicitud
-            AND idUsuario = :idEvaluador
+        'SELECT s.estadoSolicitudEvaluacion,
+                s.idCandidato,
+                c.idUsuario AS idUsuarioCandidato
+           FROM solicitudevaluacion s
+           INNER JOIN candidato c ON c.idCandidato = s.idCandidato
+          WHERE s.idSolicitudEvaluacion = :idSolicitud
+            AND s.idUsuario = :idEvaluador
           FOR UPDATE'
     );
     $solicitud->execute([
         ':idSolicitud' => $idSolicitud,
         ':idEvaluador' => $idEvaluador,
     ]);
-    $estadoActual = $solicitud->fetchColumn();
+    $solicitudFila = $solicitud->fetch();
+    $estadoActual = $solicitudFila['estadoSolicitudEvaluacion'] ?? null;
 
-    if (!$estadoActual) {
+    if (!$solicitudFila) {
         $pdo->rollBack();
         responder(['ok' => false, 'mensaje' => 'La solicitud no existe o no esta asignada a tu usuario.'], 404);
     }
@@ -152,6 +157,33 @@ try {
     $actualizarSolicitud->execute([
         ':estado' => $nuevoEstado,
         ':idSolicitud' => $idSolicitud,
+    ]);
+
+    $resultadoEtiquetas = [
+        'apto' => 'Apto',
+        'no_apto' => 'No Apto',
+        'con_observaciones' => 'Con observaciones',
+    ];
+
+    if ($accion === 'finalizar') {
+        $accionHistorial = 'Evaluación finalizada';
+        $detalleHistorial = 'Resultado: ' . ($resultadoEtiquetas[$resultado] ?? $resultado) . '.';
+    } elseif ($estadoActual === 'pendiente') {
+        $accionHistorial = 'Evaluación iniciada';
+        $detalleHistorial = 'El evaluador inició la evaluación.';
+    } else {
+        $accionHistorial = 'Borrador actualizado';
+        $detalleHistorial = 'Se actualizó el borrador de la evaluación.';
+    }
+
+    registrarHistorial($pdo, [
+        'idSolicitud' => $idSolicitud,
+        'idCandidato' => (int) $solicitudFila['idCandidato'],
+        'tipoGestion' => $solicitudFila['idUsuarioCandidato'] === null ? 'externa' : 'interna',
+        'accion' => $accionHistorial,
+        'detalle' => $detalleHistorial,
+        'idUsuario' => $idEvaluador,
+        'estado' => $nuevoEstado,
     ]);
 
     $fechaServidor = (string) $pdo->query('SELECT CURDATE()')->fetchColumn();

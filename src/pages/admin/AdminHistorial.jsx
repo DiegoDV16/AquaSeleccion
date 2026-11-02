@@ -1,26 +1,62 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import EstadoBadge from '../../components/ui/EstadoBadge.jsx';
 import TipoPostulacionBadge from '../../components/ui/TipoPostulacionBadge.jsx';
-import { HISTORIAL_SOLICITUDES, filtrarHistorial } from '../../mock/historialSolicitudes.js';
 import { ESTADOS_SOLICITUD } from '../../mock/solicitudes.js';
 import { TIPOS_GESTION } from '../../mock/historialSolicitudes.js';
+import { listarHistorial } from '../../services/historialApi.js';
+
+function formatearFechaHora(valor) {
+  if (!valor) return '-';
+
+  const [fecha, hora = ''] = String(valor).split(' ');
+  const [anio, mes, dia] = fecha.split('-');
+
+  return `${dia}/${mes}/${anio}${hora ? ` ${hora.slice(0, 5)}` : ''}`;
+}
 
 /**
  * AdminHistorial
- * Trazabilidad de la tabla `historialsolicitudes`: cada fila es un movimiento
- * del ciclo de vida de una solicitud, con el usuario que lo ejecuto.
+ * Trazabilidad real de los movimientos del ciclo de vida de las solicitudes.
  */
 export default function AdminHistorial() {
   const [filtros, setFiltros] = useState({
     tipoGestion: 'todas',
-    estado: 'todas',
+    estado: 'todos',
     texto: '',
     mes: '',
   });
+  const [movimientos, setMovimientos] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+  const [recarga, setRecarga] = useState(0);
 
-  const movimientos = useMemo(() => filtrarHistorial(filtros), [filtros]);
+  useEffect(() => {
+    let vigente = true;
+
+    setCargando(true);
+    setError('');
+
+    listarHistorial(filtros)
+      .then((datos) => {
+        if (!vigente) return;
+
+        if (!datos?.ok) {
+          setError(datos?.mensaje ?? 'No se pudo cargar el historial.');
+          setMovimientos([]);
+        } else {
+          setMovimientos(datos.movimientos ?? []);
+        }
+      })
+      .finally(() => {
+        if (vigente) setCargando(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, [filtros, recarga]);
 
   function actualizarFiltro(campo, valor) {
     setFiltros((actual) => ({ ...actual, [campo]: valor }));
@@ -31,9 +67,14 @@ export default function AdminHistorial() {
       <PageHeader
         etiqueta="Modulo Administrador"
         titulo="Historial de solicitudes"
-        descripcion="Trazabilidad de movimientos sobre las solicitudes de evaluacion psicologica."
+        descripcion="Trazabilidad de movimientos sobre las solicitudes de evaluación psicológica."
         acciones={
-          <button type="button" className="btn btn-soft btn-sm" disabled title="Disponible con el controlador PHP">
+          <button
+            type="button"
+            className="btn btn-soft btn-sm"
+            disabled
+            title="Disponible próximamente"
+          >
             <i className="bi bi-download me-1" aria-hidden="true" />
             Exportar CSV
           </button>
@@ -129,56 +170,86 @@ export default function AdminHistorial() {
           </div>
         </div>
 
-        <div className="table-responsive">
-          <table className="table aqua-table mb-0">
-            <thead>
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">ID solicitud</th>
-                <th scope="col">Candidato</th>
-                <th scope="col">Tipo de gestión</th>
-                <th scope="col">Movimiento</th>
-                <th scope="col">Usuario</th>
-                <th scope="col">Estado</th>
-                <th scope="col">Fecha</th>
-              </tr>
-            </thead>
-            <tbody>
-              {movimientos.map((movimiento) => (
-                <tr key={movimiento.id}>
-                  <td className="text-muted-aqua">{movimiento.id}</td>
-                  <td className="fw-semibold">{movimiento.solicitud_id}</td>
-                  <td>{movimiento.candidato}</td>
-                  <td>
-                    <TipoPostulacionBadge tipo={movimiento.tipo_gestion} />
-                  </td>
-                  <td>
-                    <span className="d-block">{movimiento.accion}</span>
-                    <span className="d-block text-muted-aqua" style={{ fontSize: '0.76rem' }}>
-                      {movimiento.detalle}
-                    </span>
-                  </td>
-                  <td className="text-muted-aqua">{movimiento.usuario_accion}</td>
-                  <td>
-                    <EstadoBadge estado={movimiento.estado} />
-                  </td>
-                  <td className="text-muted-aqua small text-nowrap">{movimiento.fecha_movimiento}</td>
-                </tr>
-              ))}
-              {movimientos.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="text-center text-muted-aqua py-4">
-                    No hay movimientos que coincidan con los filtros aplicados.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        {cargando ? (
+          <div className="card-body text-center py-5 text-muted-aqua">
+            <div className="spinner-border text-primary mb-3" role="status" aria-hidden="true" />
+            <p className="mb-0 small">Cargando movimientos...</p>
+          </div>
+        ) : error ? (
+          <div className="card-body">
+            <div
+              className="alert alert-danger d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-0"
+              role="alert"
+            >
+              <span>
+                <i className="bi bi-exclamation-triangle me-2" aria-hidden="true" />
+                {error}
+              </span>
+              <button
+                type="button"
+                className="btn btn-soft btn-sm"
+                onClick={() => setRecarga((valor) => valor + 1)}
+              >
+                Reintentar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="table-responsive">
+              <table className="table aqua-table mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Solicitud</th>
+                    <th scope="col">Candidato</th>
+                    <th scope="col">Tipo de gestión</th>
+                    <th scope="col">Movimiento</th>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {movimientos.map((movimiento) => (
+                    <tr key={movimiento.id}>
+                      <td className="text-muted-aqua">{movimiento.id}</td>
+                      <td className="fw-semibold text-nowrap">{movimiento.solicitud}</td>
+                      <td>{movimiento.candidato}</td>
+                      <td>
+                        <TipoPostulacionBadge tipo={movimiento.tipoGestion} />
+                      </td>
+                      <td>
+                        <span className="d-block">{movimiento.accion}</span>
+                        <span className="d-block text-muted-aqua" style={{ fontSize: '0.76rem' }}>
+                          {movimiento.detalle}
+                        </span>
+                      </td>
+                      <td className="text-muted-aqua">{movimiento.usuario}</td>
+                      <td>
+                        <EstadoBadge estado={movimiento.estado} />
+                      </td>
+                      <td className="text-muted-aqua small text-nowrap">
+                        {formatearFechaHora(movimiento.fecha)}
+                      </td>
+                    </tr>
+                  ))}
+                  {movimientos.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="text-center text-muted-aqua py-4">
+                        No hay movimientos que coincidan con los filtros aplicados.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-        <div className="card-footer bg-white small text-muted-aqua">
-          Mostrando {movimientos.length} de {HISTORIAL_SOLICITUDES.length} movimientos registrados.
-        </div>
+            <div className="card-footer bg-white small text-muted-aqua">
+              Mostrando {movimientos.length} movimientos.
+            </div>
+          </>
+        )}
       </div>
     </>
   );
