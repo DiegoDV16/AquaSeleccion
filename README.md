@@ -274,7 +274,7 @@ Reglas:
 - Para finalizar una evaluación se exige fecha de evaluación, resultado y observaciones de al menos 20 caracteres.
 - El evaluador guarda un borrador en estado `en_proceso`; al finalizar, la solicitud pasa a `finalizada` y el resultado solo se expone cuando está cerrada.
 - El módulo Evaluador usa endpoints propios en `backend/api/evaluaciones/`; el listado y el detalle filtran siempre por el evaluador de la sesión.
-- La evaluación admite datos opcionales de batería complementaria: cargo al que fue expuesto/a y comentario de entrevista.
+- La evaluación admite antecedentes de entrevista opcionales: cargo actual o de referencia y comentario del evaluador. No son una batería de tests psicométricos.
 - Las observaciones se limitan a 250 caracteres; `estadoEvaluacion` se amplió a `VARCHAR(20)` para almacenar `con_observaciones`.
 - Una solicitud finalizada queda en modo solo lectura; para editarla debe cambiarse el estado del proceso.
 - La trazabilidad histórica en `historialsolicitudes` queda fuera de esta entrega; el módulo Administrador la muestra con datos simulados.

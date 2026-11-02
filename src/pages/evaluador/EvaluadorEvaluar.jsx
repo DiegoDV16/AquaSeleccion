@@ -196,7 +196,7 @@ export default function EvaluadorEvaluar() {
   if (cargando) {
     return (
       <>
-        <PageHeader etiqueta={`Modulo Evaluador \u00b7 ${codigo}`} titulo="Evaluacion psicologica" />
+        <PageHeader etiqueta={`Módulo Evaluador \u00b7 ${codigo}`} titulo="Evaluación psicológica" />
         <div className="aqua-card">
           <div className="card-body text-center py-5 text-muted-aqua">
             <div className="spinner-border text-primary mb-3" role="status" aria-hidden="true" />
@@ -239,7 +239,7 @@ export default function EvaluadorEvaluar() {
     <>
       <PageHeader
         etiqueta={`Modulo Evaluador · ${codigo}`}
-        titulo={`Evaluacion psicologica · ${candidato?.nombreCompleto ?? 'Postulante'}`}
+        titulo={`Evaluación psicológica · ${candidato?.nombreCompleto ?? 'Postulante'}`}
         descripcion={`Cargo evaluado: ${familia} / ${cargo} · Asignada el ${formatearFecha(solicitud.fechaAsignacion)}`}
         acciones={
           <>
@@ -380,16 +380,20 @@ export default function EvaluadorEvaluar() {
               </div>
             </div>
 
-            <div className="aqua-card mt-3">
+            <div className="aqua-card evaluador-antecedentes mt-3">
               <div className="card-header">
-                <i className="bi bi-clipboard2-pulse me-2" aria-hidden="true" />
-                Batería complementaria (opcional)
+                <i className="bi bi-chat-left-text me-2" aria-hidden="true" />
+                Antecedentes de entrevista
+                <span className="badge rounded-pill bg-tint-info ms-2">Opcional</span>
               </div>
               <div className="card-body">
+                <p className="text-muted-aqua small mb-3">
+                  Información cualitativa que complementa la evaluación. No es una batería de tests.
+                </p>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label" htmlFor="cargoActual">
-                      Cargo al que fue expuesto/a
+                      Cargo actual o de referencia
                     </label>
                     <input
                       type="text"
@@ -423,38 +427,46 @@ export default function EvaluadorEvaluar() {
               </div>
             </div>
 
-            <div className="aqua-card mt-3">
-              <div className="card-body d-flex flex-column flex-sm-row gap-2">
-                {!soloLectura && (
-                  <>
-                    <button type="submit" className="btn btn-aqua px-4" disabled={guardando}>
-                      {guardando ? (
-                        <>
-                          <span className="spinner-border spinner-border-sm me-1" aria-hidden="true" />
-                          Guardando...
-                        </>
-                      ) : (
-                        <>
-                          <i className="bi bi-check2-circle me-1" aria-hidden="true" />
-                          Guardar y Finalizar Evaluación
-                        </>
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-soft px-4"
-                      onClick={() => guardar('borrador')}
-                      disabled={guardando}
-                    >
-                      <i className="bi bi-save me-1" aria-hidden="true" />
-                      Guardar borrador
-                    </button>
-                  </>
-                )}
-                <Link to="/evaluador/mis-solicitudes" className="btn btn-outline-aqua px-4">
-                  <i className="bi bi-x-circle me-1" aria-hidden="true" />
-                  {soloLectura ? 'Volver a mis solicitudes' : 'Cancelar'}
-                </Link>
+            <div className="aqua-card evaluacion-acciones-bar mt-3">
+              <div className="card-body d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <p className="text-muted-aqua small mb-0">
+                  <i className="bi bi-info-circle me-1" aria-hidden="true" />
+                  {soloLectura
+                    ? 'La evaluación está cerrada y no admite cambios.'
+                    : 'Puedes guardar un borrador y completar la evaluación más tarde.'}
+                </p>
+                <div className="d-flex flex-column flex-sm-row gap-2">
+                  {!soloLectura && (
+                    <>
+                      <button type="submit" className="btn btn-aqua px-4" disabled={guardando}>
+                        {guardando ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-1" aria-hidden="true" />
+                            Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-check2-circle me-1" aria-hidden="true" />
+                            Guardar y Finalizar Evaluación
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-soft px-4"
+                        onClick={() => guardar('borrador')}
+                        disabled={guardando}
+                      >
+                        <i className="bi bi-save me-1" aria-hidden="true" />
+                        Guardar borrador
+                      </button>
+                    </>
+                  )}
+                  <Link to="/evaluador/mis-solicitudes" className="btn btn-outline-aqua px-4">
+                    <i className="bi bi-x-circle me-1" aria-hidden="true" />
+                    {soloLectura ? 'Volver a mis solicitudes' : 'Cancelar'}
+                  </Link>
+                </div>
               </div>
             </div>
           </form>

@@ -549,6 +549,15 @@ body {
   letter-spacing: 0.03em;
 }
 
+.evaluador-antecedentes .card-body,
+.evaluacion-acciones-bar .card-body {
+  background: #fff;
+}
+
+.evaluacion-acciones-bar {
+  border-top: 3px solid var(--aqua-primary-light);
+}
+
 .evaluacion-formulario .card-body {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -1174,8 +1183,21 @@ padding-bottom: 1.25rem;
 }
 
 .cv-postulante {
-  margin-top: 0 !important;
+  margin-top: 1rem !important;
   border-top: 1px solid #d8dee5;
+}
+
+.cv-file-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #fdecec;
+  color: #b91c1c;
+  font-size: 1.1rem;
 }
 
 .cv-postulante-header {

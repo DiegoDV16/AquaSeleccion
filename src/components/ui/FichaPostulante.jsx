@@ -64,32 +64,27 @@ export default function FichaPostulante({ candidato, titulo = 'Datos del postula
         </dl>
 
         {candidato.cv_archivo || candidato.cvArchivo ? (
-          <div className="cv-postulante border-top">
-            <div className="cv-postulante-header d-flex align-items-center mb-2 position-relative">
-              <span className="small fw-semibold text-muted-aqua">
-                <i className="bi bi-file-earmark-text me-1" aria-hidden="true" />
-                Curriculum Vitae
+          <div className="cv-postulante border-top mt-3 pt-3">
+            <div className="d-flex align-items-center gap-2">
+              <span className="cv-file-icon" aria-hidden="true">
+                <i className="bi bi-file-earmark-pdf" />
               </span>
-              <span className="badge text-bg-light border cv-postulante-extension">
-                {(candidato.cv_archivo || candidato.cvArchivo).split('.').pop().toUpperCase()}
-              </span>
-            </div>
-            <button type="button" className="cv-preview-card" onClick={onCvPreview} aria-label="Abrir vista previa del currículum">
-              <div className="cv-preview-sheet">
-                <span className="cv-preview-avatar"><i className="bi bi-person-fill" aria-hidden="true" /></span>
-                <span className="cv-preview-name">{nombre}</span>
-                <span className="cv-preview-line cv-preview-line-wide" />
-                <span className="cv-preview-line" />
-                <span className="cv-preview-line cv-preview-line-wide" />
-                <span className="cv-preview-line cv-preview-line-short" />
+              <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                <span className="d-block small fw-semibold">Currículum Vitae</span>
+                <span className="d-block text-muted-aqua text-truncate" style={{ fontSize: '0.76rem' }}>
+                  Documento adjunto ·{' '}
+                  {(candidato.cv_archivo || candidato.cvArchivo).split('.').pop().toUpperCase()}
+                </span>
               </div>
-              <span className="cv-preview-overlay">
-                <i className="bi bi-arrows-fullscreen me-1" aria-hidden="true" />
-                Ver CV completo
-              </span>
-            </button>
+              {onCvPreview && (
+                <button type="button" className="btn btn-soft btn-sm" onClick={onCvPreview}>
+                  <i className="bi bi-eye me-1" aria-hidden="true" />
+                  Ver
+                </button>
+              )}
+            </div>
             {onCvDownload && (
-              <button type="button" className="cv-descarga-btn btn btn-soft btn-sm w-100 mt-2" onClick={onCvDownload}>
+              <button type="button" className="btn btn-aqua btn-sm w-100 mt-2" onClick={onCvDownload}>
                 <i className="bi bi-download me-1" aria-hidden="true" />
                 Descargar CV
               </button>
