@@ -193,7 +193,7 @@ npm run dev
 | `npm run lint` | Análisis estático con ESLint |
 | `npm test -- --run` | Ejecuta la suite completa de Vitest |
 
-> La suite actual contiene **17 archivos y 76 pruebas**, todas aprobadas. Cubre layout, autenticación, permisos por rol, filtros, historial, formularios de postulación, creación de solicitudes, evaluación y lectura de usuarios. No se mide cobertura formal ni se cubren todos los formularios CRUD.
+> La suite actual contiene **17 archivos y 77 pruebas**, todas aprobadas. Cubre layout, autenticación, permisos por rol, filtros, historial, formularios de postulación, creación de solicitudes, evaluación y lectura de usuarios. No se mide cobertura formal ni se cubren todos los formularios CRUD.
 
 ---
 

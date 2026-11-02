@@ -11,3 +11,8 @@ dist*
 *.log
 npm-debug.log*
 /backend/config/conexion.php
+
+# Archivos subidos por usuarios (CV): no deben versionarse
+backend/uploads/**
+!backend/uploads/**/
+!backend/uploads/**/.gitkeep
