@@ -36,7 +36,6 @@ export const MENU_POR_ROL = {
       titulo: 'Evaluacion',
       items: [
         { to: '/evaluador/mis-solicitudes', label: 'Mis solicitudes', icono: 'inbox' },
-        { to: '/evaluador/evaluar/SOL-0142', label: 'Evaluar solicitud', icono: 'clipboard2-check' },
       ],
     },
   ],

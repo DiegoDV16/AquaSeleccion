@@ -25,6 +25,12 @@ function fechaHoyLocal() {
   return `${hoy.getFullYear()}-${mes}-${dia}`;
 }
 
+function codigoSolicitud(valor) {
+  const texto = String(valor ?? '').trim();
+
+  return /^\d+$/.test(texto) ? `SOL-${texto.padStart(4, '0')}` : texto || 'SOL';
+}
+
 const FORMULARIO_INICIAL = {
   fechaEvaluacion: '',
   resultado: '',
@@ -83,7 +89,7 @@ export default function EvaluadorEvaluar() {
   }, [cargarSolicitud, recarga]);
 
   const soloLectura = solicitud?.estado === 'finalizada';
-  const codigo = `SOL-${String(id).padStart(4, '0')}`;
+  const codigo = codigoSolicitud(id);
 
   const resultadoNombre = useMemo(
     () => RESULTADOS.find((item) => item.clave === formulario.resultado)?.nombre ?? '-',
