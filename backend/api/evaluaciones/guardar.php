@@ -71,6 +71,7 @@ try {
     $solicitud = $pdo->prepare(
         'SELECT s.estadoSolicitudEvaluacion,
                 s.idCandidato,
+                c.idCargo,
                 c.idUsuario AS idUsuarioCandidato
            FROM solicitudevaluacion s
            INNER JOIN candidato c ON c.idCandidato = s.idCandidato
@@ -182,6 +183,7 @@ try {
     registrarHistorial($pdo, [
         'idSolicitud' => $idSolicitud,
         'idCandidato' => (int) $solicitudFila['idCandidato'],
+        'idCargo' => (int) $solicitudFila['idCargo'],
         'tipoGestion' => $solicitudFila['idUsuarioCandidato'] === null ? 'externa' : 'interna',
         'accion' => $accionHistorial,
         'detalle' => $detalleHistorial,

@@ -72,15 +72,18 @@ try {
     $pdo = obtenerConexion();
     $sql = "SELECT h.idHistorial AS id,
                    h.idSolicitudEvaluacion,
+                   h.idCargo,
                    h.tipoGestion,
                    h.accion,
                    h.detalle,
                    h.estado,
                    h.fechaMovimiento,
+                   ca.cargo AS nombreCargo,
                    TRIM(CONCAT_WS(' ', c.nombres, c.apellidoPaterno, c.apellidoMaterno)) AS candidato,
                    TRIM(CONCAT_WS(' ', u.nombres, u.apellidoPaterno, u.apellidoMaterno)) AS usuario
               FROM historialsolicitudes h
               INNER JOIN candidato c ON c.idCandidato = h.idCandidato
+              LEFT JOIN cargo ca ON ca.idCargo = h.idCargo
               LEFT JOIN usuario u ON u.idUsuario = h.idUsuario";
 
     if ($condiciones !== []) {
@@ -104,6 +107,8 @@ try {
             'solicitud' => $idSolicitud !== null
                 ? 'SOL-' . str_pad((string) $idSolicitud, 4, '0', STR_PAD_LEFT)
                 : 'Sin solicitud',
+            'idCargo' => $fila['idCargo'] !== null ? (int) $fila['idCargo'] : null,
+            'cargo' => (string) ($fila['nombreCargo'] ?? ''),
             'candidato' => (string) $fila['candidato'],
             'tipoGestion' => (string) $fila['tipoGestion'],
             'accion' => (string) $fila['accion'],

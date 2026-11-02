@@ -10,7 +10,7 @@ declare(strict_types=1);
 /**
  * Inserta un movimiento de historial dentro de la transaccion actual.
  *
- * @param array{idSolicitud?: int|null, idCandidato: int, tipoGestion: string, accion: string, detalle?: string, idUsuario?: int|null, estado: string} $datos
+ * @param array{idSolicitud?: int|null, idCandidato: int, idCargo?: int|null, tipoGestion: string, accion: string, detalle?: string, idUsuario?: int|null, estado: string} $datos
  */
 function registrarHistorial(PDO $pdo, array $datos): void
 {
@@ -21,14 +21,15 @@ function registrarHistorial(PDO $pdo, array $datos): void
 
     $consulta = $pdo->prepare(
         'INSERT INTO historialsolicitudes
-            (idSolicitudEvaluacion, idCandidato, tipoGestion, accion, detalle, idUsuario, estado)
+            (idSolicitudEvaluacion, idCandidato, idCargo, tipoGestion, accion, detalle, idUsuario, estado)
          VALUES
-            (:idSolicitud, :idCandidato, :tipoGestion, :accion, :detalle, :idUsuario, :estado)'
+            (:idSolicitud, :idCandidato, :idCargo, :tipoGestion, :accion, :detalle, :idUsuario, :estado)'
     );
 
     $consulta->execute([
         ':idSolicitud' => $datos['idSolicitud'] ?? null,
         ':idCandidato' => (int) $datos['idCandidato'],
+        ':idCargo' => $datos['idCargo'] ?? null,
         ':tipoGestion' => (string) $datos['tipoGestion'],
         ':accion' => (string) $datos['accion'],
         ':detalle' => $detalle !== '' ? $detalle : null,

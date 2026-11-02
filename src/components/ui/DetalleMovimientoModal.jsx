@@ -75,6 +75,14 @@ export default function DetalleMovimientoModal({ movimiento, visible, onCerrar }
                   <span className="ficha-dato-valor">{movimiento.candidato}</span>
                 </div>
                 <div className="ficha-dato">
+                  <span>Cargo</span>
+                  <span className="ficha-dato-valor">{movimiento.cargo || 'Sin cargo'}</span>
+                </div>
+                <div className="ficha-dato">
+                  <span>ID del cargo</span>
+                  <span className="ficha-dato-valor">{movimiento.idCargo ?? 'Sin ID'}</span>
+                </div>
+                <div className="ficha-dato">
                   <span>Tipo de gestión</span>
                   <span className="ficha-dato-valor">
                     {movimiento.tipoGestion === 'interna' ? 'Interna' : 'Externa'}

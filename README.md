@@ -148,6 +148,7 @@ mysql -u root aquaseleccion < backend/sql/migracion_evaluacion_bateria.sql
 
 ```bash
 mysql -u root aquaseleccion < backend/sql/migracion_historial.sql
+mysql -u root aquaseleccion < backend/sql/migracion_historial_cargo.sql
 ```
 
 6. Crear el rol Jefatura:
@@ -302,6 +303,7 @@ Reglas:
 
 - Cada movimiento del historial registra: solicitud, candidato, tipo de gestión, acción, detalle, usuario que ejecutó la acción, estado y fecha.
 - Tipos de gestión: `externa` e `interna`.
+- Los movimientos guardan el `idCargo` y el nombre del cargo como respaldo histórico, además del candidato y usuario.
 - El historial permite filtrar por tipo, estado, texto (ID de solicitud o candidato) y mes.
 - Los movimientos se registran al crear solicitudes y al iniciar, guardar borrador o finalizar una evaluación.
 - El botón **Exportar CSV** descarga los movimientos que coinciden con los filtros actuales, con codificación UTF-8 para Excel.

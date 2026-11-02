@@ -48,7 +48,7 @@ try {
     $pdo->beginTransaction();
 
     $candidato = $pdo->prepare(
-        'SELECT c.idCandidato, c.idUsuario, ca.cargo
+        'SELECT c.idCandidato, c.idUsuario, c.idCargo, ca.cargo
            FROM candidato c
            INNER JOIN cargo ca ON ca.idCargo = c.idCargo
           WHERE c.idCandidato = :idCandidato
@@ -121,6 +121,7 @@ try {
     registrarHistorial($pdo, [
         'idSolicitud' => $idSolicitud,
         'idCandidato' => $idCandidato,
+        'idCargo' => (int) $candidatoFila['idCargo'],
         'tipoGestion' => $candidatoFila['idUsuario'] === null ? 'externa' : 'interna',
         'accion' => 'Solicitud de evaluación creada',
         'detalle' => 'Cargo: ' . $candidatoFila['cargo']
