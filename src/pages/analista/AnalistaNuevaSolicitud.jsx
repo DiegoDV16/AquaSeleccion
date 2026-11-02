@@ -398,7 +398,7 @@ export default function AnalistaNuevaSolicitud() {
                   <div className="analista-footer d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                     <p className="text-muted-aqua small mb-0">
                       <i className="bi bi-shield-check me-1" aria-hidden="true" />
-                      Se guarda en MySQL y queda en estado Pendiente.
+                      La solicitud quedará asignada al evaluador seleccionado.
                     </p>
                     <div className="d-flex flex-column-reverse flex-sm-row gap-2">
                       <Link to="/analista/solicitudes" className="btn btn-soft px-4">
@@ -529,7 +529,7 @@ export default function AnalistaNuevaSolicitud() {
               <ul className="list-unstyled d-grid gap-2 mb-0 small text-muted-aqua">
                 <li className="d-flex gap-2">
                   <i className="bi bi-check2-circle text-success mt-1" aria-hidden="true" />
-                  <span>La solicitud se guarda en MySQL y queda en estado Pendiente.</span>
+                  <span>La solicitud quedará disponible para el evaluador responsable.</span>
                 </li>
                 <li className="d-flex gap-2">
                   <i className="bi bi-check2-circle text-success mt-1" aria-hidden="true" />
