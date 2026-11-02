@@ -266,7 +266,10 @@ export default function Postular() {
                 <i className="bi bi-shield-lock" aria-hidden="true" />
                 Postulación segura
               </span>
-              <Link to="/login" className="btn btn-soft btn-sm public-login-link">
+              <Link
+                to="/login"
+                className="btn btn-soft btn-sm public-login-link d-inline-flex align-items-center gap-2"
+              >
                 <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
                 Acceso funcionarios
               </Link>
