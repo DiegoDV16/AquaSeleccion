@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import EstadoBadge from '../../components/ui/EstadoBadge.jsx';
 import TipoPostulacionBadge from '../../components/ui/TipoPostulacionBadge.jsx';
+import DetalleMovimientoModal from '../../components/ui/DetalleMovimientoModal.jsx';
 import { ESTADOS_SOLICITUD } from '../../mock/solicitudes.js';
 import { TIPOS_GESTION } from '../../mock/historialSolicitudes.js';
 import { listarHistorial } from '../../services/historialApi.js';
@@ -49,6 +50,7 @@ export default function AdminHistorial() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [recarga, setRecarga] = useState(0);
+  const [movimientoDetalle, setMovimientoDetalle] = useState(null);
 
   useEffect(() => {
     let vigente = true;
@@ -273,6 +275,9 @@ export default function AdminHistorial() {
                     <th scope="col">Usuario</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Fecha</th>
+                    <th scope="col" className="text-end">
+                      Detalle
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -297,11 +302,22 @@ export default function AdminHistorial() {
                       <td className="text-muted-aqua small text-nowrap">
                         {formatearFechaHora(movimiento.fecha)}
                       </td>
+                      <td className="text-end">
+                        <button
+                          type="button"
+                          className="btn btn-soft btn-sm text-nowrap"
+                          onClick={() => setMovimientoDetalle(movimiento)}
+                          title="Ver detalle del movimiento"
+                        >
+                          <i className="bi bi-eye me-1" aria-hidden="true" />
+                          Ver
+                        </button>
+                      </td>
                     </tr>
                   ))}
                   {movimientos.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="text-center text-muted-aqua py-4">
+                      <td colSpan={9} className="text-center text-muted-aqua py-4">
                         No hay movimientos que coincidan con los filtros aplicados.
                       </td>
                     </tr>
@@ -316,6 +332,12 @@ export default function AdminHistorial() {
           </>
         )}
       </div>
+
+      <DetalleMovimientoModal
+        movimiento={movimientoDetalle}
+        visible={Boolean(movimientoDetalle)}
+        onCerrar={() => setMovimientoDetalle(null)}
+      />
     </>
   );
 }

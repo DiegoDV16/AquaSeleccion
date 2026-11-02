@@ -168,6 +168,9 @@ try {
     if ($accion === 'finalizar') {
         $accionHistorial = 'Evaluación finalizada';
         $detalleHistorial = 'Resultado: ' . ($resultadoEtiquetas[$resultado] ?? $resultado) . '.';
+        if ($observaciones !== '') {
+            $detalleHistorial .= ' Observaciones: ' . $observaciones;
+        }
     } elseif ($estadoActual === 'pendiente') {
         $accionHistorial = 'Evaluación iniciada';
         $detalleHistorial = 'El evaluador inició la evaluación.';

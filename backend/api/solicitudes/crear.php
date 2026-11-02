@@ -48,7 +48,11 @@ try {
     $pdo->beginTransaction();
 
     $candidato = $pdo->prepare(
-        'SELECT idCandidato, idUsuario FROM candidato WHERE idCandidato = :idCandidato FOR UPDATE'
+        'SELECT c.idCandidato, c.idUsuario, ca.cargo
+           FROM candidato c
+           INNER JOIN cargo ca ON ca.idCargo = c.idCargo
+          WHERE c.idCandidato = :idCandidato
+          FOR UPDATE'
     );
     $candidato->execute([':idCandidato' => $idCandidato]);
     $candidatoFila = $candidato->fetch();
@@ -119,7 +123,9 @@ try {
         'idCandidato' => $idCandidato,
         'tipoGestion' => $candidatoFila['idUsuario'] === null ? 'externa' : 'interna',
         'accion' => 'Solicitud de evaluación creada',
-        'detalle' => 'Asignada a ' . $evaluadorNombre . ' · Prioridad ' . $prioridad . '.',
+        'detalle' => 'Cargo: ' . $candidatoFila['cargo']
+            . ' · Evaluador: ' . $evaluadorNombre
+            . ' · Prioridad: ' . $prioridad . '.',
         'idUsuario' => (int) ($sesion['id'] ?? 0),
         'estado' => 'pendiente',
     ]);
