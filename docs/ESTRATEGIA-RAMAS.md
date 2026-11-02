@@ -48,7 +48,7 @@ Estructura base del proyecto y layout del monolito.
 
 Vista de login institucional y enlace a la postulación externa.
 
-- `src/pages/auth/Login.jsx`: correo institucional, contraseña, botón **Iniciar Sesión**
+- `src/pages/auth/Login.jsx`: correo institucional, contrasena, botón **Iniciar Sesión**
 - Enlace destacado **"¿Deseas postular a nuestras vacantes? Postula aquí"** → `<Link to="/postular">`
 - `src/pages/SinPermisos.jsx` y `src/pages/NotFound.jsx`
 - `src/routes/RutaProtegida.jsx` con `PERMISOS_POR_MODULO`

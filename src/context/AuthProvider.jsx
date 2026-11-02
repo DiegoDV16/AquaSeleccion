@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
       return { ok: false, mensaje: 'Ingresa tu correo institucional y contraseña.' };
     }
 
-    const datos = await iniciarSesion({ correo: correo.trim(), contraseña: clave });
+    const datos = await iniciarSesion({ correo: correo.trim(), contrasena: clave });
 
     if (!datos?.ok) {
       return { ok: false, mensaje: datos?.mensaje ?? 'No se pudo iniciar sesion.' };

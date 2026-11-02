@@ -3,7 +3,7 @@
 /**
  * login.php
  * POST /backend/api/auth/login.php
- * Cuerpo JSON: { "correo": "...", "contraseña": "..." }
+ * Cuerpo JSON: { "correo": "...", "contrasena": "..." }
  *
  * Valida que el usuario exista, que este activo y que la contrasena coincida
  * con el hash almacenado (password_verify). Si todo es correcto abre la sesion
@@ -25,10 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $datos = cuerpoJson();
 $correo = trim((string) ($datos['correo'] ?? ''));
-$contrasena = (string) ($datos['contraseña'] ?? $datos['contrasena'] ?? $datos['clave'] ?? '');
+$contrasena = (string) ($datos['contrasena'] ?? $datos['clave'] ?? '');
 
 if ($correo === '' || $contrasena === '') {
-    responder(['ok' => false, 'mensaje' => 'Ingresa tu correo institucional y contrasena.'], 400);
+    responder(['ok' => false, 'mensaje' => 'Ingresa tu correo institucional y contraseña.'], 400);
 }
 
 try {
@@ -73,7 +73,7 @@ try {
 
     if (!password_verify($contrasena, $registro['contrasena'])) {
         registrarIntentoLogin($pdo, $correo, $ip, false);
-        responder(['ok' => false, 'mensaje' => 'La contrasena es incorrecta. Vuelve a intentarlo.'], 401);
+        responder(['ok' => false, 'mensaje' => 'La contraseña es incorrecta. Vuelve a intentarlo.'], 401);
     }
 
     $rolSistema = rolDelSistema((int) $registro['idRol']);

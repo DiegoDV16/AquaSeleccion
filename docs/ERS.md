@@ -110,7 +110,7 @@ La aplicación permite demostrar el recorrido completo desde el frontend y manti
 
 | Funcionalidad | Estado |
 | --- | --- |
-| Recuperación de contraseña | Pendiente |
+| Recuperación de contrasena | Pendiente |
 | Notificaciones por correo | Pendiente |
 | Batería psicométrica completa | Fuera del alcance; la evaluación registra antecedentes, resultado y observaciones |
 | Firma electrónica de informes | Pendiente |

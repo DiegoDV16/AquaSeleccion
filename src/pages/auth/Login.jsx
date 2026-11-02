@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext.js';
 /**
  * Login
  * Vista publica de acceso al monolito. El submit llama a AuthProvider.login(),
- * que valida contra el backend PHP (usuario existente, activo y contrasena
+ * que valida contra el backend PHP (usuario existente, activo y contraseña
  * correcta) y redirige al modulo que corresponde al rol. No hay selector de
  * modulo: para entrar a otro modulo hay que iniciar sesion con otra cuenta.
  */
