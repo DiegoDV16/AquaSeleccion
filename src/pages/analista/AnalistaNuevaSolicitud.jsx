@@ -78,7 +78,9 @@ export default function AnalistaNuevaSolicitud() {
       return;
     }
 
-    const listaCandidatos = respuestaCandidatos.candidatos ?? [];
+    const listaCandidatos = (respuestaCandidatos.candidatos ?? []).filter(
+      (candidato) => !['apto', 'no_apto'].includes(candidato.estado),
+    );
     setCandidatos(listaCandidatos);
     setEvaluadores(respuestaEvaluadores.evaluadores ?? []);
 
@@ -206,7 +208,8 @@ export default function AnalistaNuevaSolicitud() {
         <div className="alert alert-warning d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2" role="alert">
           <span>
             <i className="bi bi-info-circle me-2" aria-hidden="true" />
-            No hay candidatos registrados. Primero registra un candidato para poder crear una solicitud.
+            No hay candidatos disponibles para una nueva evaluación. Los candidatos aprobados o rechazados
+            se excluyen automáticamente.
           </span>
           <Link to="/analista/candidatos" className="btn btn-soft btn-sm">
             Ir a candidatos
@@ -274,7 +277,7 @@ export default function AnalistaNuevaSolicitud() {
                         </select>
                         {errores.candidato_id && <div className="invalid-feedback">{errores.candidato_id}</div>}
                         <div className="form-text">
-                          Solo aparecen candidatos ya registrados. Si falta alguno, registralo desde Candidatos.
+                          Solo aparecen candidatos disponibles. No se listan los ya aprobados o rechazados.
                         </div>
                       </div>
 
