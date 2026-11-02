@@ -54,13 +54,13 @@ Vitest `5.0.5` está instalado, pero el proyecto aún no tiene pruebas ni un scr
 3. Comprueba el esquema y los datos disponibles antes de escribir consultas o asumir claves y relaciones. No confundas tablas mostradas en mocks con tablas persistidas.
 4. Para el backend, usa PDO y parámetros enlazados en todas las consultas. Evita concatenar entrada del usuario en SQL.
 5. Si el trabajo requiere cambiar el esquema, describe el SQL de forma reproducible y actualiza la documentación pertinente; aplica el cambio solo en el entorno solicitado. No inventes un sistema de migraciones que el repositorio todavía no tiene.
-6. Mantén las credenciales locales en `backend/config/conexion.php`, que se crea desde `backend/config/conexion.example.php` y no se debe publicar. No asumas que `root` sin contraseña es apropiado fuera del entorno local.
+6. Mantén las credenciales locales en `backend/config/conexion.php`, que se crea desde `backend/config/conexion.example.php` y no se debe publicar. No asumas que `root` sin contrasena es apropiado fuera del entorno local.
 7. Ante un error de conexión, verifica servicio, host, puerto, nombre de base y credenciales sin mostrar secretos en la salida.
 
 ## Flujo 5: autenticación, permisos y archivos
 
 - La sesión PHP es la fuente de verdad de autenticación. Verifica los permisos en cada endpoint protegido y no dependas solo de las rutas protegidas de React.
-- Conserva el uso de `password_hash` / `password_verify` para contraseñas y no las registres.
+- Conserva el uso de `password_hash` / `password_verify` para contrasenas y no las registres.
 - Valida tipo MIME, extensión y tamaño de archivos en el servidor; genera nombres de almacenamiento no predecibles y evita exponer rutas internas.
 - No incluyas datos personales, currículums, credenciales ni configuración local en commits, fixtures o logs.
 

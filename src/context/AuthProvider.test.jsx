@@ -111,7 +111,7 @@ describe('AuthProvider: login', () => {
 
     expect(iniciarSesion).toHaveBeenCalledWith({
       correo: 'mariajose.rojas@aquachile.cl',
-      contraseña: 'AquaChile2026!',
+      contrasena: 'AquaChile2026!',
     });
     expect(resultado.ok).toBe(true);
     expect(resultado.rol.clave).toBe('analista');

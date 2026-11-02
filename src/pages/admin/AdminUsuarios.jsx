@@ -131,7 +131,7 @@ export default function AdminUsuarios() {
       return;
     }
     if (!formularioCrear.contrasena) {
-      setErrorModalCrear('Ingresa la contrasena.');
+      setErrorModalCrear('Ingresa la contraseña.');
       return;
     }
 
@@ -686,7 +686,7 @@ export default function AdminUsuarios() {
                           />
                         </div>
                         <div className="col-md-6">
-                          <label className="form-label" htmlFor="crear-contrasena">Contrasena</label>
+                          <label className="form-label" htmlFor="crear-contrasena">Contraseña</label>
                           <input
                             type="password"
                             className="form-control"

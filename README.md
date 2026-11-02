@@ -42,7 +42,7 @@ El proyecto es un monolito con frontend SPA en React y backend PHP sobre MySQL. 
 - Guardado de borrador o finalización de la evaluación.
 
 ### Autenticación
-- Login institucional por correo y contraseña.
+- Login institucional por correo y contrasena.
 - Sesión PHP en el servidor; el rol determina automáticamente el módulo de destino.
 - Rutas protegidas por rol en el frontend y validación de permisos en los endpoints PHP.
 
@@ -219,12 +219,12 @@ Reglas:
 
 - El correo debe existir en la tabla `usuario`.
 - El usuario debe estar activo (`estado = 1`); si está inactivo, se rechaza el acceso.
-- La contraseña se valida con `password_verify` contra el hash almacenado.
+- La contrasena se valida con `password_verify` contra el hash almacenado.
 - Al iniciar sesión se regenera el ID de sesión.
 - La sesión PHP es la única fuente de verdad; al recargar la página se restaura consultando `session.php`.
 - La cookie de sesión es `HttpOnly` y `SameSite=Lax`.
 - El cierre de sesión destruye la sesión en el servidor y elimina la cookie.
-- No existe actualmente recuperación de contraseña; el enlace es solo visual.
+- No existe actualmente recuperación de contrasena; el enlace es solo visual.
 
 ### 5.3 Postulación externa
 
@@ -261,10 +261,10 @@ Reglas:
 ### 5.5 Gestión de usuarios
 
 - Solo el Administrador puede listar, crear, editar y eliminar usuarios.
-- Para crear un usuario son obligatorios: rol, nombres, apellido paterno, correo y contraseña.
+- Para crear un usuario son obligatorios: rol, nombres, apellido paterno, correo y contrasena.
 - El correo debe ser válido y único en el sistema.
-- La contraseña se almacena siempre como hash.
-- En la edición, si el campo contraseña queda vacío, la contraseña actual no cambia.
+- La contrasena se almacena siempre como hash.
+- En la edición, si el campo contrasena queda vacío, la contrasena actual no cambia.
 - El estado se normaliza a `1` (activo) o `0` (inactivo).
 - Un administrador no puede eliminar su propio usuario.
 - La interfaz permite asignar los roles Administrador, Analista, Evaluador y Jefatura; el rol Colaborador se reserva para empleados sin acceso.
@@ -352,7 +352,7 @@ Reglas:
 - Exportación CSV del historial filtrado.
 
 ### Pendiente o limitado
-- Recuperación de contraseña.
+- Recuperación de contrasena.
 - Cobertura de pruebas limitada a layout, autenticación, permisos, filtros, historial y formularios principales; no se mide cobertura formal.
 - Configuración de entorno para producción (las URLs del backend están fijadas a `localhost/AquaSeleccion`).
 

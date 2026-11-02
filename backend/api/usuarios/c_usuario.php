@@ -42,7 +42,7 @@ $contrasena = (string) ($datos['contrasena'] ?? '');
 $estado = $datos['estado'] ?? '1';
 
 if ($idRol <= 0 || $nombres === '' || $apellidoPaterno === '' || $correo === '' || $contrasena === '') {
-    responder(['ok' => false, 'mensaje' => 'Completa los campos obligatorios: idRol, nombres, apellidoPaterno, correo y contrasena.'], 400);
+    responder(['ok' => false, 'mensaje' => 'Completa los campos obligatorios: idRol, nombres, apellidoPaterno, correo y contraseña.'], 400);
 }
 
 if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
