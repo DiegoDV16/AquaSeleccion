@@ -88,6 +88,7 @@ AquaSeleccion/
 │   ├── api/
 │   │   ├── auth/           login.php, logout.php, session.php
 │   │   ├── candidatos/     listar.php, crear.php, actualizar.php, cv.php, descargar_cv.php
+│   │   ├── evaluaciones/   listar.php, detalle.php, guardar.php
 │   │   ├── solicitudes/    listar.php, crear.php, detalle.php, evaluadores.php
 │   │   └── usuarios/       listar.php, c_usuario.php, u_usuario.php, d_usuario.php
 │   ├── config/             conexión, sesión, roles, catálogos y controlador de candidato
@@ -130,14 +131,21 @@ npm install
 mysql -u root aquaseleccion < backend/sql/2026-11-01_analista.sql
 ```
 
-4. Copiar la plantilla de conexión:
+4. Aplicar las migraciones del módulo Evaluador:
+
+```bash
+mysql -u root aquaseleccion < backend/sql/migracion_evaluacion.sql
+mysql -u root aquaseleccion < backend/sql/migracion_evaluacion_bateria.sql
+```
+
+5. Copiar la plantilla de conexión:
 
 ```bash
 cp backend/config/conexion.example.php backend/config/conexion.php
 ```
 
-5. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
-6. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
+6. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
+7. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
 7. Iniciar el frontend:
 
 ```bash
@@ -264,6 +272,10 @@ Reglas:
 - Cada solicitud debe tener un candidato y un evaluador responsable; la fecha de asignación se registra automáticamente con la fecha del sistema.
 - El evaluador solo ve las solicitudes cuyo `evaluador_id` coincide con su usuario.
 - Para finalizar una evaluación se exige fecha de evaluación, resultado y observaciones de al menos 20 caracteres.
+- El evaluador guarda un borrador en estado `en_proceso`; al finalizar, la solicitud pasa a `finalizada` y el resultado solo se expone cuando está cerrada.
+- El módulo Evaluador usa endpoints propios en `backend/api/evaluaciones/`; el listado y el detalle filtran siempre por el evaluador de la sesión.
+- La evaluación admite datos opcionales de batería complementaria: cargo al que fue expuesto/a y comentario de entrevista.
+- Las observaciones se limitan a 250 caracteres; `estadoEvaluacion` se amplió a `VARCHAR(20)` para almacenar `con_observaciones`.
 - Una solicitud finalizada queda en modo solo lectura; para editarla debe cambiarse el estado del proceso.
 - La trazabilidad histórica en `historialsolicitudes` queda fuera de esta entrega; el módulo Administrador la muestra con datos simulados.
 
@@ -303,15 +315,14 @@ Reglas:
 - Módulo Analista: registro de postulaciones internas con CV opcional, listado, edición y detalle de candidatos con previsualización y descarga del CV en PDF, DOC y DOCX.
 - Módulo Administrador: listado de candidatos y registro de postulaciones internas con CV opcional mediante modal.
 - Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
+- Módulo Evaluador: bandeja de solicitudes asignadas, ficha del postulante, CV, borrador y finalización de la evaluación psicolaboral con persistencia en `evaluacion`.
 
 ### Implementado con datos simulados
 - Dashboard y métricas.
-- Evaluación psicolaboral.
 - Historial de solicitudes.
 
 ### Pendiente o limitado
-- Persistencia real de evaluaciones e historial.
-- Endpoints para el módulo Evaluador.
+- Historial de solicitudes y trazabilidad.
 - Recuperación de contraseña.
 - Exportación CSV del historial.
 - Cobertura de pruebas limitada a los filtros del módulo Analista.

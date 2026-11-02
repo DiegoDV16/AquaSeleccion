@@ -74,12 +74,7 @@ export default function FichaPostulante({ candidato, titulo = 'Datos del postula
                 {(candidato.cv_archivo || candidato.cvArchivo).split('.').pop().toUpperCase()}
               </span>
             </div>
-            <button
-              type="button"
-              className="cv-preview-card"
-              onClick={onCvPreview}
-              aria-label="Abrir vista previa del currículum"
-            >
+            <button type="button" className="cv-preview-card" onClick={onCvPreview} aria-label="Abrir vista previa del currículum">
               <div className="cv-preview-sheet">
                 <span className="cv-preview-avatar"><i className="bi bi-person-fill" aria-hidden="true" /></span>
                 <span className="cv-preview-name">{nombre}</span>
@@ -93,15 +88,17 @@ export default function FichaPostulante({ candidato, titulo = 'Datos del postula
                 Ver CV completo
               </span>
             </button>
-            <button type="button" className="cv-descarga-btn btn btn-soft btn-sm w-100 mt-2" onClick={onCvDownload}>
-              <i className="bi bi-download me-1" aria-hidden="true" />
-              Descargar CV
-            </button>
+            {onCvDownload && (
+              <button type="button" className="cv-descarga-btn btn btn-soft btn-sm w-100 mt-2" onClick={onCvDownload}>
+                <i className="bi bi-download me-1" aria-hidden="true" />
+                Descargar CV
+              </button>
+            )}
           </div>
         ) : null}
       </div>
     </div>
-    {(candidato.cv_archivo || candidato.cvArchivo) && (
+    {(candidato.cv_archivo || candidato.cvArchivo) && onCvTestDownload && (
       <button
         type="button"
         className="cv-prueba-link"

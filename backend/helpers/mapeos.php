@@ -103,9 +103,13 @@ function normalizarSolicitud(array $fila): array
     if (!empty($fila['idEvaluacion'])) {
         $evaluacion = [
             'id' => (int) $fila['idEvaluacion'],
-            'resultado' => !empty($fila['resultadoEvaluacion']) ? (string) $fila['resultadoEvaluacion'] : null,
+            'resultado' => ($fila['estado'] ?? '') === 'finalizada' && !empty($fila['resultadoEvaluacion'])
+                ? (string) $fila['resultadoEvaluacion']
+                : null,
             'fechaEvaluacion' => $fila['fechaEvaluacion'] ?? null,
             'observacion' => (string) ($fila['observacionEvaluacion'] ?? ''),
+            'cargoActual' => (string) ($fila['cargoActual'] ?? ''),
+            'comentarioEntrevista' => (string) ($fila['comentarioEntrevista'] ?? ''),
         ];
     }
 
