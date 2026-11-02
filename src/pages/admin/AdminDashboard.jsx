@@ -284,7 +284,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="col-lg-4">
-          <div className="aqua-card h-100">
+          <div className="aqua-card h-100 dashboard-panel-card">
             <div className="card-header">
               <i className="bi bi-activity me-2" aria-hidden="true" />
               Actividad reciente
@@ -324,7 +324,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="col-lg-4">
-          <div className="aqua-card h-100">
+          <div className="aqua-card h-100 dashboard-panel-card">
             <div className="card-header">
               <i className="bi bi-pie-chart me-2" aria-hidden="true" />
               Solicitudes por estado
@@ -362,7 +362,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="col-lg-4">
-          <div className="aqua-card h-100">
+          <div className="aqua-card h-100 dashboard-panel-card">
             <div className="card-header">
               <i className="bi bi-diagram-3 me-2" aria-hidden="true" />
               Postulaciones por familia
@@ -400,7 +400,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="col-lg-4">
-          <div className="aqua-card h-100">
+          <div className="aqua-card h-100 dashboard-panel-card">
             <div className="card-header">
               <i className="bi bi-graph-up-arrow me-2" aria-hidden="true" />
               Cargos con mayor demanda

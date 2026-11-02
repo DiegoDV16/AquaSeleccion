@@ -404,7 +404,7 @@ body {
 }
 
 .dashboard-dist-item {
-  padding: 0.6rem 0.7rem;
+  padding: 0.8rem 0.9rem;
   border: 1px solid var(--aqua-border);
   border-radius: 8px;
   background: #fff;
@@ -434,6 +434,14 @@ body {
 }
 
 .dashboard-recent-card .card-body {
+  padding: 1.15rem 1.25rem 1.2rem;
+}
+
+.dashboard-panel-card .card-header {
+  padding: 0.8rem 1.25rem;
+}
+
+.dashboard-panel-card .card-body {
   padding: 1.15rem 1.25rem 1.2rem;
 }
 
