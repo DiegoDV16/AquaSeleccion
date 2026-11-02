@@ -267,12 +267,7 @@ export default function Postular() {
                     <i className="bi bi-send-check" aria-hidden="true" />
                   </span>
                   <strong>Postulación 100% online</strong>
-                  <p>Completa el formulario, adjunta tu CV y revisa el estado de tu proceso.</p>
-                  <ol className="public-hero-steps">
-                    <li>Postulación</li>
-                    <li>Evaluación</li>
-                    <li>Resultado</li>
-                  </ol>
+                  <p>Completa tus datos, adjunta tu currículum y envía tu postulación.</p>
                 </div>
               </div>
             </div>
@@ -759,32 +754,14 @@ export default function Postular() {
                 <div className="public-side-card">
                   <div className="public-side-card-head">
                     <span>
-                      <i className="bi bi-signpost-split" aria-hidden="true" /> Etapas del proceso
+                      <i className="bi bi-check2-square" aria-hidden="true" /> Antes de enviar
                     </span>
                   </div>
-                  <ol className="public-process-list">
-                    <li>
-                      <span>1</span>
-                      <div>
-                        <strong>Postulación</strong>
-                        <p>Envío de antecedentes y CV.</p>
-                      </div>
-                    </li>
-                    <li>
-                      <span>2</span>
-                      <div>
-                        <strong>Evaluación</strong>
-                        <p>Revisión del perfil y evaluación psicolaboral.</p>
-                      </div>
-                    </li>
-                    <li>
-                      <span>3</span>
-                      <div>
-                        <strong>Resultado</strong>
-                        <p>Comunicación del equipo de Personas.</p>
-                      </div>
-                    </li>
-                  </ol>
+                  <ul className="public-checklist">
+                    <li>Currículum en PDF o Word, máximo 5 MB.</li>
+                    <li>Correo y teléfono actualizados.</li>
+                    <li>Consentimiento de tratamiento de datos aceptado.</li>
+                  </ul>
                 </div>
 
                 <div className="public-side-card public-side-help">
