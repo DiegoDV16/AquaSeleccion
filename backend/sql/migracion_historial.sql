@@ -1,6 +1,8 @@
 -- Migracion del historial de solicitudes
 -- Registra los movimientos del ciclo de vida y carga los datos existentes.
 
+SET NAMES utf8mb4;
+
 CREATE TABLE IF NOT EXISTS historialsolicitudes (
     idHistorial INT NOT NULL AUTO_INCREMENT,
     idSolicitudEvaluacion INT NULL,
