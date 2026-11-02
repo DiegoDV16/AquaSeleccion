@@ -9,6 +9,7 @@ const candidatos = [
     correo: 'martina@correo.cl',
     telefono: '+56 9 1111 2222',
     tipoPostulacion: 'externa',
+    fechaPostulacion: '2026-09-15',
   },
   {
     id: 2,
@@ -16,6 +17,7 @@ const candidatos = [
     correo: 'jorge@aquachile.cl',
     telefono: '+56 9 3333 4444',
     tipoPostulacion: 'interna',
+    fechaPostulacion: '2026-11-02',
   },
 ];
 
@@ -57,6 +59,12 @@ describe('filtrarCandidatos', () => {
   it('filtra por origen de la postulacion', () => {
     expect(filtrarCandidatos(candidatos, { tipo: 'interna' })).toHaveLength(1);
     expect(filtrarCandidatos(candidatos, { tipo: 'externa' })[0].id).toBe(1);
+  });
+
+  it('filtra por rango de meses de postulacion', () => {
+    expect(filtrarCandidatos(candidatos, { mesDesde: '2026-10', mesHasta: '2026-12' })[0].id).toBe(2);
+    expect(filtrarCandidatos(candidatos, { mesDesde: '2026-01', mesHasta: '2026-09' })[0].id).toBe(1);
+    expect(filtrarCandidatos(candidatos, { mesDesde: '2026-10' })).toHaveLength(1);
   });
 
   it('combina texto y origen', () => {

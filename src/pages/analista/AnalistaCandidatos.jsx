@@ -54,6 +54,8 @@ export default function AnalistaCandidatos() {
   const [errorCatalogos, setErrorCatalogos] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('todas');
+  const [mesDesde, setMesDesde] = useState('');
+  const [mesHasta, setMesHasta] = useState('');
   const [detalle, setDetalle] = useState(null);
   const [candidatoCv, setCandidatoCv] = useState(null);
   const [mensaje, setMensaje] = useState('');
@@ -107,8 +109,8 @@ export default function AnalistaCandidatos() {
   }, []);
 
   const visibles = useMemo(
-    () => filtrarCandidatos(candidatos, { busqueda, tipo: filtroTipo }),
-    [candidatos, busqueda, filtroTipo],
+    () => filtrarCandidatos(candidatos, { busqueda, tipo: filtroTipo, mesDesde, mesHasta }),
+    [candidatos, busqueda, filtroTipo, mesDesde, mesHasta],
   );
 
   const cargosDisponibles = useMemo(() => {
@@ -413,6 +415,47 @@ export default function AnalistaCandidatos() {
             </div>
             <div className="col-lg-3 d-flex align-items-center justify-content-lg-end text-muted-aqua">
               <small>{visibles.length} resultados</small>
+            </div>
+          </div>
+
+          <div className="row g-2 mt-1">
+            <div className="col-sm-6 col-lg-3">
+              <label className="form-label small text-muted-aqua mb-1" htmlFor="mes-desde">
+                Postulación desde
+              </label>
+              <input
+                type="month"
+                className="form-control form-control-sm"
+                id="mes-desde"
+                value={mesDesde}
+                onChange={(evento) => setMesDesde(evento.target.value)}
+              />
+            </div>
+            <div className="col-sm-6 col-lg-3">
+              <label className="form-label small text-muted-aqua mb-1" htmlFor="mes-hasta">
+                Postulación hasta
+              </label>
+              <input
+                type="month"
+                className="form-control form-control-sm"
+                id="mes-hasta"
+                value={mesHasta}
+                onChange={(evento) => setMesHasta(evento.target.value)}
+              />
+            </div>
+            <div className="col-lg-6 d-flex align-items-end justify-content-lg-end">
+              {(mesDesde || mesHasta) && (
+                <button
+                  type="button"
+                  className="btn btn-link btn-sm text-decoration-none p-0"
+                  onClick={() => {
+                    setMesDesde('');
+                    setMesHasta('');
+                  }}
+                >
+                  Limpiar meses
+                </button>
+              )}
             </div>
           </div>
         </div>

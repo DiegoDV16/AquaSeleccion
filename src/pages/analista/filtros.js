@@ -5,13 +5,17 @@
  */
 
 /**
- * Filtra candidatos por texto (nombre, correo o telefono) y origen.
+ * Filtra candidatos por texto (nombre, correo o telefono), origen y rango de
+ * meses de postulacion.
  *
  * @param {Array<object>} candidatos
- * @param {{ busqueda?: string, tipo?: string }} opciones
+ * @param {{ busqueda?: string, tipo?: string, mesDesde?: string, mesHasta?: string }} opciones
  * @returns {Array<object>}
  */
-export function filtrarCandidatos(candidatos, { busqueda = '', tipo = 'todas' } = {}) {
+export function filtrarCandidatos(
+  candidatos,
+  { busqueda = '', tipo = 'todas', mesDesde = '', mesHasta = '' } = {},
+) {
   const texto = busqueda.trim().toLowerCase();
 
   return candidatos.filter((candidato) => {
@@ -21,8 +25,13 @@ export function filtrarCandidatos(candidatos, { busqueda = '', tipo = 'todas' } 
       String(candidato.correo ?? '').toLowerCase().includes(texto) ||
       String(candidato.telefono ?? '').toLowerCase().includes(texto);
     const coincideTipo = tipo === 'todas' || candidato.tipoPostulacion === tipo;
+    const fecha = String(candidato.fechaPostulacion ?? candidato.fecha_postulacion ?? '');
+    const mes = fecha.slice(0, 7);
+    const coincideMes =
+      (mesDesde === '' || (mes !== '' && mes >= mesDesde)) &&
+      (mesHasta === '' || (mes !== '' && mes <= mesHasta));
 
-    return coincideTexto && coincideTipo;
+    return coincideTexto && coincideTipo && coincideMes;
   });
 }
 
