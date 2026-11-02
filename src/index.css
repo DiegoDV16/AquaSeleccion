@@ -403,6 +403,17 @@ body {
   margin-top: 0.85rem;
 }
 
+.dashboard-dist-item {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--aqua-border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.dashboard-dist-item + .dashboard-dist-item {
+  margin-top: 0.55rem;
+}
+
 .dist-head {
   display: flex;
   justify-content: space-between;
