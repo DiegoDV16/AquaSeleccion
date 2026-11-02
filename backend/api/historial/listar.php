@@ -108,7 +108,7 @@ try {
             'tipoGestion' => (string) $fila['tipoGestion'],
             'accion' => (string) $fila['accion'],
             'detalle' => (string) ($fila['detalle'] ?? ''),
-            'usuario' => !empty($fila['usuario']) ? (string) $fila['usuario'] : 'Sistema',
+            'usuario' => !empty($fila['usuario']) ? (string) $fila['usuario'] : 'No registrado',
             'estado' => (string) $fila['estado'],
             'fecha' => (string) $fila['fechaMovimiento'],
         ];
