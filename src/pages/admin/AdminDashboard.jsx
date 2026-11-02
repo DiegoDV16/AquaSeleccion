@@ -209,7 +209,7 @@ export default function AdminDashboard() {
 
       <div className="row g-3">
         <div className="col-lg-8">
-          <div className="aqua-card h-100">
+          <div className="aqua-card">
             <div className="card-header d-flex justify-content-between align-items-center">
               <span>
                 <i className="bi bi-file-earmark-text me-2" aria-hidden="true" />
@@ -219,56 +219,66 @@ export default function AdminDashboard() {
                 Ultimas {recientes.length} de {totalSolicitudes}
               </span>
             </div>
-            <div className="table-responsive">
-              <table className="table aqua-table mb-0">
-                <thead>
-                  <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Candidato</th>
-                    <th scope="col">Cargo</th>
-                    <th scope="col">Evaluador</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col" className="text-end">
-                      Accion
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div className="card-body">
+              {recientes.length === 0 ? (
+                <div className="text-center py-4 text-muted-aqua">
+                  <i className="bi bi-inbox fs-3 d-block mb-2" aria-hidden="true" />
+                  <p className="small mb-0">No hay solicitudes registradas.</p>
+                </div>
+              ) : (
+                <div className="dashboard-request-list">
                   {recientes.map((solicitud) => {
                     const candidato = solicitud.candidato ?? {};
                     const codigo = `SOL-${String(solicitud.id).padStart(4, '0')}`;
 
                     return (
-                      <tr key={solicitud.id}>
-                        <td className="fw-semibold text-nowrap">{codigo}</td>
-                        <td>{candidato.nombreCompleto ?? 'Sin nombre'}</td>
-                        <td className="text-muted-aqua">{candidato.cargo ?? '-'}</td>
-                        <td className="text-muted-aqua">{solicitud.evaluador?.nombre ?? 'Sin asignar'}</td>
-                        <td>
-                          <EstadoBadge estado={solicitud.estado} />
-                        </td>
-                        <td className="text-end">
-                          <Link
-                            to="/admin/candidatos"
-                            className="btn btn-soft btn-sm"
-                            aria-label={`Ver candidatos de ${codigo}`}
-                            title="Ver candidatos"
-                          >
-                            <i className="bi bi-eye" aria-hidden="true" />
-                          </Link>
-                        </td>
-                      </tr>
+                      <article className="dashboard-request-item" key={solicitud.id}>
+                        <div className="d-flex justify-content-between align-items-start gap-3">
+                          <div style={{ minWidth: 0 }}>
+                            <span className="dashboard-code">{codigo}</span>
+                            <h6 className="mb-1 text-truncate" title={candidato.nombreCompleto ?? ''}>
+                              {candidato.nombreCompleto ?? 'Sin nombre'}
+                            </h6>
+                            <p className="text-muted-aqua small mb-0 text-truncate">
+                              {candidato.cargo ?? '-'}
+                            </p>
+                          </div>
+                          <div className="d-flex flex-column align-items-end gap-2">
+                            <EstadoBadge estado={solicitud.estado} />
+                            <Link
+                              to="/admin/candidatos"
+                              className="btn btn-soft btn-sm"
+                              aria-label={`Ver candidatos de ${codigo}`}
+                              title="Ver candidatos"
+                            >
+                              <i className="bi bi-eye" aria-hidden="true" />
+                            </Link>
+                          </div>
+                        </div>
+
+                        <div className="dashboard-request-meta">
+                          <span className="text-truncate">
+                            <i className="bi bi-person-badge me-1" aria-hidden="true" />
+                            {solicitud.evaluador?.nombre ?? 'Sin evaluador asignado'}
+                          </span>
+                          <span>
+                            <i className="bi bi-calendar3 me-1" aria-hidden="true" />
+                            {formatearFecha(solicitud.fechaSolicitud)}
+                          </span>
+                        </div>
+                      </article>
                     );
                   })}
-                  {recientes.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="text-center text-muted-aqua py-4">
-                        No hay solicitudes registradas.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                </div>
+              )}
+
+              <div className="dashboard-panel-footer">
+                <span>Mostrando {recientes.length} de {totalSolicitudes}</span>
+                <Link to="/admin/candidatos" className="text-decoration-none fw-semibold">
+                  Ver candidatos
+                  <i className="bi bi-arrow-right ms-1" aria-hidden="true" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -286,26 +296,26 @@ export default function AdminDashboard() {
                   <p className="small mb-0">Aun no hay movimientos registrados.</p>
                 </div>
               ) : (
-                <div className="aqua-timeline">
+                <div className="dashboard-activity-list">
                   {actividad.map((evento) => (
-                    <div className="aqua-timeline-item" key={evento.id}>
-                      <div className="d-flex align-items-center gap-2 mb-1">
-                        <span
-                          className={`stat-icon ${evento.tinte}`}
-                          style={{ width: 30, height: 30, flexBasis: 30, fontSize: '0.85rem' }}
-                          aria-hidden="true"
-                        >
-                          <i className={`bi bi-${evento.icono}`} />
-                        </span>
-                        <p className="mb-0 fw-semibold small">{evento.titulo}</p>
+                    <article className="dashboard-activity-item" key={evento.id}>
+                      <span
+                        className={`stat-icon ${evento.tinte}`}
+                        style={{ width: 32, height: 32, flexBasis: 32, fontSize: '0.85rem' }}
+                        aria-hidden="true"
+                      >
+                        <i className={`bi bi-${evento.icono}`} />
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <p className="mb-1 fw-semibold small">{evento.titulo}</p>
+                        <p className="mb-1 text-muted-aqua" style={{ fontSize: '0.8rem' }}>
+                          {evento.detalle}
+                        </p>
+                        <p className="mb-0 text-muted-aqua fst-italic" style={{ fontSize: '0.74rem' }}>
+                          {formatearFecha(evento.fecha)}
+                        </p>
                       </div>
-                      <p className="mb-0 text-muted-aqua" style={{ fontSize: '0.8rem' }}>
-                        {evento.detalle}
-                      </p>
-                      <p className="mb-0 text-muted-aqua fst-italic" style={{ fontSize: '0.74rem' }}>
-                        {formatearFecha(evento.fecha)}
-                      </p>
-                    </div>
+                    </article>
                   ))}
                 </div>
               )}
