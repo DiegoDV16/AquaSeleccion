@@ -289,13 +289,13 @@ export default function Postular() {
 
                 <div className="public-progress">
                   <div className="public-progress-head">
-                    <span>Progreso de tu postulación</span>
+                    <span>Progreso del formulario</span>
                     <strong>{progreso}%</strong>
                   </div>
                   <div
                     className="progress"
                     role="progressbar"
-                    aria-label="Progreso de la postulación"
+                    aria-label="Progreso del formulario"
                     aria-valuenow={progreso}
                     aria-valuemin={0}
                     aria-valuemax={100}
