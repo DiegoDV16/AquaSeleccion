@@ -16,6 +16,24 @@ function formatearFechaHora(valor) {
   return `${dia}/${mes}/${anio}${hora ? ` ${hora.slice(0, 5)}` : ''}`;
 }
 
+function escaparCsv(valor) {
+  let texto = String(valor ?? '');
+
+  if (/^[=+\-@]/.test(texto)) {
+    texto = `'${texto}`;
+  }
+
+  return `"${texto.replace(/"/g, '""')}"`;
+}
+
+function fechaArchivo() {
+  const hoy = new Date();
+  const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dia = String(hoy.getDate()).padStart(2, '0');
+
+  return `${hoy.getFullYear()}-${mes}-${dia}`;
+}
+
 /**
  * AdminHistorial
  * Trazabilidad real de los movimientos del ciclo de vida de las solicitudes.
@@ -62,6 +80,48 @@ export default function AdminHistorial() {
     setFiltros((actual) => ({ ...actual, [campo]: valor }));
   }
 
+  function exportarCsv() {
+    if (movimientos.length === 0) return;
+
+    const columnas = [
+      'ID',
+      'Solicitud',
+      'Candidato',
+      'Tipo de gestión',
+      'Acción',
+      'Detalle',
+      'Usuario',
+      'Estado',
+      'Fecha',
+    ];
+
+    const filas = movimientos.map((movimiento) => [
+      movimiento.id,
+      movimiento.solicitud,
+      movimiento.candidato,
+      movimiento.tipoGestion,
+      movimiento.accion,
+      movimiento.detalle,
+      movimiento.usuario,
+      movimiento.estado,
+      formatearFechaHora(movimiento.fecha),
+    ]);
+
+    const contenido = [columnas, ...filas]
+      .map((fila) => fila.map(escaparCsv).join(';'))
+      .join('\r\n');
+
+    const blob = new Blob(['\uFEFF', contenido], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = `historial-solicitudes-${fechaArchivo()}.csv`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
   return (
     <>
       <PageHeader
@@ -71,9 +131,14 @@ export default function AdminHistorial() {
         acciones={
           <button
             type="button"
-            className="btn btn-soft btn-sm"
-            disabled
-            title="Disponible próximamente"
+            className="btn btn-aqua btn-sm"
+            onClick={exportarCsv}
+            disabled={cargando || movimientos.length === 0}
+            title={
+              movimientos.length > 0
+                ? `Exportar ${movimientos.length} movimientos filtrados`
+                : 'No hay movimientos para exportar'
+            }
           >
             <i className="bi bi-download me-1" aria-hidden="true" />
             Exportar CSV

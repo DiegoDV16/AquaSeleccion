@@ -292,7 +292,7 @@ Reglas:
 - Tipos de gestión: `externa` e `interna`.
 - El historial permite filtrar por tipo, estado, texto (ID de solicitud o candidato) y mes.
 - Los movimientos se registran al crear solicitudes y al iniciar, guardar borrador o finalizar una evaluación.
-- La exportación CSV está prevista, pero deshabilitada en la versión actual.
+- El botón **Exportar CSV** descarga los movimientos que coinciden con los filtros actuales, con codificación UTF-8 para Excel.
 
 ### 5.9 Catálogos de cargos
 
@@ -326,10 +326,10 @@ Reglas:
 - Módulo Evaluador: bandeja de solicitudes asignadas, ficha del postulante, CV, borrador y finalización de la evaluación psicolaboral con persistencia en `evaluacion`.
 - Módulo Administrador: dashboard con métricas, solicitudes recientes, actividad y distribuciones calculadas desde MySQL.
 - Historial y trazabilidad de solicitudes en `historialsolicitudes`, con filtros por tipo, estado, texto y mes.
+- Exportación CSV del historial filtrado.
 
 ### Pendiente o limitado
 - Recuperación de contraseña.
-- Exportación CSV del historial.
 - Cobertura de pruebas limitada a los filtros del módulo Analista.
 - Configuración de entorno para producción (las URLs del backend están fijadas a `localhost/AquaSeleccion`).
 
