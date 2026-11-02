@@ -209,7 +209,7 @@ export default function AdminDashboard() {
 
       <div className="row g-3">
         <div className="col-lg-8">
-          <div className="aqua-card">
+          <div className="aqua-card dashboard-recent-card">
             <div className="card-header d-flex justify-content-between align-items-center">
               <span>
                 <i className="bi bi-file-earmark-text me-2" aria-hidden="true" />
@@ -274,7 +274,7 @@ export default function AdminDashboard() {
 
               <div className="dashboard-panel-footer">
                 <span>Mostrando {recientes.length} de {totalSolicitudes}</span>
-                <Link to="/admin/candidatos" className="text-decoration-none fw-semibold">
+                <Link to="/admin/candidatos" className="btn btn-soft btn-sm">
                   Ver candidatos
                   <i className="bi bi-arrow-right ms-1" aria-hidden="true" />
                 </Link>

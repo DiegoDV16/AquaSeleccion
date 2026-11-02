@@ -423,10 +423,18 @@ body {
 
 .dashboard-request-item,
 .dashboard-activity-item {
-  padding: 0.8rem 0.9rem;
+  padding: 1rem 1.1rem;
   border: 1px solid var(--aqua-border);
   border-radius: 9px;
   background: #fff;
+}
+
+.dashboard-recent-card .card-header {
+  padding: 0.8rem 1.25rem;
+}
+
+.dashboard-recent-card .card-body {
+  padding: 1.15rem 1.25rem 1.2rem;
 }
 
 .dashboard-request-item h6 {
@@ -449,8 +457,8 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 0.9rem;
-  margin-top: 0.65rem;
-  padding-top: 0.55rem;
+  margin-top: 0.85rem;
+  padding-top: 0.65rem;
   border-top: 1px dashed rgba(14, 58, 93, 0.12);
   color: var(--aqua-muted);
   font-size: 0.76rem;
@@ -467,8 +475,8 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin-top: 1rem;
-  padding-top: 0.75rem;
+  margin-top: 1.1rem;
+  padding-top: 0.85rem;
   border-top: 1px solid var(--aqua-border);
   color: var(--aqua-muted);
   font-size: 0.78rem;
