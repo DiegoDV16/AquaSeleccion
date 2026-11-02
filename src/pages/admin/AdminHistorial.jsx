@@ -13,7 +13,12 @@ import { TIPOS_GESTION } from '../../mock/historialSolicitudes.js';
  * del ciclo de vida de una solicitud, con el usuario que lo ejecuto.
  */
 export default function AdminHistorial() {
-  const [filtros, setFiltros] = useState({ tipoGestion: 'todas', estado: 'todas', texto: '' });
+  const [filtros, setFiltros] = useState({
+    tipoGestion: 'todas',
+    estado: 'todas',
+    texto: '',
+    mes: '',
+  });
 
   const movimientos = useMemo(() => filtrarHistorial(filtros), [filtros]);
 
@@ -38,7 +43,7 @@ export default function AdminHistorial() {
       <div className="aqua-card">
         <div className="card-header">
           <div className="row g-2">
-            <div className="col-lg-5">
+            <div className="col-lg-4">
               <label className="visually-hidden" htmlFor="busqueda-historial">
                 Buscar en el historial
               </label>
@@ -56,7 +61,7 @@ export default function AdminHistorial() {
                 />
               </div>
             </div>
-            <div className="col-sm-6 col-lg-3">
+            <div className="col-sm-6 col-lg-2">
               <label className="visually-hidden" htmlFor="filtro-tipo">
                 Tipo de gestion
               </label>
@@ -74,7 +79,7 @@ export default function AdminHistorial() {
                 ))}
               </select>
             </div>
-            <div className="col-sm-6 col-lg-3">
+            <div className="col-sm-6 col-lg-2">
               <label className="visually-hidden" htmlFor="filtro-estado-historial">
                 Estado
               </label>
@@ -92,7 +97,33 @@ export default function AdminHistorial() {
                 ))}
               </select>
             </div>
-            <div className="col-lg-1 d-flex align-items-center justify-content-lg-end text-muted-aqua">
+            <div className="col-sm-6 col-lg-3">
+              <label className="visually-hidden" htmlFor="filtro-mes-historial">
+                Mes del movimiento
+              </label>
+              <div className="input-group input-group-sm">
+                <input
+                  type="month"
+                  className="form-control"
+                  id="filtro-mes-historial"
+                  value={filtros.mes}
+                  onChange={(evento) => actualizarFiltro('mes', evento.target.value)}
+                  title="Filtrar por mes"
+                />
+                {filtros.mes && (
+                  <button
+                    type="button"
+                    className="btn btn-soft"
+                    onClick={() => actualizarFiltro('mes', '')}
+                    aria-label="Limpiar filtro de mes"
+                    title="Limpiar mes"
+                  >
+                    <i className="bi bi-x-lg" aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="col-sm-6 col-lg-1 d-flex align-items-center justify-content-lg-end text-muted-aqua">
               <small>{movimientos.length}</small>
             </div>
           </div>

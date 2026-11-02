@@ -145,15 +145,21 @@ export const HISTORIAL_SOLICITUDES = [
   },
 ];
 
-export function filtrarHistorial({ tipoGestion = 'todas', estado = 'todas', texto = '' } = {}) {
+export function filtrarHistorial({
+  tipoGestion = 'todas',
+  estado = 'todas',
+  texto = '',
+  mes = '',
+} = {}) {
   return HISTORIAL_SOLICITUDES.filter((movimiento) => {
     const coincideTipo = tipoGestion === 'todas' || movimiento.tipo_gestion === tipoGestion;
     const coincideEstado = estado === 'todas' || movimiento.estado === estado;
+    const coincideMes = mes === '' || String(movimiento.fecha_movimiento).startsWith(mes);
     const coincideTexto =
       texto.trim() === '' ||
       movimiento.candidato.toLowerCase().includes(texto.trim().toLowerCase()) ||
       movimiento.solicitud_id.toLowerCase().includes(texto.trim().toLowerCase());
-    return coincideTipo && coincideEstado && coincideTexto;
+    return coincideTipo && coincideEstado && coincideMes && coincideTexto;
   });
 }
 
