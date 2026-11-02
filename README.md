@@ -8,6 +8,7 @@ El proyecto es un monolito con frontend SPA en React y backend PHP sobre MySQL. 
 - **Repositorio:** https://github.com/DiegoDV16/AquaSeleccion
 - **Rama principal:** `main`
 - **Estrategia de ramas:** ver [`docs/ESTRATEGIA-RAMAS.md`](docs/ESTRATEGIA-RAMAS.md)
+- **Documento de requisitos:** ver [`docs/ERS.md`](docs/ERS.md)
 
 ---
 
@@ -184,8 +185,9 @@ npm run dev
 | `npm run build` | Compilación de producción |
 | `npm run preview` | Previsualización de la compilación |
 | `npm run lint` | Análisis estático con ESLint |
+| `npm test -- --run` | Ejecuta la suite completa de Vitest |
 
-> Vitest está instalado, pero actualmente no existen scripts ni archivos de pruebas en el repositorio.
+> La suite actual contiene **11 archivos y 65 pruebas**, todas aprobadas. Cubre layout, autenticación, permisos por rol, filtros, historial y componentes de apoyo. No se mide cobertura formal ni se cubren todos los formularios CRUD.
 
 ---
 
@@ -345,7 +347,7 @@ Reglas:
 
 ### Pendiente o limitado
 - Recuperación de contraseña.
-- Cobertura de pruebas limitada a los filtros del módulo Analista.
+- Cobertura de pruebas limitada a layout, autenticación, permisos, filtros e historial; no se mide cobertura formal.
 - Configuración de entorno para producción (las URLs del backend están fijadas a `localhost/AquaSeleccion`).
 
 ---

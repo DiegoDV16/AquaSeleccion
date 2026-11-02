@@ -23,6 +23,10 @@ describe('ROLES', () => {
 describe('PERMISOS_POR_MODULO', () => {
   it('cada modulo admite exactamente su rol', () => {
     expect(PERMISOS_POR_MODULO.ADMINISTRADOR).toEqual([CLAVE_ROLES.ADMINISTRADOR]);
+    expect(PERMISOS_POR_MODULO.ADMINISTRACION).toEqual([
+      CLAVE_ROLES.ADMINISTRADOR,
+      CLAVE_ROLES.JEFATURA,
+    ]);
     expect(PERMISOS_POR_MODULO.ANALISTA).toEqual([CLAVE_ROLES.ANALISTA]);
     expect(PERMISOS_POR_MODULO.EVALUADOR).toEqual([CLAVE_ROLES.EVALUADOR]);
   });
@@ -36,6 +40,7 @@ describe('PERMISOS_POR_MODULO', () => {
   it('la ruta de inicio de cada rol pertenece a su modulo', () => {
     const prefijoPorModulo = {
       ADMINISTRADOR: '/admin',
+      ADMINISTRACION: '/admin',
       ANALISTA: '/analista',
       EVALUADOR: '/evaluador',
     };
