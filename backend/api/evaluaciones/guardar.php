@@ -23,7 +23,6 @@ if ($idEvaluador <= 0) {
 
 $idSolicitud = filter_var($_POST['idSolicitud'] ?? null, FILTER_VALIDATE_INT);
 $accion = trim((string) ($_POST['accion'] ?? 'borrador'));
-$fechaEvaluacion = trim((string) ($_POST['fechaEvaluacion'] ?? ''));
 $resultado = trim((string) ($_POST['resultado'] ?? ''));
 $observaciones = trim((string) ($_POST['observaciones'] ?? ''));
 $cargoActual = trim((string) ($_POST['cargoActual'] ?? ''));
@@ -36,10 +35,6 @@ if ($idSolicitud === false || $idSolicitud < 1) {
 
 if (!in_array($accion, ['borrador', 'finalizar'], true)) {
     responder(['ok' => false, 'mensaje' => 'La accion indicada no es valida.'], 400);
-}
-
-if ($fechaEvaluacion !== '' && !fechaValida($fechaEvaluacion)) {
-    responder(['ok' => false, 'mensaje' => 'La fecha de evaluacion no es valida.'], 400);
 }
 
 if ($resultado !== '' && !in_array($resultado, $resultadosValidos, true)) {
@@ -59,10 +54,6 @@ if (mb_strlen($comentarioEntrevista, 'UTF-8') > 250) {
 }
 
 if ($accion === 'finalizar') {
-    if ($fechaEvaluacion === '') {
-        responder(['ok' => false, 'mensaje' => 'Ingresa la fecha de la evaluacion.'], 400);
-    }
-
     if (!in_array($resultado, $resultadosValidos, true)) {
         responder(['ok' => false, 'mensaje' => 'Selecciona el resultado de la evaluacion.'], 400);
     }
@@ -101,7 +92,6 @@ try {
 
     $nuevoEstado = $accion === 'finalizar' ? 'finalizada' : 'en_proceso';
     $estadoEvaluacion = $resultado !== '' ? $resultado : 'en_proceso';
-    $fechaGuardar = $fechaEvaluacion !== '' ? $fechaEvaluacion : null;
     $observacionGuardar = $observaciones !== '' ? $observaciones : null;
     $cargoActualGuardar = $cargoActual !== '' ? $cargoActual : null;
     $comentarioGuardar = $comentarioEntrevista !== '' ? $comentarioEntrevista : null;
@@ -122,7 +112,7 @@ try {
             'UPDATE evaluacion
                 SET idUsuario = :idEvaluador,
                     estadoEvaluacion = :estadoEvaluacion,
-                    fechaEvaluacion = :fechaEvaluacion,
+                    fechaEvaluacion = CURDATE(),
                     cargoActual = :cargoActual,
                     comentarioEntrevista = :comentarioEntrevista,
                     Observacion = :observaciones
@@ -131,7 +121,6 @@ try {
         $actualizar->execute([
             ':idEvaluador' => $idEvaluador,
             ':estadoEvaluacion' => $estadoEvaluacion,
-            ':fechaEvaluacion' => $fechaGuardar,
             ':cargoActual' => $cargoActualGuardar,
             ':comentarioEntrevista' => $comentarioGuardar,
             ':observaciones' => $observacionGuardar,
@@ -142,13 +131,12 @@ try {
             'INSERT INTO evaluacion
                 (idSolicitudEvaluacion, idUsuario, estadoEvaluacion, fechaEvaluacion, cargoActual, comentarioEntrevista, Observacion)
              VALUES
-                (:idSolicitud, :idEvaluador, :estadoEvaluacion, :fechaEvaluacion, :cargoActual, :comentarioEntrevista, :observaciones)'
+                (:idSolicitud, :idEvaluador, :estadoEvaluacion, CURDATE(), :cargoActual, :comentarioEntrevista, :observaciones)'
         );
         $insertar->execute([
             ':idSolicitud' => $idSolicitud,
             ':idEvaluador' => $idEvaluador,
             ':estadoEvaluacion' => $estadoEvaluacion,
-            ':fechaEvaluacion' => $fechaGuardar,
             ':cargoActual' => $cargoActualGuardar,
             ':comentarioEntrevista' => $comentarioGuardar,
             ':observaciones' => $observacionGuardar,
@@ -166,6 +154,8 @@ try {
         ':idSolicitud' => $idSolicitud,
     ]);
 
+    $fechaServidor = (string) $pdo->query('SELECT CURDATE()')->fetchColumn();
+
     $pdo->commit();
 
     responder([
@@ -176,6 +166,7 @@ try {
         'idEvaluacion' => $idEvaluacion,
         'estado' => $nuevoEstado,
         'resultado' => $accion === 'finalizar' ? $resultado : null,
+        'fechaEvaluacion' => $fechaServidor,
     ]);
 } catch (PDOException $e) {
     if (isset($pdo) && $pdo->inTransaction()) {

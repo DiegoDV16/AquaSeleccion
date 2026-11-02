@@ -111,10 +111,6 @@ export default function EvaluadorEvaluar() {
     }
 
     if (finalizar) {
-      if (!formulario.fechaEvaluacion) {
-        nuevosErrores.fechaEvaluacion = 'Ingresa la fecha de la evaluacion.';
-      }
-
       if (!formulario.resultado) {
         nuevosErrores.resultado = 'Selecciona el resultado de la evaluacion.';
       }
@@ -142,7 +138,6 @@ export default function EvaluadorEvaluar() {
     const datos = await guardarEvaluacion({
       idSolicitud: id,
       accion,
-      fechaEvaluacion: formulario.fechaEvaluacion,
       resultado: formulario.resultado,
       observaciones: formulario.observaciones,
       cargoActual: formulario.cargoActual,
@@ -156,6 +151,10 @@ export default function EvaluadorEvaluar() {
       return;
     }
 
+    const fechaServidor = datos.fechaEvaluacion ?? formulario.fechaEvaluacion;
+
+    setFormulario((actual) => ({ ...actual, fechaEvaluacion: fechaServidor }));
+
     setSolicitud((actual) => ({
       ...actual,
       estado: datos.estado,
@@ -163,7 +162,7 @@ export default function EvaluadorEvaluar() {
         ...(actual?.evaluacion ?? {}),
         id: datos.idEvaluacion,
         resultado: finalizar ? datos.resultado : actual?.evaluacion?.resultado ?? null,
-        fechaEvaluacion: formulario.fechaEvaluacion || null,
+        fechaEvaluacion: fechaServidor,
         observacion: formulario.observaciones,
         cargoActual: formulario.cargoActual,
         comentarioEntrevista: formulario.comentarioEntrevista,
@@ -295,22 +294,33 @@ export default function EvaluadorEvaluar() {
                   </div>
                 )}
 
-                <div className="row g-3 mb-3">
+                <section className="evaluador-form-section">
+                  <div className="evaluador-form-section-head">
+                    <span className="evaluador-form-section-icon">
+                      <i className="bi bi-clipboard2-data" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h6>Datos de la evaluación</h6>
+                      <p>La fecha se registra automáticamente desde el sistema.</p>
+                    </div>
+                  </div>
+
+                  <div className="row g-3">
                   <div className="col-md-4">
                     <label className="form-label" htmlFor="fechaEvaluacion">
-                      Fecha de evaluación <span className="text-danger">*</span>
+                      Fecha de evaluación
                     </label>
                     <input
                       type="date"
-                      className={`form-control ${errores.fechaEvaluacion ? 'is-invalid' : ''}`}
+                      className="form-control bg-light"
                       id="fechaEvaluacion"
                       name="fechaEvaluacion"
                       value={formulario.fechaEvaluacion}
-                      onChange={actualizarCampo}
-                      disabled={soloLectura}
-                      required
+                      readOnly
+                      aria-readonly="true"
+                      title="Fecha del sistema, no editable"
                     />
-                    {errores.fechaEvaluacion && <div className="invalid-feedback">{errores.fechaEvaluacion}</div>}
+                    <div className="form-text">Fecha automática del sistema.</div>
                   </div>
 
                   <div className="col-md-4">
@@ -351,9 +361,21 @@ export default function EvaluadorEvaluar() {
                       <option value="finalizada">Finalizada</option>
                     </select>
                   </div>
-                </div>
+                  </div>
+                </section>
 
-                <div className="mb-3">
+                <section className="evaluador-form-section mt-3">
+                  <div className="evaluador-form-section-head">
+                    <span className="evaluador-form-section-icon">
+                      <i className="bi bi-chat-square-text" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h6>Observaciones psicolaborales</h6>
+                      <p>Describe hallazgos, ajuste al cargo y recomendaciones.</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-0">
                   <label className="form-label" htmlFor="observaciones">
                     Observaciones psicolaborales <span className="text-danger">*</span>
                   </label>
@@ -377,20 +399,23 @@ export default function EvaluadorEvaluar() {
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
+                </section>
 
-            <div className="aqua-card evaluador-antecedentes mt-3">
-              <div className="card-header">
-                <i className="bi bi-chat-left-text me-2" aria-hidden="true" />
-                Antecedentes de entrevista
-                <span className="badge rounded-pill bg-tint-info ms-2">Opcional</span>
-              </div>
-              <div className="card-body">
-                <p className="text-muted-aqua small mb-3">
-                  Información cualitativa que complementa la evaluación. No es una batería de tests.
-                </p>
-                <div className="row g-3">
+                <section className="evaluador-form-section evaluador-form-section-optional mt-3">
+                  <div className="evaluador-form-section-head">
+                    <span className="evaluador-form-section-icon">
+                      <i className="bi bi-chat-left-text" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h6>
+                        Antecedentes de entrevista
+                        <span className="badge rounded-pill bg-tint-info ms-2">Opcional</span>
+                      </h6>
+                      <p>Información cualitativa que complementa la evaluación. No es una batería de tests.</p>
+                    </div>
+                  </div>
+
+                  <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label" htmlFor="cargoActual">
                       Cargo actual o de referencia
@@ -424,6 +449,7 @@ export default function EvaluadorEvaluar() {
                     />
                   </div>
                 </div>
+                </section>
               </div>
 
               <div className="card-footer evaluacion-acciones-bar d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
@@ -460,10 +486,6 @@ export default function EvaluadorEvaluar() {
                       </button>
                     </>
                   )}
-                  <Link to="/evaluador/mis-solicitudes" className="btn btn-outline-aqua btn-sm px-3 text-nowrap">
-                    <i className="bi bi-x-circle me-1" aria-hidden="true" />
-                    {soloLectura ? 'Volver a mis solicitudes' : 'Cancelar'}
-                  </Link>
                 </div>
               </div>
             </div>

@@ -549,11 +549,51 @@ body {
   letter-spacing: 0.03em;
 }
 
-.evaluador-antecedentes .card-body {
+.evaluador-form-section {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--aqua-border);
+  border-radius: 10px;
+  background: #fbfcff;
+}
+
+.evaluador-form-section-optional {
   background: #fff;
 }
 
-.evaluador-antecedentes .evaluacion-acciones-bar {
+.evaluador-form-section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 0.9rem;
+}
+
+.evaluador-form-section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--aqua-surface-alt);
+  color: var(--aqua-primary);
+  font-size: 0.95rem;
+}
+
+.evaluador-form-section-head h6 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--aqua-primary-dark);
+}
+
+.evaluador-form-section-head p {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--aqua-muted);
+}
+
+.evaluacion-acciones-bar {
   padding: 0.85rem 1rem;
   border-top: 1px solid var(--aqua-border);
   border-radius: 0 0 8px 8px;
