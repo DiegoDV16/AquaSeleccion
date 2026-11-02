@@ -7,6 +7,7 @@ import ResultadoBadge from '../../components/ui/ResultadoBadge.jsx';
 import FichaPostulante from '../../components/ui/FichaPostulante.jsx';
 import VisorCvModal from '../../components/ui/VisorCvModal.jsx';
 import { formatearFecha } from '../../mock/solicitudes.js';
+import { descargarCv } from '../../services/candidatosApi.js';
 import { obtenerSolicitud } from '../../services/solicitudesApi.js';
 
 const PRIORIDAD = {
@@ -27,6 +28,7 @@ export default function AnalistaSolicitudDetalle() {
   const [error, setError] = useState('');
   const [recarga, setRecarga] = useState(0);
   const [cvVisible, setCvVisible] = useState(false);
+  const [errorAccion, setErrorAccion] = useState('');
 
   useEffect(() => {
     let vigente = true;
@@ -53,6 +55,26 @@ export default function AnalistaSolicitudDetalle() {
   }, [id, recarga]);
 
   const codigo = `SOL-${String(id).padStart(4, '0')}`;
+
+  async function descargarCurriculum() {
+    if (!solicitud?.candidato?.id) return;
+
+    const resultado = await descargarCv(solicitud.candidato.id);
+
+    if (!resultado.ok) {
+      setErrorAccion(resultado.mensaje ?? 'No se pudo descargar el currículum.');
+      return;
+    }
+
+    const objetoUrl = URL.createObjectURL(resultado.blob);
+    const enlace = document.createElement('a');
+    enlace.href = objetoUrl;
+    enlace.download = resultado.nombre;
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    URL.revokeObjectURL(objetoUrl);
+  }
 
   if (cargando) {
     return (
@@ -113,37 +135,26 @@ export default function AnalistaSolicitudDetalle() {
         }
       />
 
+      {errorAccion && (
+        <div className="alert alert-danger d-flex align-items-center gap-2" role="alert">
+          <i className="bi bi-exclamation-circle" aria-hidden="true" />
+          <span className="small">{errorAccion}</span>
+          <button
+            type="button"
+            className="btn-close ms-auto"
+            aria-label="Cerrar"
+            onClick={() => setErrorAccion('')}
+          />
+        </div>
+      )}
+
       <div className="row g-3">
         <div className="col-lg-4">
-          <FichaPostulante candidato={candidato} />
-
-          <div className="aqua-card mt-3">
-            <div className="card-header">
-              <i className="bi bi-file-earmark-pdf me-2" aria-hidden="true" />
-              Curriculum Vitae
-            </div>
-            <div className="card-body">
-              {candidato.cvArchivo ? (
-                <>
-                  <p className="small fw-semibold mb-1 text-break">
-                    {candidato.cvArchivo.split('/').pop()}
-                  </p>
-                  <p className="text-muted-aqua mb-3" style={{ fontSize: '0.78rem' }}>
-                    Documento almacenado en el servidor.
-                  </p>
-                  <button type="button" className="btn btn-aqua btn-sm" onClick={() => setCvVisible(true)}>
-                    <i className="bi bi-eye me-1" aria-hidden="true" />
-                    Previsualizar CV
-                  </button>
-                </>
-              ) : (
-                <p className="text-muted-aqua small mb-0">
-                  Postulacion sin CV adjunto. En los movimientos internos el respaldo es el legajo del
-                  colaborador.
-                </p>
-              )}
-            </div>
-          </div>
+          <FichaPostulante
+            candidato={candidato}
+            onCvPreview={() => setCvVisible(true)}
+            onCvDownload={descargarCurriculum}
+          />
         </div>
 
         <div className="col-lg-8">
@@ -153,83 +164,146 @@ export default function AnalistaSolicitudDetalle() {
               Datos de la solicitud
             </div>
             <div className="card-body">
-              <dl className="row mb-0 small">
-                <dt className="col-sm-4 text-muted-aqua fw-semibold">Codigo</dt>
-                <dd className="col-sm-8">{codigo}</dd>
-
-                <dt className="col-sm-4 text-muted-aqua fw-semibold">Estado</dt>
-                <dd className="col-sm-8">
-                  <EstadoBadge estado={solicitud.estado} />
-                </dd>
-
-                <dt className="col-sm-4 text-muted-aqua fw-semibold">Prioridad</dt>
-                <dd className="col-sm-8">
-                  <span className={`badge badge-estado ${prioridad.clase}`}>{prioridad.nombre}</span>
-                </dd>
-
-                <dt className="col-sm-4 text-muted-aqua fw-semibold">Fecha de solicitud</dt>
-                <dd className="col-sm-8">{formatearFecha(solicitud.fechaSolicitud)}</dd>
-
-                <dt className="col-sm-4 text-muted-aqua fw-semibold">Fecha de asignacion</dt>
-                <dd className="col-sm-8">{formatearFecha(solicitud.fechaAsignacion)}</dd>
-
-                <dt className="col-sm-4 text-muted-aqua fw-semibold">Evaluador responsable</dt>
-                <dd className="col-sm-8">
-                  {solicitud.evaluador ? (
-                    <>
-                      <span className="d-block">{solicitud.evaluador.nombre}</span>
-                      <span className="d-block text-muted-aqua" style={{ fontSize: '0.78rem' }}>
-                        {solicitud.evaluador.correo}
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <section className="ficha-seccion mt-0 h-100">
+                    <div className="ficha-seccion-titulo">
+                      <i className="bi bi-clipboard2-data" aria-hidden="true" />
+                      Resumen
+                    </div>
+                    <div className="ficha-dato">
+                      <span>Código</span>
+                      <span className="ficha-dato-valor">{codigo}</span>
+                    </div>
+                    <div className="ficha-dato">
+                      <span>Estado</span>
+                      <span className="ficha-dato-valor">
+                        <EstadoBadge estado={solicitud.estado} />
                       </span>
-                    </>
-                  ) : (
-                    'Sin asignar'
-                  )}
-                </dd>
+                    </div>
+                    <div className="ficha-dato">
+                      <span>Prioridad</span>
+                      <span className="ficha-dato-valor">
+                        <span className={`badge badge-estado ${prioridad.clase}`}>{prioridad.nombre}</span>
+                      </span>
+                    </div>
+                  </section>
+                </div>
 
-                <dt className="col-sm-4 text-muted-aqua fw-semibold">Cargo</dt>
-                <dd className="col-sm-8">
-                  {candidato.cargo} &middot; {candidato.familiaCargo}
-                </dd>
+                <div className="col-md-6">
+                  <section className="ficha-seccion mt-0 h-100">
+                    <div className="ficha-seccion-titulo">
+                      <i className="bi bi-calendar3" aria-hidden="true" />
+                      Fechas
+                    </div>
+                    <div className="ficha-dato">
+                      <span>Fecha de solicitud</span>
+                      <span className="ficha-dato-valor">{formatearFecha(solicitud.fechaSolicitud)}</span>
+                    </div>
+                    <div className="ficha-dato">
+                      <span>Fecha de asignación</span>
+                      <span className="ficha-dato-valor">{formatearFecha(solicitud.fechaAsignacion)}</span>
+                    </div>
+                  </section>
+                </div>
 
-                <dt className="col-sm-4 text-muted-aqua fw-semibold">Observaciones</dt>
-                <dd className="col-sm-8 mb-0">
-                  {solicitud.observaciones || <span className="text-muted-aqua">Sin observaciones.</span>}
-                </dd>
-              </dl>
+                <div className="col-12">
+                  <section className="ficha-seccion mt-0">
+                    <div className="ficha-seccion-titulo">
+                      <i className="bi bi-person-badge" aria-hidden="true" />
+                      Asignación
+                    </div>
+                    <div className="ficha-dato">
+                      <span>Evaluador responsable</span>
+                      <span className="ficha-dato-valor">
+                        {solicitud.evaluador ? (
+                          <>
+                            <span className="d-block">{solicitud.evaluador.nombre}</span>
+                            <span className="d-block text-muted-aqua" style={{ fontSize: '0.76rem' }}>
+                              {solicitud.evaluador.correo}
+                            </span>
+                          </>
+                        ) : (
+                          'Sin asignar'
+                        )}
+                      </span>
+                    </div>
+                    <div className="ficha-dato">
+                      <span>Cargo</span>
+                      <span className="ficha-dato-valor">
+                        {candidato.cargo} · {candidato.familiaCargo}
+                      </span>
+                    </div>
+                  </section>
+                </div>
+
+                <div className="col-12">
+                  <section className="ficha-seccion mt-0">
+                    <div className="ficha-seccion-titulo">
+                      <i className="bi bi-chat-left-text" aria-hidden="true" />
+                      Observaciones
+                    </div>
+                    <p className="text-muted-aqua small mb-0">
+                      {solicitud.observaciones || 'Sin observaciones.'}
+                    </p>
+                  </section>
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="aqua-card mt-3">
             <div className="card-header">
               <i className="bi bi-clipboard2-pulse me-2" aria-hidden="true" />
-              Evaluacion psicologica
+              Evaluación psicológica
             </div>
             <div className="card-body">
               {evaluacion ? (
-                <dl className="row mb-0 small">
-                  <dt className="col-sm-4 text-muted-aqua fw-semibold">Fecha de evaluacion</dt>
-                  <dd className="col-sm-8">{formatearFecha(evaluacion.fechaEvaluacion)}</dd>
-
-                  <dt className="col-sm-4 text-muted-aqua fw-semibold">Resultado</dt>
-                  <dd className="col-sm-8">
-                    <ResultadoBadge resultado={evaluacion.resultado} />
-                  </dd>
-
-                  <dt className="col-sm-4 text-muted-aqua fw-semibold">Observaciones</dt>
-                  <dd className="col-sm-8 mb-0">
-                    {evaluacion.observacion || (
-                      <span className="text-muted-aqua">Sin observaciones registradas.</span>
-                    )}
-                  </dd>
-                </dl>
+                <div className="row g-3">
+                  <div className="col-md-5">
+                    <section className="ficha-seccion mt-0 h-100">
+                      <div className="ficha-seccion-titulo">
+                        <i className="bi bi-clipboard2-check" aria-hidden="true" />
+                        Resultado
+                      </div>
+                      <div className="ficha-dato">
+                        <span>Fecha de evaluación</span>
+                        <span className="ficha-dato-valor">
+                          {formatearFecha(evaluacion.fechaEvaluacion)}
+                        </span>
+                      </div>
+                      <div className="ficha-dato">
+                        <span>Resultado</span>
+                        <span className="ficha-dato-valor">
+                          <ResultadoBadge resultado={evaluacion.resultado} />
+                        </span>
+                      </div>
+                    </section>
+                  </div>
+                  <div className="col-md-7">
+                    <section className="ficha-seccion mt-0 h-100">
+                      <div className="ficha-seccion-titulo">
+                        <i className="bi bi-chat-left-text" aria-hidden="true" />
+                        Observaciones
+                      </div>
+                      <p className="text-muted-aqua small mb-0">
+                        {evaluacion.observacion || 'Sin observaciones registradas.'}
+                      </p>
+                    </section>
+                  </div>
+                </div>
               ) : (
-                <div className="alert alert-info d-flex align-items-center gap-2 mb-0" role="alert">
-                  <i className="bi bi-clock-history" aria-hidden="true" />
-                  <span className="small">
-                    El evaluador aun no registra la evaluacion. La solicitud se encuentra en estado{' '}
-                    <strong>{solicitud.estado === 'pendiente' ? 'Pendiente' : 'En proceso'}</strong>.
+                <div className="detalle-vacio">
+                  <span className="detalle-vacio-icon" aria-hidden="true">
+                    <i className="bi bi-clock-history" />
                   </span>
+                  <div>
+                    <h6>Pendiente de evaluación</h6>
+                    <p className="text-muted-aqua small mb-0">
+                      El evaluador aún no registra la evaluación. La solicitud se encuentra en estado{' '}
+                      <strong>{solicitud.estado === 'pendiente' ? 'Pendiente' : 'En proceso'}</strong>.
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
