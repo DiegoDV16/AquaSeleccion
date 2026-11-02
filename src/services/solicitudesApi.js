@@ -1,7 +1,7 @@
 /**
  * solicitudesApi.js
- * Endpoints del modulo Analista para solicitudes de evaluacion
- * (backend/api/solicitudes/*.php).
+ * Endpoints de solicitudes de evaluacion y del modulo Evaluador
+ * (backend/api/solicitudes/*.php y backend/api/evaluaciones/*.php).
  */
 
 import { peticionFormulario } from './http.js';
@@ -24,4 +24,19 @@ export function obtenerSolicitud(idSolicitud) {
 /** POST evaluadores.php -> usuarios activos con rol Evaluador. */
 export function listarEvaluadores() {
   return peticionFormulario('backend/api/solicitudes/evaluadores.php');
+}
+
+/** POST evaluaciones/listar.php -> solicitudes asignadas al evaluador en sesion. */
+export function listarMisSolicitudes() {
+  return peticionFormulario('backend/api/evaluaciones/listar.php');
+}
+
+/** POST evaluaciones/detalle.php -> una solicitud asignada al evaluador en sesion. */
+export function obtenerMiSolicitud(idSolicitud) {
+  return peticionFormulario('backend/api/evaluaciones/detalle.php', { idSolicitud });
+}
+
+/** POST evaluaciones/guardar.php -> borrador o finalizacion de una evaluacion. */
+export function guardarEvaluacion(datos) {
+  return peticionFormulario('backend/api/evaluaciones/guardar.php', datos);
 }

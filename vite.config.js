@@ -1,9 +1,15 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   // El servidor de desarrollo usa el proxy /backend hacia Apache.
   plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.js'],
+  },
   server: {
     port: 5173,
     open: false,

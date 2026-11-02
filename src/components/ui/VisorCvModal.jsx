@@ -173,7 +173,7 @@ export default function VisorCvModal({ candidato, visible, onCerrar }) {
                     style={{ height: '65vh', backgroundColor: '#f8fafb' }}
                   />
                   <p className="text-center text-muted-aqua mt-3 mb-0" style={{ fontSize: '0.76rem' }}>
-                    Vista previa del documento almacenado en el servidor. La descarga esta deshabilitada.
+                    Documento PDF completo, navegable en una sola vista con desplazamiento vertical.
                   </p>
                 </>
               ) : cvAlmacenado && esWord ? (
@@ -196,7 +196,7 @@ export default function VisorCvModal({ candidato, visible, onCerrar }) {
                       />
                     </div>
                     <p className="text-center text-muted-aqua mt-3 mb-0" style={{ fontSize: '0.76rem' }}>
-                      Vista previa del documento Word almacenado en el servidor. La descarga esta deshabilitada.
+                      Vista previa continua del documento Word, organizada en una sola columna.
                     </p>
                   </>
                 ) : (

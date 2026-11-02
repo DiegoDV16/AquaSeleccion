@@ -21,7 +21,7 @@ El proyecto es un monolito con frontend SPA en React y backend PHP sobre MySQL. 
 ### Módulo Administrador
 - Dashboard con métricas de postulaciones y evaluaciones.
 - Listado de candidatos con previsualización y descarga del CV.
-- Registro manual de postulaciones internas.
+- Registro de postulaciones internas mediante un modal, con CV opcional.
 - CRUD de usuarios del sistema (crear, editar, eliminar, activar/inactivar).
 - Historial y trazabilidad de solicitudes.
 
@@ -88,6 +88,7 @@ AquaSeleccion/
 │   ├── api/
 │   │   ├── auth/           login.php, logout.php, session.php
 │   │   ├── candidatos/     listar.php, crear.php, actualizar.php, cv.php, descargar_cv.php
+│   │   ├── evaluaciones/   listar.php, detalle.php, guardar.php
 │   │   ├── solicitudes/    listar.php, crear.php, detalle.php, evaluadores.php
 │   │   └── usuarios/       listar.php, c_usuario.php, u_usuario.php, d_usuario.php
 │   ├── config/             conexión, sesión, roles, catálogos y controlador de candidato
@@ -130,14 +131,21 @@ npm install
 mysql -u root aquaseleccion < backend/sql/2026-11-01_analista.sql
 ```
 
-4. Copiar la plantilla de conexión:
+4. Aplicar las migraciones del módulo Evaluador:
+
+```bash
+mysql -u root aquaseleccion < backend/sql/migracion_evaluacion.sql
+mysql -u root aquaseleccion < backend/sql/migracion_evaluacion_bateria.sql
+```
+
+5. Copiar la plantilla de conexión:
 
 ```bash
 cp backend/config/conexion.example.php backend/config/conexion.php
 ```
 
-5. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
-6. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
+6. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
+7. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
 7. Iniciar el frontend:
 
 ```bash
@@ -168,7 +176,7 @@ npm run dev
 
 | ID | Rol | Acceso |
 | --- | --- | --- |
-| 1 | Administrador | `/admin/dashboard`, postulación interna, usuarios e historial |
+| 1 | Administrador | `/admin/dashboard`, candidatos, usuarios e historial |
 | 2 | Analista de Reclutamiento | Candidatos, solicitudes y creación de solicitudes |
 | 3 | Profesional Evaluador | Solo las solicitudes asignadas a su usuario |
 | 4 | Colaborador | Sin acceso a módulos de gestión; puede ser postulante interno |
@@ -214,14 +222,13 @@ Reglas:
 
 ### 5.4 Postulación interna
 
-- Solo puede registrarla un usuario autenticado con rol **Administrador**.
-- Se accede desde `/admin/postular-interno`.
-- Reutiliza el mismo controlador `c_candidato.php`, enviando el `idUsuario` del administrador en sesión.
-- Si se envía `idUsuario` sin sesión de Administrador, el backend responde `403`.
-- Los campos obligatorios y validaciones son los mismos que en la postulación externa, excepto la autorización de consentimiento, que no se exige en el formulario interno.
-- La postulación queda asociada al usuario administrador que la registra y se identifica como interna.
-- El currículum también es obligatorio en el formulario interno actual.
+- Puede registrarla un usuario autenticado con rol **Administrador**.
+- Se accede desde **Administrador → Candidatos → Nueva postulación interna**, que abre un modal.
+- El formulario consume `backend/api/candidatos/crear.php` en formato multipart; la fecha de registro se toma del sistema y es de solo lectura.
+- La postulación queda asociada al usuario que la registra y se identifica como interna.
+- El currículum es opcional: admite PDF, DOC o DOCX de hasta 5 MB.
 - El formulario permite observaciones de hasta 500 caracteres.
+- Ya no existe una página de postulación directa en `/admin/postular-interno`; el alta se realiza desde el modal de Candidatos.
 
 ### 5.5 Gestión de usuarios
 
@@ -265,6 +272,10 @@ Reglas:
 - Cada solicitud debe tener un candidato y un evaluador responsable; la fecha de asignación se registra automáticamente con la fecha del sistema.
 - El evaluador solo ve las solicitudes cuyo `evaluador_id` coincide con su usuario.
 - Para finalizar una evaluación se exige fecha de evaluación, resultado y observaciones de al menos 20 caracteres.
+- El evaluador guarda un borrador en estado `en_proceso`; al finalizar, la solicitud pasa a `finalizada` y el resultado solo se expone cuando está cerrada.
+- El módulo Evaluador usa endpoints propios en `backend/api/evaluaciones/`; el listado y el detalle filtran siempre por el evaluador de la sesión.
+- La evaluación admite antecedentes de entrevista opcionales: cargo actual o de referencia y comentario del evaluador. No son una batería de tests psicométricos.
+- Las observaciones se limitan a 250 caracteres; `estadoEvaluacion` se amplió a `VARCHAR(20)` para almacenar `con_observaciones`.
 - Una solicitud finalizada queda en modo solo lectura; para editarla debe cambiarse el estado del proceso.
 - La trazabilidad histórica en `historialsolicitudes` queda fuera de esta entrega; el módulo Administrador la muestra con datos simulados.
 
@@ -302,17 +313,16 @@ Reglas:
 - Carga de currículum con validación y almacenamiento.
 - Catálogo de familias y cargos desde base de datos.
 - Módulo Analista: registro de postulaciones internas con CV opcional, listado, edición y detalle de candidatos con previsualización y descarga del CV en PDF, DOC y DOCX.
-- Módulo Administrador: listado de candidatos con previsualización y descarga del CV.
+- Módulo Administrador: listado de candidatos y registro de postulaciones internas con CV opcional mediante modal.
 - Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
+- Módulo Evaluador: bandeja de solicitudes asignadas, ficha del postulante, CV, borrador y finalización de la evaluación psicolaboral con persistencia en `evaluacion`.
 
 ### Implementado con datos simulados
 - Dashboard y métricas.
-- Evaluación psicolaboral.
 - Historial de solicitudes.
 
 ### Pendiente o limitado
-- Persistencia real de evaluaciones e historial.
-- Endpoints para el módulo Evaluador.
+- Historial de solicitudes y trazabilidad.
 - Recuperación de contraseña.
 - Exportación CSV del historial.
 - Cobertura de pruebas limitada a los filtros del módulo Analista.

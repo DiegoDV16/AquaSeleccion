@@ -36,7 +36,7 @@ export default function AdminDashboard() {
         descripcion={`Sesion activa: ${usuario?.nombre ?? 'Administrador'} - datos simulados de demostracion`}
         acciones={
           <>
-            <Link to="/admin/postular-interno" className="btn btn-aqua btn-sm">
+            <Link to="/admin/candidatos?nueva=1" className="btn btn-aqua btn-sm">
               <i className="bi bi-person-plus me-1" aria-hidden="true" />
               Nueva postulación interna
             </Link>

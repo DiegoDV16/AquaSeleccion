@@ -11,7 +11,7 @@ export function listarCandidatos() {
   return peticionFormulario('backend/api/candidatos/listar.php');
 }
 
-/** POST crear.php -> registra un candidato externo creado por el analista. */
+/** POST crear.php -> registra una postulacion interna del analista o administrador. */
 export function crearCandidato(datos) {
   return peticionFormulario('backend/api/candidatos/crear.php', datos);
 }

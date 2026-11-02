@@ -41,6 +41,8 @@ function sqlSolicitudes(): string
                    e.idEvaluacion,
                    e.estadoEvaluacion AS resultadoEvaluacion,
                    e.fechaEvaluacion,
+                   e.cargoActual,
+                   e.comentarioEntrevista,
                    e.Observacion AS observacionEvaluacion
             FROM solicitudevaluacion s
             INNER JOIN candidato c ON c.idCandidato = s.idCandidato
