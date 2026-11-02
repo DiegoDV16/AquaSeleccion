@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import EstadoBadge from '../../components/ui/EstadoBadge.jsx';
 import ResultadoBadge from '../../components/ui/ResultadoBadge.jsx';
+import TipoPostulacionBadge from '../../components/ui/TipoPostulacionBadge.jsx';
 import { StatCardCompacta } from '../../components/ui/StatCard.jsx';
 import VisorCvModal from '../../components/ui/VisorCvModal.jsx';
 import { useAuth } from '../../context/AuthContext.js';
@@ -15,6 +16,16 @@ const PRIORIDAD = {
   normal: { nombre: 'Normal', clase: 'badge-estado-inactivo' },
   baja: { nombre: 'Baja', clase: 'badge-estado-inactivo' },
 };
+
+function iniciales(nombre = '') {
+  return String(nombre)
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((parte) => parte[0])
+    .join('')
+    .toUpperCase() || '?';
+}
 
 /** Solicitudes de evaluación asignadas al evaluador que inició sesión. */
 export default function EvaluadorMisSolicitudes() {
@@ -146,34 +157,67 @@ export default function EvaluadorMisSolicitudes() {
 
                 return (
                   <div className="col-md-6 col-xl-4" key={solicitud.id}>
-                    <article className="aqua-card h-100">
+                    <article className="aqua-card h-100 evaluador-solicitud-card">
                       <div className="card-header d-flex justify-content-between align-items-center gap-2">
-                        <span>{codigo}</span>
+                        <span className="fw-semibold">{codigo}</span>
                         <EstadoBadge estado={solicitud.estado} />
                       </div>
-                      <div className="card-body">
-                        <p className="fw-semibold mb-1">{candidato?.nombreCompleto ?? 'Postulante sin nombre'}</p>
-                        <p className="text-muted-aqua small mb-2">
-                          {candidato?.cargo ?? 'Cargo no definido'}
-                          {candidato?.familiaCargo ? ` · ${candidato.familiaCargo}` : ''}
-                        </p>
+                      <div className="card-body d-flex flex-column">
+                        <div className="d-flex align-items-start gap-3 mb-3">
+                          <span className="evaluador-card-avatar" aria-hidden="true">
+                            {iniciales(candidato?.nombreCompleto)}
+                          </span>
+                          <div style={{ minWidth: 0 }}>
+                            <h6
+                              className="fw-semibold mb-1 text-truncate"
+                              title={candidato?.nombreCompleto ?? 'Postulante sin nombre'}
+                            >
+                              {candidato?.nombreCompleto ?? 'Postulante sin nombre'}
+                            </h6>
+                            <p
+                              className="text-muted-aqua small mb-1 text-truncate"
+                              title={candidato?.cargo ?? 'Cargo no definido'}
+                            >
+                              {candidato?.cargo ?? 'Cargo no definido'}
+                            </p>
+                            <p className="text-muted-aqua mb-0" style={{ fontSize: '0.76rem' }}>
+                              {candidato?.familiaCargo ?? 'Sin familia de cargo'}
+                            </p>
+                          </div>
+                        </div>
 
-                        <span className={`badge badge-estado ${prioridad.clase} mb-3`}>
-                          Prioridad {prioridad.nombre}
-                        </span>
+                        <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
+                          <TipoPostulacionBadge tipo={candidato?.tipoPostulacion} />
+                          <span className={`badge badge-estado ${prioridad.clase}`}>
+                            Prioridad {prioridad.nombre}
+                          </span>
+                        </div>
 
-                        <dl className="row mb-0 small">
-                          <dt className="col-5 text-muted-aqua fw-semibold">Asignada</dt>
-                          <dd className="col-7">{formatearFecha(solicitud.fechaAsignacion)}</dd>
+                        <div className="border-top pt-3 mt-auto">
+                          <div className="d-flex justify-content-between align-items-center small mb-2">
+                            <span className="text-muted-aqua">
+                              <i className="bi bi-calendar3 me-1" aria-hidden="true" />
+                              Asignada
+                            </span>
+                            <span className="fw-semibold">{formatearFecha(solicitud.fechaAsignacion)}</span>
+                          </div>
 
-                          <dt className="col-5 text-muted-aqua fw-semibold">Evaluación</dt>
-                          <dd className="col-7">{formatearFecha(solicitud.evaluacion?.fechaEvaluacion)}</dd>
+                          <div className="d-flex justify-content-between align-items-center small mb-2">
+                            <span className="text-muted-aqua">
+                              <i className="bi bi-clipboard2-pulse me-1" aria-hidden="true" />
+                              Evaluación
+                            </span>
+                            <span>{formatearFecha(solicitud.evaluacion?.fechaEvaluacion)}</span>
+                          </div>
 
-                          <dt className="col-5 text-muted-aqua fw-semibold">Resultado</dt>
-                          <dd className="col-7 mb-0">
+                          <div className="d-flex justify-content-between align-items-center small">
+                            <span className="text-muted-aqua">
+                              <i className="bi bi-check2-square me-1" aria-hidden="true" />
+                              Resultado
+                            </span>
                             <ResultadoBadge resultado={resultado} />
-                          </dd>
-                        </dl>
+                          </div>
+                        </div>
                       </div>
                       <div className="card-footer bg-white d-flex gap-2">
                         <Link
@@ -181,16 +225,17 @@ export default function EvaluadorMisSolicitudes() {
                           className={`btn btn-sm flex-grow-1 ${solicitud.estado === 'finalizada' ? 'btn-soft' : 'btn-aqua'}`}
                         >
                           <i className="bi bi-clipboard2-check me-1" aria-hidden="true" />
-                          {solicitud.estado === 'finalizada' ? 'Ver evaluación' : 'Evaluar'}
+                          {solicitud.estado === 'finalizada' ? 'Ver evaluación' : 'Evaluar solicitud'}
                         </Link>
                         <button
                           type="button"
-                          className="btn btn-soft btn-sm"
+                          className="btn btn-soft btn-sm px-3"
                           disabled={!candidato?.cvArchivo}
                           onClick={() => setCandidatoCv(candidato)}
                           title={candidato?.cvArchivo ? 'Previsualizar CV' : 'Sin CV adjunto'}
                         >
                           <i className="bi bi-file-earmark-pdf" aria-hidden="true" />
+                          <span className="d-none d-sm-inline ms-1">CV</span>
                         </button>
                       </div>
                     </article>

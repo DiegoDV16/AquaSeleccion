@@ -524,6 +524,31 @@ body {
   color: var(--aqua-primary);
 }
 
+.evaluador-solicitud-card .card-body {
+  padding: 1rem;
+}
+
+.evaluador-solicitud-card .card-footer {
+  padding: 0.75rem 1rem;
+}
+
+.evaluador-card-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(14, 58, 93, 0.12);
+  border-radius: 50%;
+  background: var(--aqua-surface-alt);
+  color: var(--aqua-primary);
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
 .evaluacion-formulario .card-body {
   padding-left: 1rem;
   padding-right: 1rem;
