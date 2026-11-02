@@ -1,8 +1,9 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthContext } from '../../context/AuthContext.js';
+import { FUTURO_ROUTER } from '../../routes/futuroRouter.js';
 import Sidebar from './Sidebar.jsx';
 import { contarSolicitudes } from '../../services/solicitudesApi.js';
 
@@ -17,14 +18,21 @@ beforeEach(() => {
   });
 });
 
-function renderizarSidebar({ rolActivo = null, usuario = null, colapsado = false, onToggleColapsado = vi.fn() } = {}) {
-  return render(
-    <AuthContext.Provider value={{ rolActivo, usuario }}>
-      <MemoryRouter>
-        <Sidebar colapsado={colapsado} abierto={false} onNavegar={vi.fn()} onToggleColapsado={onToggleColapsado} />
-      </MemoryRouter>
-    </AuthContext.Provider>,
-  );
+async function renderizarSidebar({ rolActivo = null, usuario = null, colapsado = false, onToggleColapsado = vi.fn() } = {}) {
+  let resultado;
+
+  await act(async () => {
+    resultado = render(
+      <AuthContext.Provider value={{ rolActivo, usuario }}>
+        <MemoryRouter future={FUTURO_ROUTER}>
+          <Sidebar colapsado={colapsado} abierto={false} onNavegar={vi.fn()} onToggleColapsado={onToggleColapsado} />
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+    await Promise.resolve();
+  });
+
+  return resultado;
 }
 
 const analista = { rolActivo: 'analista', usuario: { id: 4 } };
@@ -32,23 +40,23 @@ const evaluador = { rolActivo: 'evaluador', usuario: { id: 8 } };
 const administrador = { rolActivo: 'administrador', usuario: { id: 1 } };
 
 describe('Sidebar: items por rol', () => {
-  it('el analista ve sus modulos y no los del administrador', () => {
-    renderizarSidebar(analista);
+  it('el analista ve sus modulos y no los del administrador', async () => {
+    await renderizarSidebar(analista);
 
     expect(screen.getByRole('link', { name: 'Candidatos' })).toHaveAttribute('href', '/analista/candidatos');
     expect(screen.getByRole('link', { name: 'Nueva solicitud' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
   });
 
-  it('el administrador ve sus modulos y no los del analista', () => {
-    renderizarSidebar(administrador);
+  it('el administrador ve sus modulos y no los del analista', async () => {
+    await renderizarSidebar(administrador);
 
     expect(screen.getByRole('link', { name: 'Usuarios del sistema' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Nueva solicitud' })).not.toBeInTheDocument();
   });
 
-  it('sin rol activo no muestra ningun item', () => {
-    renderizarSidebar({ rolActivo: null, usuario: null });
+  it('sin rol activo no muestra ningun item', async () => {
+    await renderizarSidebar({ rolActivo: null, usuario: null });
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
@@ -56,21 +64,21 @@ describe('Sidebar: items por rol', () => {
 
 describe('Sidebar: contadores', () => {
   it('el analista ve el total real de solicitudes', async () => {
-    renderizarSidebar(analista);
+    await renderizarSidebar(analista);
 
     const enlace = screen.getByRole('link', { name: 'Solicitudes' });
     expect(await within(enlace).findByText('3')).toBeInTheDocument();
   });
 
   it('el evaluador ve solo sus solicitudes pendientes', async () => {
-    renderizarSidebar(evaluador);
+    await renderizarSidebar(evaluador);
 
     const enlace = screen.getByRole('link', { name: 'Mis solicitudes' });
     expect(await within(enlace).findByText('1')).toBeInTheDocument();
   });
 
-  it('un item sin contador no muestra badge', () => {
-    renderizarSidebar(analista);
+  it('un item sin contador no muestra badge', async () => {
+    await renderizarSidebar(analista);
 
     const enlace = screen.getByRole('link', { name: 'Candidatos' });
     expect(enlace.querySelector('.badge')).toBeNull();
@@ -78,9 +86,9 @@ describe('Sidebar: contadores', () => {
 });
 
 describe('Sidebar: plegado', () => {
-  it('el boton ofrece plegar cuando esta desplegado y llama al handler', () => {
+  it('el boton ofrece plegar cuando esta desplegado y llama al handler', async () => {
     const onToggleColapsado = vi.fn();
-    renderizarSidebar({ ...analista, onToggleColapsado });
+    await renderizarSidebar({ ...analista, onToggleColapsado });
 
     const boton = screen.getByRole('button', { name: 'Plegar menu lateral' });
     boton.click();
@@ -88,15 +96,15 @@ describe('Sidebar: plegado', () => {
     expect(onToggleColapsado).toHaveBeenCalledTimes(1);
   });
 
-  it('cuando esta plegado ofrece expandir y cada enlace tiene tooltip', () => {
-    renderizarSidebar({ ...analista, colapsado: true });
+  it('cuando esta plegado ofrece expandir y cada enlace tiene tooltip', async () => {
+    await renderizarSidebar({ ...analista, colapsado: true });
 
     expect(screen.getByRole('button', { name: 'Expandir menu lateral' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Candidatos' })).toHaveAttribute('data-tooltip', 'Candidatos');
   });
 
-  it('cuando esta desplegado no agrega tooltip', () => {
-    renderizarSidebar(analista);
+  it('cuando esta desplegado no agrega tooltip', async () => {
+    await renderizarSidebar(analista);
 
     expect(screen.getByRole('link', { name: 'Candidatos' })).not.toHaveAttribute('data-tooltip');
   });

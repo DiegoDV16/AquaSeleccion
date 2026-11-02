@@ -3,10 +3,11 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
 import Footer from './Footer.jsx';
+import { FUTURO_ROUTER } from '../../routes/futuroRouter.js';
 
 function renderizarFooter() {
   return render(
-    <MemoryRouter>
+    <MemoryRouter future={FUTURO_ROUTER}>
       <Footer />
     </MemoryRouter>,
   );

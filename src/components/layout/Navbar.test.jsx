@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { AuthContext } from '../../context/AuthContext.js';
 import { obtenerRol } from '../../mock/catalogoRoles.js';
+import { FUTURO_ROUTER } from '../../routes/futuroRouter.js';
 import Navbar from './Navbar.jsx';
 
 const usuario = {
@@ -17,7 +18,7 @@ const usuario = {
 function renderizarNavbar({ logout = vi.fn(), rol = obtenerRol('analista') } = {}) {
   return render(
     <AuthContext.Provider value={{ usuario, rol, logout }}>
-      <MemoryRouter initialEntries={['/analista/candidatos']}>
+      <MemoryRouter initialEntries={['/analista/candidatos']} future={FUTURO_ROUTER}>
         <Routes>
           <Route path="/analista/candidatos" element={<Navbar sidebarAbierto={false} onToggleSidebar={vi.fn()} />} />
           <Route path="/login" element={<p>Pantalla login</p>} />

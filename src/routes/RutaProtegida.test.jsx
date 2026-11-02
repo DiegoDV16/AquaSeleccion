@@ -4,11 +4,12 @@ import { describe, expect, it } from 'vitest';
 
 import { AuthContext } from '../context/AuthContext.js';
 import RutaProtegida from './RutaProtegida.jsx';
+import { FUTURO_ROUTER } from './futuroRouter.js';
 
 function renderizarRuta(valorAuth, roles = ['administrador']) {
   return render(
     <AuthContext.Provider value={valorAuth}>
-      <MemoryRouter initialEntries={['/admin/dashboard']}>
+      <MemoryRouter initialEntries={['/admin/dashboard']} future={FUTURO_ROUTER}>
         <Routes>
           <Route path="/login" element={<p>Pantalla de login</p>} />
           <Route path="/sin-permisos" element={<p>Pantalla sin permisos</p>} />

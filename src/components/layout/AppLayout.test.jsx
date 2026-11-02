@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { AuthContext } from '../../context/AuthContext.js';
 import { obtenerRol } from '../../mock/catalogoRoles.js';
+import { FUTURO_ROUTER } from '../../routes/futuroRouter.js';
 import AppLayout from './AppLayout.jsx';
 
 function renderizarLayout({ cargando = false, autenticado = true } = {}) {
@@ -19,7 +20,7 @@ function renderizarLayout({ cargando = false, autenticado = true } = {}) {
 
   return render(
     <AuthContext.Provider value={valor}>
-      <MemoryRouter initialEntries={['/analista/candidatos']}>
+      <MemoryRouter initialEntries={['/analista/candidatos']} future={FUTURO_ROUTER}>
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/analista/candidatos" element={<p>Vista interna</p>} />
