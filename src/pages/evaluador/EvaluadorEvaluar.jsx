@@ -76,7 +76,7 @@ export default function EvaluadorEvaluar() {
         fechaEvaluacion: actual.evaluacion?.fechaEvaluacion ?? fechaHoyLocal(),
         resultado: actual.evaluacion?.resultado ?? '',
         observaciones: actual.evaluacion?.observacion ?? '',
-        cargoActual: actual.evaluacion?.cargoActual ?? '',
+        cargoActual: actual.evaluacion?.cargoActual || actual.candidato?.cargo || '',
         comentarioEntrevista: actual.evaluacion?.comentarioEntrevista ?? '',
       });
     }
@@ -422,15 +422,15 @@ export default function EvaluadorEvaluar() {
                     </label>
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control bg-light"
                       id="cargoActual"
                       name="cargoActual"
-                      maxLength={100}
-                      value={formulario.cargoActual}
-                      onChange={actualizarCampo}
-                      disabled={soloLectura}
-                      placeholder={cargo !== '-' ? cargo : 'Cargo evaluado'}
+                      value={formulario.cargoActual || (cargo !== '-' ? cargo : '')}
+                      readOnly
+                      aria-readonly="true"
+                      title="Cargo de referencia, no editable"
                     />
+                    <div className="form-text">Se toma del cargo evaluado.</div>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label" htmlFor="comentarioEntrevista">
