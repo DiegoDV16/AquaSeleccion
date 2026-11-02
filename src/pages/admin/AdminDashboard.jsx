@@ -14,6 +14,75 @@ const COLORES_ESTADO = {
   finalizada: 'var(--aqua-solid-success)',
 };
 
+function DonutChart({ segmentos, total, etiqueta }) {
+  const tamano = 164;
+  const grosor = 17;
+  const centro = tamano / 2;
+  const radio = (tamano - grosor) / 2;
+  const circunferencia = 2 * Math.PI * radio;
+  let acumulado = 0;
+
+  return (
+    <svg
+      width={tamano}
+      height={tamano}
+      viewBox={`0 0 ${tamano} ${tamano}`}
+      role="img"
+      aria-label={`${etiqueta}: ${total} solicitudes`}
+      className="dashboard-donut"
+    >
+      <circle
+        cx={centro}
+        cy={centro}
+        r={radio}
+        fill="none"
+        stroke="var(--aqua-surface-alt)"
+        strokeWidth={grosor}
+      />
+      {segmentos.map((segmento) => {
+        const proporcion = total > 0 ? segmento.total / total : 0;
+        const longitud = proporcion * circunferencia;
+        const trazo = (
+          <circle
+            key={segmento.clave}
+            cx={centro}
+            cy={centro}
+            r={radio}
+            fill="none"
+            stroke={segmento.color}
+            strokeWidth={grosor}
+            strokeDasharray={`${Math.max(longitud - 2, 0)} ${circunferencia}`}
+            strokeDashoffset={-acumulado}
+            transform={`rotate(-90 ${centro} ${centro})`}
+          />
+        );
+
+        acumulado += longitud;
+        return trazo;
+      })}
+      <text
+        x={centro}
+        y={centro - 2}
+        textAnchor="middle"
+        fill="var(--aqua-primary-dark)"
+        fontSize="1.65rem"
+        fontWeight="700"
+      >
+        {total}
+      </text>
+      <text
+        x={centro}
+        y={centro + 18}
+        textAnchor="middle"
+        fill="var(--aqua-muted)"
+        fontSize="0.7rem"
+      >
+        solicitudes
+      </text>
+    </svg>
+  );
+}
+
 /** Dashboard del modulo Administrador con datos reales de MySQL. */
 export default function AdminDashboard() {
   const { usuario, rolActivo } = useAuth();
@@ -183,7 +252,6 @@ export default function AdminDashboard() {
 
   const maxFamilia = Math.max(...porFamilia.map((familia) => familia.total), 1);
   const maxCargo = Math.max(...topCargos.map((item) => item.postulaciones), 1);
-  const maxResoluciones = Math.max(...porEvaluador.map((item) => item.total), 1);
 
   return (
     <>
@@ -346,29 +414,31 @@ export default function AdminDashboard() {
               Solicitudes por estado
             </div>
             <div className="card-body">
-              {porEstado.map((item) => (
-                <div className="dist-row dashboard-dist-item" key={item.clave}>
-                  <div className="dist-head">
-                    <span className="dist-name">{item.nombre}</span>
-                    <span className="dist-value">{item.total}</span>
-                  </div>
-                  <div
-                    className="dist-bar"
-                    role="progressbar"
-                    aria-label={`${item.nombre}: ${item.total} solicitudes`}
-                    aria-valuenow={item.total}
-                    aria-valuemin={0}
-                    aria-valuemax={Math.max(totalSolicitudes, 1)}
-                  >
-                    <span
-                      style={{
-                        width: anchoBarra(item.total, totalSolicitudes),
-                        backgroundColor: COLORES_ESTADO[item.clave],
-                      }}
-                    />
-                  </div>
+              <div className="d-flex flex-column flex-sm-row align-items-center gap-3">
+                <DonutChart
+                  segmentos={porEstado.map((item) => ({
+                    ...item,
+                    color: COLORES_ESTADO[item.clave],
+                  }))}
+                  total={totalSolicitudes}
+                  etiqueta="Solicitudes por estado"
+                />
+
+                <div className="dashboard-legend w-100">
+                  {porEstado.map((item) => (
+                    <div className="dashboard-legend-item" key={item.clave}>
+                      <span
+                        className="dashboard-legend-dot"
+                        style={{ backgroundColor: COLORES_ESTADO[item.clave] }}
+                        aria-hidden="true"
+                      />
+                      <span>{item.nombre}</span>
+                      <strong>{item.total}</strong>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
               <p className="text-muted-aqua mb-0 mt-3" style={{ fontSize: '0.78rem' }}>
                 <i className="bi bi-info-circle me-1" aria-hidden="true" />
                 {totalSolicitudes} solicitudes registradas en el sistema.
@@ -472,18 +542,30 @@ export default function AdminDashboard() {
                       <span className="dist-value">{evaluador.total}</span>
                     </div>
                     <div
-                      className="dist-bar"
-                      role="progressbar"
-                      aria-label={`${evaluador.total} resoluciones de ${evaluador.nombre}`}
-                      aria-valuenow={evaluador.total}
-                      aria-valuemin={0}
-                      aria-valuemax={maxResoluciones}
+                      className="dashboard-stacked-bar"
+                      role="img"
+                      aria-label={`${evaluador.nombre}: ${evaluador.aptos} aptos, ${evaluador.no_aptos} no aptos, ${evaluador.observaciones} con observaciones`}
                     >
                       <span
                         style={{
-                          width: anchoBarra(evaluador.total, maxResoluciones),
-                          backgroundColor: 'var(--aqua-solid-primary)',
+                          width: `${evaluador.total > 0 ? (evaluador.aptos / evaluador.total) * 100 : 0}%`,
+                          backgroundColor: 'var(--aqua-solid-success)',
                         }}
+                        title={`Apto: ${evaluador.aptos}`}
+                      />
+                      <span
+                        style={{
+                          width: `${evaluador.total > 0 ? (evaluador.no_aptos / evaluador.total) * 100 : 0}%`,
+                          backgroundColor: 'var(--aqua-solid-danger)',
+                        }}
+                        title={`No apto: ${evaluador.no_aptos}`}
+                      />
+                      <span
+                        style={{
+                          width: `${evaluador.total > 0 ? (evaluador.observaciones / evaluador.total) * 100 : 0}%`,
+                          backgroundColor: 'var(--aqua-solid-warning)',
+                        }}
+                        title={`Con observaciones: ${evaluador.observaciones}`}
                       />
                     </div>
                     <div className="d-flex flex-wrap gap-2 mt-2">

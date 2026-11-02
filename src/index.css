@@ -414,6 +414,50 @@ body {
   margin-top: 0.55rem;
 }
 
+.dashboard-donut {
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+.dashboard-legend {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.dashboard-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--aqua-muted);
+  font-size: 0.82rem;
+}
+
+.dashboard-legend-item strong {
+  margin-left: auto;
+  color: var(--aqua-primary-dark);
+}
+
+.dashboard-legend-dot {
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dashboard-stacked-bar {
+  display: flex;
+  height: 10px;
+  margin-top: 0.45rem;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--aqua-surface-alt);
+}
+
+.dashboard-stacked-bar span {
+  display: block;
+  height: 100%;
+}
+
 .dashboard-request-list,
 .dashboard-activity-list {
   display: flex;
