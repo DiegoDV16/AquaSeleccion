@@ -5,43 +5,18 @@ declare(strict_types=1);
 require_once __DIR__ . '/conexion.php';
 require_once __DIR__ . '/sesion.php';
 
-header('Content-Type: text/html; charset=utf-8');
-
-function destinoFormulario(): string
-{
-    $referer = $_SERVER['HTTP_REFERER'] ?? '';
-    $partes = parse_url($referer);
-    $esInterna = !empty($_POST['idUsuario']);
-
-    if (is_array($partes) && isset($partes['scheme'], $partes['host'])) {
-        $puerto = isset($partes['port']) ? ':' . $partes['port'] : '';
-        $ruta = $partes['path'] ?? '';
-        $esInterna = $esInterna || str_contains($ruta, '/admin/');
-        $marcador = $esInterna ? '/admin/' : '/postular';
-        $posicion = strpos($ruta, $marcador);
-        $base = $posicion !== false ? substr($ruta, 0, $posicion) : '';
-        $destino = $esInterna ? '/admin/postular-interno' : '/postular';
-
-        return $partes['scheme'] . '://' . $partes['host'] . $puerto . $base . $destino;
-    }
-
-    return $esInterna
-        ? 'http://localhost:5173/admin/postular-interno'
-        : 'http://localhost:5173/postular';
-}
-
+/**
+ * Responde siempre en JSON para que el formulario publico pueda mostrar el
+ * resultado en un modal, sin redirecciones ni alertas del navegador.
+ */
 function responder(int $estado, string $mensaje): void
 {
     http_response_code($estado);
-    $mensajeJson = json_encode(
-        $mensaje,
-        JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-    );
-    $destinoJson = json_encode(destinoFormulario(), JSON_UNESCAPED_SLASHES);
-
-    echo '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Postulación</title></head><body>';
-    echo '<script>alert(' . $mensajeJson . '); window.location.replace(' . $destinoJson . ');</script>';
-    echo '</body></html>';
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'ok' => $estado >= 200 && $estado < 300,
+        'mensaje' => $mensaje,
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -170,6 +145,10 @@ if (
     responder(400, 'El currículum debe ser un PDF o un documento Word (.doc o .docx).');
 }
 
+if ((int) $archivo['size'] > 5 * 1024 * 1024) {
+    responder(400, 'El currículum supera el tamaño máximo de 5 MB.');
+}
+
 $nombreCv = bin2hex(random_bytes(16)) . '.' . $extensionCv;
 $destinoCv = $directorioCv . DIRECTORY_SEPARATOR . $nombreCv;
 if (!move_uploaded_file($archivo['tmp_name'], $destinoCv)) {
@@ -208,13 +187,11 @@ if ($idCandidato === false || $idCandidato === '0' || $idCandidato === '') {
     throw new RuntimeException('La base de datos no devolvió el identificador del candidato.');
 }
 
-$fechaSolicitudMostrar = date('d-m-y');
-
 if ($idUsuario !== null) {
-    responder(201, "Postulación interna registrada el {$fechaSolicitudMostrar}. Número de seguimiento: {$idCandidato}.");
+    responder(201, 'Postulación interna registrada correctamente.');
 }
 
-responder(201, "¡Listo! Recibimos tu postulación el {$fechaSolicitudMostrar}. Tu número de seguimiento es {$idCandidato}.");
+responder(201, 'Tu postulación fue enviada correctamente. El equipo de Personas revisará tus antecedentes.');
 } catch (Throwable $e) {
     restore_error_handler();
 

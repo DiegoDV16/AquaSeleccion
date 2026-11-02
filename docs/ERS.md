@@ -203,7 +203,7 @@ npm test -- --run
 
 ```text
 Test Files  17 passed (17)
-Tests       76 passed (76)
+Tests       77 passed (77)
 ```
 
 **Archivos principales:**
@@ -232,7 +232,7 @@ Tests       76 passed (76)
 | IE2.1.1 Estructura React y pertinencia VcM | Flujo completo de candidato, solicitud, evaluación y auditoría |
 | IE2.1.2 Componentes, props y responsive | Componentes UI reutilizables, `.map()`, Bootstrap 5 y vistas adaptables |
 | IE2.1.5 Estado, formularios, filtros y navegación | `useState`, `useEffect`, validaciones, filtros y React Router |
-| IE2.2.1 / IE2.3.1 Pruebas Vitest | 17 archivos y 76 pruebas ejecutadas correctamente |
+| IE2.2.1 / IE2.3.1 Pruebas Vitest | 17 archivos y 77 pruebas ejecutadas correctamente |
 | IE2.1.3 Problema y diseño frontend | Este documento y README explican problema, alcance y solución |
 | IE2.1.4 Dominio de componentes y responsividad | Arquitectura de componentes y uso de Bootstrap documentados |
 | IE2.1.6 Flujo interactivo y coherencia | Recorrido funcional de postulación a historial |

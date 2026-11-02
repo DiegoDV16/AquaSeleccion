@@ -11,6 +11,11 @@ export function listarCandidatos() {
   return peticionFormulario('backend/api/candidatos/listar.php');
 }
 
+/** POST c_candidato.php -> registra una postulación externa pública. */
+export function crearPostulacionPublica(datos) {
+  return peticionFormulario('backend/config/c_candidato.php', datos);
+}
+
 /** POST crear.php -> registra una postulacion interna del analista o administrador. */
 export function crearCandidato(datos) {
   return peticionFormulario('backend/api/candidatos/crear.php', datos);

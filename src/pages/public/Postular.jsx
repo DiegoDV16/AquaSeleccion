@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import ConfirmacionModal from '../../components/ui/ConfirmacionModal.jsx';
+import { crearPostulacionPublica } from '../../services/candidatosApi.js';
+
 const ESTADO_INICIAL = {
   fechaSolicitud: '',
   nombres: '',
@@ -44,6 +47,8 @@ export default function Postular() {
   const [cv, setCv] = useState(null);
   const [arrastrando, setArrastrando] = useState(false);
   const [errores, setErrores] = useState({});
+  const [enviando, setEnviando] = useState(false);
+  const [resultado, setResultado] = useState(null);
   const inputArchivoRef = useRef(null);
 
   useEffect(() => {
@@ -194,8 +199,44 @@ export default function Postular() {
     return Object.keys(nuevosErrores).length === 0;
   }
 
-  function manejarEnvio(evento) {
-    if (!validarFormulario()) evento.preventDefault();
+  async function manejarEnvio(evento) {
+    evento.preventDefault();
+
+    if (enviando || !validarFormulario()) return;
+
+    setEnviando(true);
+
+    const respuesta = await crearPostulacionPublica({
+      fechaSolicitud: formulario.fechaSolicitud,
+      nombres: formulario.nombres,
+      apellidoPaterno: formulario.apellidoPaterno,
+      apellidoMaterno: formulario.apellidoMaterno,
+      correo: formulario.correo,
+      telefono: formulario.telefono,
+      idFamiliaCargo: formulario.idFamiliaCargo,
+      idCargo: formulario.idCargo,
+      observaciones: formulario.comentarios,
+      autorizacion: formulario.autorizacion ? '1' : '',
+      curriculumCv: cv,
+    });
+
+    setEnviando(false);
+
+    if (!respuesta?.ok) {
+      setResultado({
+        tipo: 'error',
+        titulo: 'No pudimos enviar tu postulación',
+        mensaje: respuesta?.mensaje ?? 'Ocurrió un problema al enviar tus antecedentes. Inténtalo nuevamente.',
+      });
+      return;
+    }
+
+    setResultado({
+      tipo: 'exito',
+      titulo: 'Postulación enviada',
+      mensaje: respuesta.mensaje,
+    });
+    limpiarFormulario();
   }
 
   function limpiarFormulario() {
@@ -331,9 +372,6 @@ export default function Postular() {
                 <form
                   id="formulario-postulacion"
                   className="aqua-form public-form"
-                  method="POST"
-                  action="http://localhost/AquaSeleccion/backend/config/c_candidato.php"
-                  encType="multipart/form-data"
                   onSubmit={manejarEnvio}
                   noValidate
                 >
@@ -710,9 +748,19 @@ export default function Postular() {
                       <button
                         type="submit"
                         className="btn btn-aqua d-flex align-items-center justify-content-center gap-2 px-4"
+                        disabled={enviando}
                       >
-                        <i className="bi bi-send-fill" aria-hidden="true" />
-                        Enviar postulación
+                        {enviando ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm" aria-hidden="true" />
+                            Enviando...
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-send-fill" aria-hidden="true" />
+                            Enviar postulación
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -787,6 +835,24 @@ export default function Postular() {
           <span>Proceso confidencial · Uso exclusivo para postulaciones</span>
         </div>
       </footer>
+
+      {resultado && (
+        <ConfirmacionModal
+          visible
+          titulo={resultado.titulo}
+          icono={resultado.tipo === 'exito' ? 'check-lg' : 'exclamation-triangle'}
+          tinte={resultado.tipo === 'exito' ? 'bg-tint-success' : 'bg-tint-danger'}
+          acciones={[
+            {
+              etiqueta: resultado.tipo === 'exito' ? 'Cerrar' : 'Volver al formulario',
+              variante: 'btn-aqua',
+              onClick: () => setResultado(null),
+            },
+          ]}
+        >
+          <p className="mb-0">{resultado.mensaje}</p>
+        </ConfirmacionModal>
+      )}
     </div>
   );
 }
