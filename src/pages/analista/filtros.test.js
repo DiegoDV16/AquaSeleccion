@@ -61,10 +61,17 @@ describe('filtrarCandidatos', () => {
     expect(filtrarCandidatos(candidatos, { tipo: 'externa' })[0].id).toBe(1);
   });
 
-  it('filtra por rango de meses de postulacion', () => {
-    expect(filtrarCandidatos(candidatos, { mesDesde: '2026-10', mesHasta: '2026-12' })[0].id).toBe(2);
-    expect(filtrarCandidatos(candidatos, { mesDesde: '2026-01', mesHasta: '2026-09' })[0].id).toBe(1);
-    expect(filtrarCandidatos(candidatos, { mesDesde: '2026-10' })).toHaveLength(1);
+  it('filtra por rango de fechas de postulacion', () => {
+    expect(
+      filtrarCandidatos(candidatos, { fechaDesde: '2026-10-01', fechaHasta: '2026-12-31' })[0].id,
+    ).toBe(2);
+    expect(
+      filtrarCandidatos(candidatos, { fechaDesde: '2026-01-01', fechaHasta: '2026-09-30' })[0].id,
+    ).toBe(1);
+    expect(filtrarCandidatos(candidatos, { fechaDesde: '2026-10-01' })).toHaveLength(1);
+    expect(
+      filtrarCandidatos(candidatos, { fechaDesde: '2026-09-15', fechaHasta: '2026-09-15' })[0].id,
+    ).toBe(1);
   });
 
   it('combina texto y origen', () => {

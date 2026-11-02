@@ -54,8 +54,8 @@ export default function AnalistaCandidatos() {
   const [errorCatalogos, setErrorCatalogos] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('todas');
-  const [mesDesde, setMesDesde] = useState('');
-  const [mesHasta, setMesHasta] = useState('');
+  const [fechaDesde, setFechaDesde] = useState('');
+  const [fechaHasta, setFechaHasta] = useState('');
   const [detalle, setDetalle] = useState(null);
   const [candidatoCv, setCandidatoCv] = useState(null);
   const [mensaje, setMensaje] = useState('');
@@ -109,8 +109,8 @@ export default function AnalistaCandidatos() {
   }, []);
 
   const visibles = useMemo(
-    () => filtrarCandidatos(candidatos, { busqueda, tipo: filtroTipo, mesDesde, mesHasta }),
-    [candidatos, busqueda, filtroTipo, mesDesde, mesHasta],
+    () => filtrarCandidatos(candidatos, { busqueda, tipo: filtroTipo, fechaDesde, fechaHasta }),
+    [candidatos, busqueda, filtroTipo, fechaDesde, fechaHasta],
   );
 
   const cargosDisponibles = useMemo(() => {
@@ -420,40 +420,42 @@ export default function AnalistaCandidatos() {
 
           <div className="row g-2 mt-1">
             <div className="col-sm-6 col-lg-3">
-              <label className="form-label small text-muted-aqua mb-1" htmlFor="mes-desde">
+              <label className="form-label small text-muted-aqua mb-1" htmlFor="fecha-desde">
                 Postulación desde
               </label>
               <input
-                type="month"
+                type="date"
                 className="form-control form-control-sm"
-                id="mes-desde"
-                value={mesDesde}
-                onChange={(evento) => setMesDesde(evento.target.value)}
+                id="fecha-desde"
+                value={fechaDesde}
+                max={fechaHasta || undefined}
+                onChange={(evento) => setFechaDesde(evento.target.value)}
               />
             </div>
             <div className="col-sm-6 col-lg-3">
-              <label className="form-label small text-muted-aqua mb-1" htmlFor="mes-hasta">
+              <label className="form-label small text-muted-aqua mb-1" htmlFor="fecha-hasta">
                 Postulación hasta
               </label>
               <input
-                type="month"
+                type="date"
                 className="form-control form-control-sm"
-                id="mes-hasta"
-                value={mesHasta}
-                onChange={(evento) => setMesHasta(evento.target.value)}
+                id="fecha-hasta"
+                value={fechaHasta}
+                min={fechaDesde || undefined}
+                onChange={(evento) => setFechaHasta(evento.target.value)}
               />
             </div>
             <div className="col-lg-6 d-flex align-items-end justify-content-lg-end">
-              {(mesDesde || mesHasta) && (
+              {(fechaDesde || fechaHasta) && (
                 <button
                   type="button"
                   className="btn btn-link btn-sm text-decoration-none p-0"
                   onClick={() => {
-                    setMesDesde('');
-                    setMesHasta('');
+                    setFechaDesde('');
+                    setFechaHasta('');
                   }}
                 >
-                  Limpiar meses
+                  Limpiar fechas
                 </button>
               )}
             </div>
