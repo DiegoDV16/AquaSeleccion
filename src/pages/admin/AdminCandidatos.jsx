@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import TipoPostulacionBadge from '../../components/ui/TipoPostulacionBadge.jsx';
 import VisorCvModal from '../../components/ui/VisorCvModal.jsx';
+import PostulacionInternaModal from '../../components/candidatos/PostulacionInternaModal.jsx';
 import { formatearFecha } from '../../mock/solicitudes.js';
 import { listarCandidatos } from '../../services/candidatosApi.js';
 
@@ -28,6 +29,8 @@ export default function AdminCandidatos() {
   const [busqueda, setBusqueda] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('todas');
   const [candidatoCv, setCandidatoCv] = useState(null);
+  const [mostrarPostulacion, setMostrarPostulacion] = useState(false);
+  const [parametros, setParametros] = useSearchParams();
 
   const cargarCandidatos = useCallback(async () => {
     setCargando(true);
@@ -48,6 +51,15 @@ export default function AdminCandidatos() {
   useEffect(() => {
     cargarCandidatos();
   }, [cargarCandidatos]);
+
+  useEffect(() => {
+    if (parametros.get('nueva') !== '1') return;
+
+    setMostrarPostulacion(true);
+    const siguientes = new URLSearchParams(parametros);
+    siguientes.delete('nueva');
+    setParametros(siguientes, { replace: true });
+  }, [parametros, setParametros]);
 
   const visibles = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
@@ -74,10 +86,14 @@ export default function AdminCandidatos() {
         titulo="Candidatos registrados"
         descripcion={`${candidatos.length} postulaciones en el sistema (${totalExternas} externas y ${totalInternas} internas)`}
         acciones={
-          <Link to="/admin/postular-interno" className="btn btn-aqua btn-sm">
+          <button
+            type="button"
+            className="btn btn-aqua btn-sm"
+            onClick={() => setMostrarPostulacion(true)}
+          >
             <i className="bi bi-person-plus me-1" aria-hidden="true" />
             Nueva postulación interna
-          </Link>
+          </button>
         }
       />
 
@@ -221,6 +237,14 @@ export default function AdminCandidatos() {
       </div>
 
       <VisorCvModal candidato={candidatoCv} visible={Boolean(candidatoCv)} onCerrar={() => setCandidatoCv(null)} />
+
+      {mostrarPostulacion && (
+        <PostulacionInternaModal
+          visible
+          onCerrar={() => setMostrarPostulacion(false)}
+          onGuardado={cargarCandidatos}
+        />
+      )}
     </>
   );
 }

@@ -21,12 +21,12 @@ El proyecto es un monolito con frontend SPA en React y backend PHP sobre MySQL. 
 ### Módulo Administrador
 - Dashboard con métricas de postulaciones y evaluaciones.
 - Listado de candidatos con previsualización y descarga del CV.
-- Registro manual de postulaciones internas.
+- Registro de postulaciones internas mediante un modal, con CV opcional.
 - CRUD de usuarios del sistema (crear, editar, eliminar, activar/inactivar).
 - Historial y trazabilidad de solicitudes.
 
 ### Módulo Analista de Reclutamiento
-- Registro y edición de candidatos, con listado, detalle y previsualización del CV almacenado.
+- Registro de postulaciones internas con CV opcional y edición de candidatos, con listado, detalle y previsualización/descarga del CV.
 - Creación, listado, filtros y detalle de solicitudes de evaluación.
 - Asignación de un evaluador responsable y de la prioridad del proceso.
 
@@ -168,7 +168,7 @@ npm run dev
 
 | ID | Rol | Acceso |
 | --- | --- | --- |
-| 1 | Administrador | `/admin/dashboard`, postulación interna, usuarios e historial |
+| 1 | Administrador | `/admin/dashboard`, candidatos, usuarios e historial |
 | 2 | Analista de Reclutamiento | Candidatos, solicitudes y creación de solicitudes |
 | 3 | Profesional Evaluador | Solo las solicitudes asignadas a su usuario |
 | 4 | Colaborador | Sin acceso a módulos de gestión; puede ser postulante interno |
@@ -214,14 +214,13 @@ Reglas:
 
 ### 5.4 Postulación interna
 
-- Solo puede registrarla un usuario autenticado con rol **Administrador**.
-- Se accede desde `/admin/postular-interno`.
-- Reutiliza el mismo controlador `c_candidato.php`, enviando el `idUsuario` del administrador en sesión.
-- Si se envía `idUsuario` sin sesión de Administrador, el backend responde `403`.
-- Los campos obligatorios y validaciones son los mismos que en la postulación externa, excepto la autorización de consentimiento, que no se exige en el formulario interno.
-- La postulación queda asociada al usuario administrador que la registra y se identifica como interna.
-- El currículum también es obligatorio en el formulario interno actual.
+- Puede registrarla un usuario autenticado con rol **Administrador**.
+- Se accede desde **Administrador → Candidatos → Nueva postulación interna**, que abre un modal.
+- El formulario consume `backend/api/candidatos/crear.php` en formato multipart; la fecha de registro se toma del sistema y es de solo lectura.
+- La postulación queda asociada al usuario que la registra y se identifica como interna.
+- El currículum es opcional: admite PDF, DOC o DOCX de hasta 5 MB.
 - El formulario permite observaciones de hasta 500 caracteres.
+- Ya no existe una página de postulación directa en `/admin/postular-interno`; el alta se realiza desde el modal de Candidatos.
 
 ### 5.5 Gestión de usuarios
 
@@ -239,8 +238,9 @@ Reglas:
 
 - Un candidato puede originarse por postulación externa o interna.
 - El origen se distingue por el tipo de postulación (`externa` / `interna`).
-- El Analista puede registrar candidatos externos manualmente y editar sus datos principales; el Administrador mantiene la postulación interna.
-- Los candidatos externos pueden tener currículum adjunto; las postulaciones internas se respaldan con el legajo del colaborador.
+- El Analista registra postulaciones internas manualmente y puede adjuntar el CV (opcional); el Administrador mantiene la postulación interna desde su módulo.
+- La postulación interna registrada por el Analista queda vinculada al usuario de la sesión (`candidato.idUsuario`), por lo que el origen se muestra como interna.
+- Los candidatos externos pueden tener currículum adjunto; las postulaciones internas pueden respaldarse con el CV cargado o con el legajo del colaborador.
 - El estado del candidato se deriva de su última solicitud y evaluación: `pendiente`, `en_proceso`, `apto`, `no_apto` o `con_observaciones`.
 - El CV se previsualiza desde el archivo almacenado en el servidor: PDF en un visor integrado y DOCX convertido a HTML. Los `.doc` antiguos no se previsualizan, pero se pueden descargar. La descarga se hace mediante un endpoint autenticado y conserva el nombre `CV_<id>`.
 
@@ -300,8 +300,8 @@ Reglas:
 - Registro de postulaciones externas e internas en la tabla `candidato`.
 - Carga de currículum con validación y almacenamiento.
 - Catálogo de familias y cargos desde base de datos.
-- Módulo Analista: listado, registro, edición y detalle de candidatos con previsualización y descarga del CV en PDF, DOC y DOCX.
-- Módulo Administrador: listado de candidatos con previsualización y descarga del CV.
+- Módulo Analista: registro de postulaciones internas con CV opcional, listado, edición y detalle de candidatos con previsualización y descarga del CV en PDF, DOC y DOCX.
+- Módulo Administrador: listado de candidatos y registro de postulaciones internas con CV opcional mediante modal.
 - Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
 
 ### Implementado con datos simulados
