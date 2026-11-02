@@ -380,15 +380,6 @@ export default function AdminUsuarios() {
         }
       />
 
-      {soloLectura && (
-        <div className="alert alert-info d-flex align-items-center gap-2" role="status">
-          <i className="bi bi-shield-lock" aria-hidden="true" />
-          <span className="small">
-            Perfil Jefatura: acceso de solo lectura. No puedes crear, editar ni eliminar usuarios.
-          </span>
-        </div>
-      )}
-
       <div className="aqua-card">
         <div className="card-header">
           <div className="row g-2">
