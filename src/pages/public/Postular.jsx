@@ -252,8 +252,8 @@ export default function Postular() {
         <div className="container">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div className="public-brand">
-              <span className="aqua-brand-mark" aria-hidden="true">
-                <i className="bi bi-water" />
+              <span className="aqua-brand-mark aqua-logo-box" aria-hidden="true">
+                <img src="/ImagenRedes_Aqua.webp" alt="" className="aqua-logo-img" />
               </span>
               <div>
                 <span className="public-brand-title">AquaChile</span>

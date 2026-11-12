@@ -62,8 +62,8 @@ export default function Login() {
 
             <div className="position-relative" style={{ zIndex: 1 }}>
               <div className="d-flex align-items-center gap-2 mb-4">
-                <span className="d-inline-flex align-items-center justify-content-center bg-white rounded-3 shadow-sm" style={{ width: 42, height: 42 }} aria-hidden="true">
-                  <i className="bi bi-water text-primary" style={{ fontSize: '1.4rem' }} />
+                <span className="d-inline-flex align-items-center justify-content-center aqua-logo-box" aria-hidden="true">
+                  <img src="/ImagenRedes_Aqua.webp" alt="" className="aqua-logo-img" />
                 </span>
                 <span className="d-flex flex-column lh-sm">
                   <span className="fw-semibold text-uppercase" style={{ letterSpacing: '0.08em', color: '#81f0ff', fontSize: '0.95rem' }}>AquaChile</span>
@@ -119,8 +119,8 @@ export default function Login() {
           <div className="col-lg-7 bg-white p-4 p-lg-5 d-flex flex-column justify-content-center">
             <div className="w-100 mx-auto" style={{ maxWidth: 480 }}>
               <div className="d-flex align-items-center gap-3 mb-4">
-                <span className="d-inline-flex align-items-center justify-content-center rounded-3" style={{ width: 48, height: 48, backgroundColor: '#eff4ff', border: '1px solid #d3e4fe' }} aria-hidden="true">
-                  <i className="bi bi-water" style={{ color: '#0e3a5d', fontSize: '1.3rem' }} />
+                <span className="d-inline-flex align-items-center justify-content-center aqua-logo-box" aria-hidden="true">
+                  <img src="/ImagenRedes_Aqua.webp" alt="" className="aqua-logo-img" />
                 </span>
                 <span>
                   <h2 className="h5 fw-semibold mb-0" style={{ color: '#00243f' }}>Acceso Plataforma</h2>

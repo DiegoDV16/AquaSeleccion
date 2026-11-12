@@ -11,8 +11,8 @@ export default function NotFound() {
       <div className="container py-5 flex-grow-1 d-flex align-items-center justify-content-center">
         <div className="aqua-card text-center w-100" style={{ maxWidth: 640 }}>
           <div className="card-body p-5">
-            <span className="d-inline-flex align-items-center justify-content-center rounded-3 mb-4" style={{ width: 56, height: 56, backgroundColor: '#eff4ff', border: '1px solid #d3e4fe' }} aria-hidden="true">
-              <i className="bi bi-water" style={{ color: '#0e3a5d', fontSize: '1.5rem' }} />
+            <span className="d-inline-flex align-items-center justify-content-center mb-4 aqua-logo-box" aria-hidden="true">
+              <img src="/ImagenRedes_Aqua.webp" alt="" className="aqua-logo-img" />
             </span>
             <p className="display-6 fw-bold mb-1" style={{ color: '#0e3a5d' }}>404</p>
             <h1 className="h5 fw-semibold mb-2" style={{ color: '#00243f' }}>Página no encontrada</h1>

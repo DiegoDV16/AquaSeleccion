@@ -66,8 +66,8 @@ export default function Navbar({ sidebarAbierto, onToggleSidebar }) {
         </button>
 
         <Link className="navbar-brand d-flex align-items-center gap-2 me-lg-3" to={rol?.rutaInicio ?? '/login'}>
-          <span className="aqua-brand-mark" aria-hidden="true">
-            <i className="bi bi-water" />
+          <span className="aqua-brand-mark aqua-logo-box" aria-hidden="true">
+            <img src="/ImagenRedes_Aqua.webp" alt="" className="aqua-logo-img" />
           </span>
           <span className="d-flex flex-column lh-sm">
             <span className="fw-semibold">AquaSeleccion</span>

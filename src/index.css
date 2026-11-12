@@ -136,6 +136,14 @@ body {
   box-shadow: 0 2px 6px rgba(14, 58, 93, 0.28);
 }
 
+/* Logo institucional: se ajusta al contenedor sin deformarse */
+.aqua-logo-img {
+  display: block;
+  width: auto;
+  height: 46px;
+  object-fit: contain;
+}
+
 .aqua-avatar {
   width: 34px;
   height: 34px;
@@ -1753,6 +1761,21 @@ padding-bottom: 1.25rem;
   font-size: 1.25rem;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.aqua-logo-box,
+.public-brand .aqua-logo-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  flex: 0 0 auto;
+  padding: 0.45rem 0.85rem;
+  background-color: #fff;
+  border: 1px solid var(--aqua-border);
+  border-radius: 10px;
+  box-shadow: var(--aqua-shadow);
 }
 
 .public-brand-title,
