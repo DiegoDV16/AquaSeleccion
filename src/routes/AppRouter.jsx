@@ -19,6 +19,7 @@ import AnalistaSolicitudDetalle from '../pages/analista/AnalistaSolicitudDetalle
 
 import EvaluadorMisSolicitudes from '../pages/evaluador/EvaluadorMisSolicitudes.jsx';
 import EvaluadorEvaluar from '../pages/evaluador/EvaluadorEvaluar.jsx';
+import EvaluadorEntrevistaIA from '../pages/evaluador/EvaluadorEntrevistaIA.jsx';
 
 import SinPermisos from '../pages/SinPermisos.jsx';
 import NotFound from '../pages/NotFound.jsx';
@@ -149,6 +150,14 @@ export default function AppRouter() {
           element={
             <RutaProtegida rolesPermitidos={PERMISOS.EVALUADOR}>
               <EvaluadorEvaluar />
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/evaluador/entrevista/:id"
+          element={
+            <RutaProtegida rolesPermitidos={PERMISOS.EVALUADOR}>
+              <EvaluadorEntrevistaIA />
             </RutaProtegida>
           }
         />

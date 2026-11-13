@@ -164,15 +164,21 @@ mysql -u root aquaseleccion < backend/sql/migracion_jefatura.sql
 mysql -u root aquaseleccion < backend/sql/migracion_seguridad.sql
 ```
 
-8. Copiar la plantilla de conexión:
+8. Crear la tabla de entrevistas asistidas por IA:
+
+```bash
+mysql -u root aquaseleccion < backend/sql/migracion_entrevista_ia.sql
+```
+
+9. Copiar la plantilla de conexión:
 
 ```bash
 cp backend/config/conexion.example.php backend/config/conexion.php
 ```
 
-9. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
-10. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
-11. Iniciar el frontend:
+10. Ajustar las credenciales en `backend/config/conexion.php` si es necesario.
+11. Verificar que Apache sirva el proyecto en `http://localhost/AquaSeleccion`.
+12. Iniciar el frontend:
 
 ```bash
 npm run dev
@@ -182,6 +188,20 @@ npm run dev
 - Postulación pública: `http://localhost:5173/postular`
 - Login: `http://localhost:5173/login`
 - Backend: `http://localhost/AquaSeleccion/backend`
+
+### Configuración de IA para entrevistas
+
+La transcripción en vivo usa la Web Speech API del navegador y requiere Chrome o Edge.
+
+La generación del documento usa un proveedor compatible con OpenAI. La clave **no se guarda en el repositorio**; debe configurarse como variable de entorno del servidor Apache:
+
+```text
+IA_API_KEY=tu_clave
+IA_BASE_URL=https://api.openai.com/v1
+IA_CHAT_MODEL=gpt-4o-mini
+```
+
+Después de configurarla, reinicia Apache. Si no existe `IA_API_KEY`, la transcripción sigue funcionando, pero el botón **Generar borrador** devuelve un mensaje indicando que la IA no está configurada.
 
 ### Scripts disponibles
 
@@ -193,7 +213,7 @@ npm run dev
 | `npm run lint` | Análisis estático con ESLint |
 | `npm test -- --run` | Ejecuta la suite completa de Vitest |
 
-> La suite actual contiene **17 archivos y 77 pruebas**, todas aprobadas. Cubre layout, autenticación, permisos por rol, filtros, historial, formularios de postulación, creación de solicitudes, evaluación y lectura de usuarios. No se mide cobertura formal ni se cubren todos los formularios CRUD.
+> La suite actual contiene **26 archivos y 89 pruebas**, todas aprobadas. Cubre layout, autenticación, permisos por rol, filtros, historial, formularios de postulación, creación de solicitudes, evaluación, lectura de usuarios y entrevista asistida por IA. No se mide cobertura formal ni se cubren todos los formularios CRUD.
 
 ---
 
@@ -346,6 +366,7 @@ Reglas:
 - Módulo Administrador: listado de candidatos y registro de postulaciones internas con CV opcional mediante modal.
 - Módulo Analista: creación, listado con filtros y detalle de solicitudes de evaluación en `solicitudevaluacion`.
 - Módulo Evaluador: bandeja de solicitudes asignadas, ficha del postulante, CV, borrador y finalización de la evaluación psicolaboral con persistencia en `evaluacion`.
+- Módulo Evaluador: entrevista presencial con transcripción en vivo, consentimiento y generación de un borrador de documento mediante IA.
 - Módulo Administrador: dashboard con métricas, solicitudes recientes, actividad y distribuciones calculadas desde MySQL.
 - Módulo Jefatura: panel de resoluciones por evaluador, usuarios e historial en modo solo lectura.
 - Historial y trazabilidad de solicitudes en `historialsolicitudes`, con filtros por tipo, estado, texto y mes.
@@ -353,6 +374,8 @@ Reglas:
 
 ### Pendiente o limitado
 - Recuperación de contrasena.
+- La transcripción en vivo depende de la Web Speech API de Chrome/Edge y de permisos de micrófono.
+- La generación del documento requiere configurar `IA_API_KEY` en el servidor.
 - Cobertura de pruebas limitada a layout, autenticación, permisos, filtros, historial y formularios principales; no se mide cobertura formal.
 - Configuración de entorno para producción (las URLs del backend están fijadas a `localhost/AquaSeleccion`).
 

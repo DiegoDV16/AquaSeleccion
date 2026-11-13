@@ -64,6 +64,12 @@ La aplicación permite demostrar el recorrido completo desde el frontend y manti
   - No apto.
   - Con observaciones.
 - Persistencia del estado de la solicitud.
+- Entrevista presencial asistida:
+  - Consentimiento explícito del postulante.
+  - Transcripción en vivo desde el navegador.
+  - Edición manual de la transcripción.
+  - Generación de un borrador de documento con IA.
+  - Revisión humana obligatoria antes de usarlo.
 
 ### 2.5 Módulo Administrador
 
@@ -119,7 +125,7 @@ La aplicación permite demostrar el recorrido completo desde el frontend y manti
 | Cobertura formal de pruebas | No medida; existen pruebas de componentes, permisos, filtros e historial |
 | Exportaciones distintas de CSV | Pendiente |
 
-> Los datos utilizados son ficticios o anonimizados. No se usan datos personales reales.
+> Los datos utilizados son ficticios o anonimizados. No se usan datos personales reales. La entrevista asistida requiere consentimiento explícito y revisión humana del borrador generado por IA.
 
 ---
 
@@ -202,8 +208,8 @@ npm test -- --run
 **Resultado de la ejecución:**
 
 ```text
-Test Files  17 passed (17)
-Tests       77 passed (77)
+Test Files  26 passed (26)
+Tests       89 passed (89)
 ```
 
 **Archivos principales:**
@@ -232,7 +238,7 @@ Tests       77 passed (77)
 | IE2.1.1 Estructura React y pertinencia VcM | Flujo completo de candidato, solicitud, evaluación y auditoría |
 | IE2.1.2 Componentes, props y responsive | Componentes UI reutilizables, `.map()`, Bootstrap 5 y vistas adaptables |
 | IE2.1.5 Estado, formularios, filtros y navegación | `useState`, `useEffect`, validaciones, filtros y React Router |
-| IE2.2.1 / IE2.3.1 Pruebas Vitest | 17 archivos y 77 pruebas ejecutadas correctamente |
+| IE2.2.1 / IE2.3.1 Pruebas Vitest | 26 archivos y 89 pruebas ejecutadas correctamente |
 | IE2.1.3 Problema y diseño frontend | Este documento y README explican problema, alcance y solución |
 | IE2.1.4 Dominio de componentes y responsividad | Arquitectura de componentes y uso de Bootstrap documentados |
 | IE2.1.6 Flujo interactivo y coherencia | Recorrido funcional de postulación a historial |

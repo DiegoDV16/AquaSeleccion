@@ -243,6 +243,10 @@ export default function EvaluadorEvaluar() {
         acciones={
           <>
             <EstadoBadge estado={solicitud.estado} />
+            <Link to={`/evaluador/entrevista/${id}`} className="btn btn-aqua btn-sm">
+              <i className="bi bi-stars me-1" aria-hidden="true" />
+              Entrevista con IA
+            </Link>
             <Link to="/evaluador/mis-solicitudes" className="btn btn-soft btn-sm">
               <i className="bi bi-arrow-left me-1" aria-hidden="true" />
               Volver
