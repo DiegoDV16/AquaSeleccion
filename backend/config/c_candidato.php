@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/conexion.php';
 require_once __DIR__ . '/sesion.php';
+require_once __DIR__ . '/../helpers/mailer.php';
 
 /**
  * Responde siempre en JSON para que el formulario publico pueda mostrar el
@@ -111,13 +112,19 @@ if ($idFamiliaCargo === false || $idFamiliaCargo < 1 || $idCargo === false || $i
 
 $pdo = obtenerConexion();
 $consultaCargo = $pdo->prepare(
-    'SELECT 1 FROM cargo WHERE idCargo = :idCargo AND idFamiliaCargo = :idFamiliaCargo'
+    'SELECT c.cargo, fc.familiaCargo AS familia
+       FROM cargo c
+       INNER JOIN familiacargo fc ON fc.idFamiliaCargo = c.idFamiliaCargo
+      WHERE c.idCargo = :idCargo
+        AND c.idFamiliaCargo = :idFamiliaCargo
+      LIMIT 1'
 );
 $consultaCargo->execute([
     'idCargo' => $idCargo,
     'idFamiliaCargo' => $idFamiliaCargo,
 ]);
-if ($consultaCargo->fetchColumn() === false) {
+$cargoInfo = $consultaCargo->fetch();
+if (!$cargoInfo) {
     responder(400, 'El cargo seleccionado no está disponible en esa familia. Vuelve a elegirlo.');
 }
 
@@ -189,6 +196,24 @@ if ($idCandidato === false || $idCandidato === '0' || $idCandidato === '') {
 
 if ($idUsuario !== null) {
     responder(201, 'Postulación interna registrada correctamente.');
+}
+
+try {
+    notificarNuevaPostulacion($pdo, [
+        'idCandidato' => (int) $idCandidato,
+        'nombres' => $nombres,
+        'apellidoPaterno' => $apellidoPaterno,
+        'apellidoMaterno' => $apellidoMaterno,
+        'correo' => $correo,
+        'telefono' => $telefono,
+        'cargo' => (string) $cargoInfo['cargo'],
+        'familia' => (string) $cargoInfo['familia'],
+        'fecha' => date('d-m-Y'),
+        'observaciones' => $observaciones,
+    ]);
+} catch (Throwable $errorCorreo) {
+    // La postulación ya quedó registrada: un fallo de correo no debe perderla.
+    error_log('No se pudo notificar la postulación al analista: ' . $errorCorreo->getMessage());
 }
 
 responder(201, 'Tu postulación fue enviada correctamente. El equipo de Personas revisará tus antecedentes.');

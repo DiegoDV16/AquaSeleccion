@@ -183,6 +183,43 @@ npm run dev
 - Login: `http://localhost:5173/login`
 - Backend: `http://localhost/AquaSeleccion/backend`
 
+### Configuración de Resend
+
+El correo al analista se envía desde PHP, nunca desde el navegador. Por eso no requiere cambios de CORS en `vite.config.js`.
+
+1. Copiar la plantilla:
+
+```bash
+cp backend/config/resend.example.php backend/config/resend.php
+```
+
+2. Configurar la API key y el remitente en `backend/config/resend.php`:
+
+```php
+return [
+    'api_key' => 're_TU_API_KEY',
+    'from' => 'AquaSeleccion <onboarding@resend.dev>',
+    'analyst_fallback' => 'analista@aquachile.cl',
+    'test_recipient' => '',
+    'app_url' => 'http://localhost:5173',
+];
+```
+
+3. En modo de prueba, Resend solo permite enviar al correo propietario de la cuenta si no hay un dominio verificado. Usa `test_recipient` para redirigir temporalmente los correos de prueba.
+
+4. Para producción:
+
+- Verificar un dominio en Resend.
+- Cambiar `from` por un correo del dominio verificado.
+- Dejar `test_recipient` vacío.
+- Configurar `analyst_fallback` o mantener analistas activos en la tabla `usuario`.
+
+El correo se envía a todos los usuarios activos con rol **Analista**. Si no existe ninguno, se usa `analyst_fallback`.
+
+La plantilla está en `backend/templates/emails/postulacion_analista.php` e incluye versión HTML y texto plano. No adjunta el CV por seguridad.
+
+**Importante:** `backend/config/resend.php` está en `.gitignore`. No subir la API key al repositorio.
+
 ### Scripts disponibles
 
 | Comando | Descripción |
@@ -193,7 +230,7 @@ npm run dev
 | `npm run lint` | Análisis estático con ESLint |
 | `npm test -- --run` | Ejecuta la suite completa de Vitest |
 
-> La suite actual contiene **17 archivos y 77 pruebas**, todas aprobadas. Cubre layout, autenticación, permisos por rol, filtros, historial, formularios de postulación, creación de solicitudes, evaluación y lectura de usuarios. No se mide cobertura formal ni se cubren todos los formularios CRUD.
+> La suite actual contiene **25 archivos y 87 pruebas**, todas aprobadas. Cubre layout, autenticación, permisos por rol, filtros, historial, formularios de postulación, creación de solicitudes, evaluación y lectura de usuarios. No se mide cobertura formal ni se cubren todos los formularios CRUD.
 
 ---
 
