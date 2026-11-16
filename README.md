@@ -243,6 +243,8 @@ Reglas:
 - El archivo se valida por extensión y tipo MIME real.
 - Tamaño máximo de archivo: 5 MB; nombre de archivo máximo: 255 caracteres.
 - El archivo se guarda con un nombre aleatorio en `backend/uploads/cv`.
+- Además de la copia local, el currículum se envía a Google Drive mediante un Web App de Apps Script (`docs/drive/Code.gs`), dentro de una carpeta por postulante (`APELLIDO_PATERNO APELLIDO_MATERNO NOMBRES - ID`). La configuración está en `backend/config/drive.php` (copiar desde `drive.example.php`).
+- Si la subida a Drive falla, no se registra la postulación y se elimina la copia local.
 - Si falla el registro en base de datos, el archivo subido se elimina.
 - La postulación se registra como candidato externo (`idUsuario = NULL`) con fecha de solicitud y número de seguimiento.
 - La autorización de tratamiento de datos es obligatoria, conforme a la Ley N° 19.628.

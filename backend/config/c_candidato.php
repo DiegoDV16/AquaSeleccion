@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/conexion.php';
 require_once __DIR__ . '/sesion.php';
+require_once __DIR__ . '/../helpers/drive_cv.php';
 
 /**
  * Responde siempre en JSON para que el formulario publico pueda mostrar el
@@ -158,6 +159,8 @@ if (!move_uploaded_file($archivo['tmp_name'], $destinoCv)) {
 $rutaCv = 'uploads/cv/' . $nombreCv;
 $fechaSolicitud = date('Y-m-d');
 
+$pdo->beginTransaction();
+
 $stmt = $pdo->prepare(
     'INSERT INTO candidato
         (idUsuario, idCargo, nombres, apellidoPaterno, apellidoMaterno, correo, telefono, curriculumCv, fechaSolicitud, observaciones)
@@ -187,6 +190,15 @@ if ($idCandidato === false || $idCandidato === '0' || $idCandidato === '') {
     throw new RuntimeException('La base de datos no devolvió el identificador del candidato.');
 }
 
+subirCvADrive(
+    $destinoCv,
+    nombreSeguroDrive($apellidoPaterno . ' ' . $apellidoMaterno . ' ' . $nombres . ' - ' . $idCandidato),
+    'CV_' . $idCandidato . '.' . $extensionCv,
+    $mimeCv
+);
+
+$pdo->commit();
+
 if ($idUsuario !== null) {
     responder(201, 'Postulación interna registrada correctamente.');
 }
@@ -194,6 +206,10 @@ if ($idUsuario !== null) {
 responder(201, 'Tu postulación fue enviada correctamente. El equipo de Personas revisará tus antecedentes.');
 } catch (Throwable $e) {
     restore_error_handler();
+
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
 
     if ($destinoCv !== null && is_file($destinoCv) && !@unlink($destinoCv)) {
         error_log('No fue posible eliminar el CV tras fallar el registro: ' . $destinoCv);
