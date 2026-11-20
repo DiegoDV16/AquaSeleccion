@@ -194,22 +194,47 @@ if ($idCandidato === false || $idCandidato === '0' || $idCandidato === '') {
     throw new RuntimeException('La base de datos no devolvió el identificador del candidato.');
 }
 
+$candidatoDb = $pdo->prepare(
+    'SELECT c.nombres,
+            c.apellidoPaterno,
+            c.apellidoMaterno,
+            c.correo,
+            c.telefono,
+            c.observaciones,
+            c.fechaSolicitud,
+            ca.cargo,
+            fc.familiaCargo
+       FROM candidato c
+       INNER JOIN cargo ca ON ca.idCargo = c.idCargo
+       INNER JOIN familiacargo fc ON fc.idFamiliaCargo = ca.idFamiliaCargo
+      WHERE c.idCandidato = :idCandidato
+      LIMIT 1'
+);
+$candidatoDb->execute([':idCandidato' => $idCandidato]);
+$datosCandidato = $candidatoDb->fetch();
+
+if (!$datosCandidato) {
+    throw new RuntimeException('No se pudo recuperar la postulación recién creada.');
+}
+
 if ($idUsuario !== null) {
     responder(201, 'Postulación interna registrada correctamente.');
 }
 
 try {
+    $fechaCorreo = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $datosCandidato['fechaSolicitud']);
+
     notificarNuevaPostulacion($pdo, [
         'idCandidato' => (int) $idCandidato,
-        'nombres' => $nombres,
-        'apellidoPaterno' => $apellidoPaterno,
-        'apellidoMaterno' => $apellidoMaterno,
-        'correo' => $correo,
-        'telefono' => $telefono,
-        'cargo' => (string) $cargoInfo['cargo'],
-        'familia' => (string) $cargoInfo['familia'],
-        'fecha' => date('d-m-Y'),
-        'observaciones' => $observaciones,
+        'nombres' => (string) $datosCandidato['nombres'],
+        'apellidoPaterno' => (string) $datosCandidato['apellidoPaterno'],
+        'apellidoMaterno' => (string) $datosCandidato['apellidoMaterno'],
+        'correo' => (string) $datosCandidato['correo'],
+        'telefono' => (string) $datosCandidato['telefono'],
+        'cargo' => (string) $datosCandidato['cargo'],
+        'familia' => (string) $datosCandidato['familiaCargo'],
+        'fecha' => $fechaCorreo instanceof DateTimeImmutable ? $fechaCorreo->format('d-m-Y') : date('d-m-Y'),
+        'observaciones' => (string) $datosCandidato['observaciones'],
     ]);
 } catch (Throwable $errorCorreo) {
     // La postulación ya quedó registrada: un fallo de correo no debe perderla.
