@@ -14,6 +14,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../helpers/autorizacion.php';
 require_once __DIR__ . '/../../helpers/historial.php';
+require_once __DIR__ . '/../../helpers/mailer.php';
 
 requerirPost();
 $sesion = requerirRoles(['analista']);
@@ -48,9 +49,12 @@ try {
     $pdo->beginTransaction();
 
     $candidato = $pdo->prepare(
-        'SELECT c.idCandidato, c.idUsuario, c.idCargo, ca.cargo
+        'SELECT c.idCandidato, c.idUsuario, c.idCargo,
+                c.nombres, c.apellidoPaterno, c.apellidoMaterno,
+                ca.cargo, fc.familiaCargo
            FROM candidato c
            INNER JOIN cargo ca ON ca.idCargo = c.idCargo
+           INNER JOIN familiacargo fc ON fc.idFamiliaCargo = ca.idFamiliaCargo
           WHERE c.idCandidato = :idCandidato
           FOR UPDATE'
     );
@@ -63,7 +67,7 @@ try {
     }
 
     $evaluador = $pdo->prepare(
-        'SELECT idUsuario, nombres, apellidoPaterno
+        'SELECT idUsuario, nombres, apellidoPaterno, correo
            FROM usuario
           WHERE idUsuario = :idEvaluador AND idRol = 3 AND estado = 1
           LIMIT 1'
@@ -132,6 +136,33 @@ try {
     ]);
 
     $pdo->commit();
+
+    try {
+        $candidatoNombre = trim(
+            (string) $candidatoFila['nombres'] . ' '
+            . (string) $candidatoFila['apellidoPaterno'] . ' '
+            . (string) $candidatoFila['apellidoMaterno']
+        );
+
+        notificarAsignacionEvaluador(
+            [
+                'correo' => (string) $evaluadorFila['correo'],
+                'nombre' => $evaluadorNombre,
+            ],
+            [
+                'idSolicitud' => $idSolicitud,
+                'candidato' => $candidatoNombre,
+                'cargo' => (string) $candidatoFila['cargo'],
+                'familia' => (string) $candidatoFila['familiaCargo'],
+                'prioridad' => $prioridad,
+                'fecha' => date('d-m-Y'),
+                'observaciones' => $observaciones,
+            ]
+        );
+    } catch (Throwable $errorCorreo) {
+        // La asignación ya quedó guardada: un fallo de correo no debe deshacerla.
+        error_log('No se pudo enviar el correo de asignacion al evaluador: ' . $errorCorreo->getMessage());
+    }
 
     responder([
         'ok' => true,

@@ -185,7 +185,7 @@ npm run dev
 
 ### Configuración de Resend
 
-El correo al analista se envía desde PHP, nunca desde el navegador. Por eso no requiere cambios de CORS en `vite.config.js`.
+El correo al analista y al evaluador se envía desde PHP, nunca desde el navegador. Por eso no requiere cambios de CORS en `vite.config.js`.
 
 1. Copiar la plantilla:
 
@@ -216,7 +216,9 @@ return [
 
 El correo se envía a todos los usuarios activos con rol **Analista**. Si no existe ninguno, se usa `analyst_fallback`.
 
-La plantilla está en `backend/templates/emails/postulacion_analista.php` e incluye versión HTML y texto plano. No adjunta el CV por seguridad.
+Cuando el analista asigna una solicitud, también se notifica al evaluador seleccionado usando el correo de su usuario. En modo de prueba, `test_recipient` redirige ambas notificaciones a la cuenta configurada.
+
+Las plantillas están en `backend/templates/emails/` e incluyen versión HTML y texto plano. No adjuntan el CV por seguridad.
 
 **Importante:** `backend/config/resend.php` está en `.gitignore`. No subir la API key al repositorio.
 

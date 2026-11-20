@@ -193,3 +193,60 @@ function notificarNuevaPostulacion(PDO $pdo, array $datos): array
         'destinatarios' => count($analistas),
     ];
 }
+
+/**
+ * Notifica al evaluador que el analista le asignó una solicitud.
+ *
+ * @param array{correo: string, nombre: string} $evaluador
+ * @param array<string, mixed> $datos
+ * @return array{ok: bool, mensaje: string, id?: string}
+ */
+function notificarAsignacionEvaluador(array $evaluador, array $datos): array
+{
+    $config = configuracionResend();
+    $destino = trim((string) ($config['test_recipient'] ?? ''));
+
+    if ($destino === '') {
+        $destino = trim((string) ($evaluador['correo'] ?? ''));
+    }
+
+    if ($destino === '') {
+        error_log('No se pudo notificar al evaluador: correo vacio.');
+
+        return ['ok' => false, 'mensaje' => 'El evaluador no tiene correo configurado.'];
+    }
+
+    $idSolicitud = (int) ($datos['idSolicitud'] ?? 0);
+    $enlace = rtrim((string) $config['app_url'], '/') . '/evaluador/evaluar/' . $idSolicitud;
+
+    $plantilla = __DIR__ . '/../templates/emails/asignacion_evaluador.php';
+    if (!is_file($plantilla)) {
+        error_log('No se encontro la plantilla de asignacion de evaluador.');
+
+        return ['ok' => false, 'mensaje' => 'No se encontro la plantilla de correo.'];
+    }
+
+    $datos['evaluador'] = (string) ($evaluador['nombre'] ?? 'Evaluador');
+    ob_start();
+    include $plantilla;
+    $html = (string) ob_get_clean();
+
+    $asunto = 'Evaluación asignada: ' . ($datos['candidato'] ?? 'Postulante') . ' · ' . ($datos['cargo'] ?? 'Cargo');
+    $texto = "Nueva evaluación asignada\n\n"
+        . 'Evaluador: ' . $datos['evaluador'] . "\n"
+        . 'Candidato: ' . ($datos['candidato'] ?? '-') . "\n"
+        . 'Cargo: ' . ($datos['cargo'] ?? '-') . "\n"
+        . 'Familia: ' . ($datos['familia'] ?? '-') . "\n"
+        . 'Prioridad: ' . ($datos['prioridad'] ?? 'normal') . "\n"
+        . 'Fecha: ' . ($datos['fecha'] ?? '-') . "\n\n"
+        . 'Abrir solicitud: ' . $enlace . "\n";
+
+    $resultado = enviarCorreoResend($destino, $asunto, $html, $texto);
+    if ($resultado['ok']) {
+        error_log('Notificacion de asignacion enviada a ' . $destino . ' (Resend ID: ' . ($resultado['id'] ?? 'sin-id') . ')');
+    } else {
+        error_log('No se pudo notificar la asignacion a ' . $destino . ': ' . ($resultado['mensaje'] ?? 'error'));
+    }
+
+    return $resultado;
+}

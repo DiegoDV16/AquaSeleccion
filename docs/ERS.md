@@ -111,7 +111,7 @@ La aplicación permite demostrar el recorrido completo desde el frontend y manti
 | Funcionalidad | Estado |
 | --- | --- |
 | Recuperación de contrasena | Pendiente |
-| Notificaciones por correo | Implementado para nuevas postulaciones públicas mediante Resend |
+| Notificaciones por correo | Implementado para postulaciones públicas y asignaciones de evaluador mediante Resend |
 | Batería psicométrica completa | Fuera del alcance; la evaluación registra antecedentes, resultado y observaciones |
 | Firma electrónica de informes | Pendiente |
 | Integración con sistemas internos de AquaChile | Pendiente |
