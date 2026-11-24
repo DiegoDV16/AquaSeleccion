@@ -11,6 +11,7 @@ dist*
 *.log
 npm-debug.log*
 /backend/config/conexion.php
+/backend/config/calendario.php
 
 # Archivos subidos por usuarios (CV): no deben versionarse
 backend/uploads/**
