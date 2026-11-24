@@ -14,6 +14,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../helpers/autorizacion.php';
 require_once __DIR__ . '/../../helpers/historial.php';
+require_once __DIR__ . '/../../helpers/calendario.php';
 
 requerirPost();
 $sesion = requerirRoles(['analista']);
@@ -48,7 +49,7 @@ try {
     $pdo->beginTransaction();
 
     $candidato = $pdo->prepare(
-        'SELECT c.idCandidato, c.idUsuario, c.idCargo, ca.cargo
+        'SELECT c.idCandidato, c.idUsuario, c.idCargo, c.nombres, c.apellidoPaterno, ca.cargo
            FROM candidato c
            INNER JOIN cargo ca ON ca.idCargo = c.idCargo
           WHERE c.idCandidato = :idCandidato
@@ -63,7 +64,7 @@ try {
     }
 
     $evaluador = $pdo->prepare(
-        'SELECT idUsuario, nombres, apellidoPaterno
+        'SELECT idUsuario, nombres, apellidoPaterno, correo
            FROM usuario
           WHERE idUsuario = :idEvaluador AND idRol = 3 AND estado = 1
           LIMIT 1'
@@ -131,12 +132,22 @@ try {
         'estado' => 'pendiente',
     ]);
 
+    $nombreCandidato = trim((string) $candidatoFila['nombres'] . ' ' . (string) $candidatoFila['apellidoPaterno']);
+
+    try {
+        $agenda = agendarEvaluacion($nombreCandidato, (string) $evaluadorFila['correo']);
+    } catch (RuntimeException $e) {
+        $pdo->rollBack();
+        responder(['ok' => false, 'mensaje' => $e->getMessage()], 502);
+    }
+
     $pdo->commit();
 
     responder([
         'ok' => true,
         'mensaje' => 'Solicitud de evaluacion creada correctamente.',
         'idSolicitud' => $idSolicitud,
+        'inicioEvaluacion' => $agenda['inicio'],
     ], 201);
 } catch (PDOException $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
