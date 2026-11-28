@@ -29,6 +29,20 @@ function iniciales(candidato) {
   return `${nombres.charAt(0)}${apellido.charAt(0)}`.toUpperCase() || '??';
 }
 
+function formatearInicio(iso) {
+  if (!iso) return '';
+
+  return new Intl.DateTimeFormat('es-CL', {
+    timeZone: 'America/Santiago',
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(iso));
+}
+
 /**
  * AnalistaNuevaSolicitud
  * Crea una solicitud de evaluacion en MySQL y la asigna a un evaluador activo.
@@ -165,6 +179,7 @@ export default function AnalistaNuevaSolicitud() {
       candidato: candidatoSeleccionado?.nombreCompleto ?? 'Candidato',
       evaluador: evaluadorSeleccionado?.nombre ?? 'Evaluador',
       cargo: candidatoSeleccionado?.cargo ?? '-',
+      inicio: formatearInicio(respuesta.inicioEvaluacion),
     });
 
     setFormulario((actual) => ({ ...actual, candidato_id: '', observaciones: '' }));
@@ -570,7 +585,8 @@ export default function AnalistaNuevaSolicitud() {
                   </h2>
                   <p className="text-muted-aqua small mb-0">
                     <strong>{confirmacion.candidato}</strong> fue asignado a{' '}
-                    <strong>{confirmacion.evaluador}</strong> para el cargo de {confirmacion.cargo}.
+                    <strong>{confirmacion.evaluador}</strong> para el cargo de {confirmacion.cargo}
+                    {confirmacion.inicio && <> para el <strong>{confirmacion.inicio}</strong></>}.
                   </p>
                 </div>
                 <div className="modal-footer justify-content-center border-0 pt-0">
